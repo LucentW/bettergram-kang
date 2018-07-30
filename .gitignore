@@ -57,3 +57,4 @@ xcuserdata
 *.*~
 .editorconfig
 Telegram/gyp/Bettergram.entitlements
+Telegram/enc_temp_folder
