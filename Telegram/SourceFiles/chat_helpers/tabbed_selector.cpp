@@ -26,42 +26,6 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 namespace ChatHelpers {
 
-class TabbedSelector::SlideAnimation : public Ui::RoundShadowAnimation {
-public:
-	enum class Direction {
-		LeftToRight,
-		RightToLeft,
-	};
-	void setFinalImages(Direction direction, QImage &&left, QImage &&right, QRect inner, bool wasSectionIcons);
-
-	void start();
-	void paintFrame(QPainter &p, float64 dt, float64 opacity);
-
-private:
-	Direction _direction = Direction::LeftToRight;
-	QPixmap _leftImage, _rightImage;
-	int _width = 0;
-	int _height = 0;
-	int _innerLeft = 0;
-	int _innerTop = 0;
-	int _innerRight = 0;
-	int _innerBottom = 0;
-	int _innerWidth = 0;
-	int _innerHeight = 0;
-
-	int _painterInnerLeft = 0;
-	int _painterInnerTop = 0;
-	int _painterInnerWidth = 0;
-	int _painterInnerBottom = 0;
-	int _painterCategoriesTop = 0;
-	int _painterInnerHeight = 0;
-	int _painterInnerRight = 0;
-
-	int _frameIntsPerLineAdd = 0;
-	bool _wasSectionIcons = false;
-
-};
-
 void TabbedSelector::SlideAnimation::setFinalImages(Direction direction, QImage &&left, QImage &&right, QRect inner, bool wasSectionIcons) {
 	Expects(!started());
 	_direction = direction;

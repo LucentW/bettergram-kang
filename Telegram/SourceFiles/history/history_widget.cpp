@@ -37,6 +37,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "profile/profile_block_group_members.h"
 #include "info/info_memento.h"
 #include "core/click_handler_types.h"
+#include "chat_helpers/bettergram_tabbed_panel.h"
+#include "chat_helpers/bettergram_tabbed_selector.h"
+#include "chat_helpers/bettergram_tabbed_section.h"
 #include "chat_helpers/tabbed_panel.h"
 #include "chat_helpers/tabbed_selector.h"
 #include "chat_helpers/tabbed_section.h"
@@ -439,7 +442,8 @@ HistoryWidget::HistoryWidget(
 , _recordCancelWidth(st::historyRecordFont->width(lang(lng_record_cancel)))
 , _a_recording(animation(this, &HistoryWidget::step_recording))
 , _kbScroll(this, st::botKbScroll)
-, _bettergramTabsPanel(this, controller)
+, _bettergramTabbedPanel(this, controller)
+, _bettergramTabbedSelector(_bettergramTabbedPanel->getSelector())
 , _tabbedPanel(this, controller)
 , _tabbedSelector(_tabbedPanel->getSelector())
 , _attachDragState(DragState::None)
@@ -573,7 +577,7 @@ HistoryWidget::HistoryWidget(
 	_botKeyboardHide->hide();
 	_botCommandStart->hide();
 
-	_bettergramTabsToggle->installEventFilter(_bettergramTabsPanel);
+	_bettergramTabsToggle->installEventFilter(_bettergramTabbedPanel);
 	_bettergramTabsToggle->setClickedCallback([this] {
 		toggleBettergramTabsMode();
 	});
@@ -587,7 +591,7 @@ HistoryWidget::HistoryWidget(
 	connect(_botKeyboardHide, SIGNAL(clicked()), this, SLOT(onKbToggle()));
 	connect(_botCommandStart, SIGNAL(clicked()), this, SLOT(onCmdStart()));
 
-	_bettergramTabsPanel->hide();
+	_bettergramTabbedPanel->hide();
 	_tabbedPanel->hide();
 	_attachDragDocument->hide();
 	_attachDragPhoto->hide();
@@ -1111,8 +1115,8 @@ void HistoryWidget::orderWidgets() {
 	if (_inlineResults) {
 		_inlineResults->raise();
 	}
-	if (_bettergramTabsPanel) {
-		_bettergramTabsPanel->raise();
+	if (_bettergramTabbedPanel) {
+		_bettergramTabbedPanel->raise();
 	}
 	if (_tabbedPanel) {
 		_tabbedPanel->raise();
@@ -2025,7 +2029,7 @@ bool HistoryWidget::contentOverlapped(const QRect &globalRect) {
 	return (_attachDragDocument->overlaps(globalRect)
 			|| _attachDragPhoto->overlaps(globalRect)
 			|| _fieldAutocomplete->overlaps(globalRect)
-			|| (_bettergramTabsPanel && _bettergramTabsPanel->overlaps(globalRect))
+			|| (_bettergramTabbedPanel && _bettergramTabbedPanel->overlaps(globalRect))
 			|| (_tabbedPanel && _tabbedPanel->overlaps(globalRect))
 			|| (_inlineResults && _inlineResults->overlaps(globalRect)));
 }
@@ -2220,8 +2224,8 @@ void HistoryWidget::updateControlsVisibility() {
 		_botKeyboardShow->hide();
 		_botKeyboardHide->hide();
 		_botCommandStart->hide();
-		if (_bettergramTabsPanel) {
-			_bettergramTabsPanel->hide();
+		if (_bettergramTabbedPanel) {
+			_bettergramTabbedPanel->hide();
 		}
 		if (_tabbedPanel) {
 			_tabbedPanel->hide();
@@ -2325,8 +2329,8 @@ void HistoryWidget::updateControlsVisibility() {
 		_botKeyboardShow->hide();
 		_botKeyboardHide->hide();
 		_botCommandStart->hide();
-		if (_bettergramTabsPanel) {
-			_bettergramTabsPanel->hide();
+		if (_bettergramTabbedPanel) {
+			_bettergramTabbedPanel->hide();
 		}
 		if (_tabbedPanel) {
 			_tabbedPanel->hide();
@@ -3044,8 +3048,8 @@ bool HistoryWidget::saveEditMsgFail(History *history, const RPCError &error, mtp
 
 void HistoryWidget::hideSelectorControlsAnimated() {
 	_fieldAutocomplete->hideAnimated();
-	if (_bettergramTabsPanel) {
-		_bettergramTabsPanel->hideAnimated();
+	if (_bettergramTabbedPanel) {
+		_bettergramTabbedPanel->hideAnimated();
 	}
 	if (_tabbedPanel) {
 		_tabbedPanel->hideAnimated();
@@ -3943,7 +3947,7 @@ void HistoryWidget::onModerateKeyActivate(int index, bool *outHandled) {
 
 void HistoryWidget::pushBettergramTabsToThirdSection(
 	const Window::SectionShow &params) {
-	if (!_history || !_bettergramTabsPanel) {
+	if (!_history || !_bettergramTabbedPanel) {
 		return;
 	}
 	else if (!_canSendMessages) {
@@ -3956,12 +3960,12 @@ void HistoryWidget::pushBettergramTabsToThirdSection(
 		&st::historyAttachEmojiActive,
 		&st::historyRecordVoiceFgActive,
 		&st::historyRecordVoiceRippleBgActive);
-	auto destroyingPanel = std::move(_bettergramTabsPanel);
-	auto memento = ChatHelpers::TabbedMemento(
+	auto destroyingPanel = std::move(_bettergramTabbedPanel);
+	auto memento = ChatHelpers::BettergramTabbedMemento(
 		destroyingPanel->takeSelector(),
 		crl::guard(this, [this](
-			object_ptr<TabbedSelector> selector) {
-		returnBettergramTabsSelector(std::move(selector));
+			object_ptr<BettergramTabbedSelector> selector) {
+		returnBettergramTabbedSelector(std::move(selector));
 	}));
 	controller()->resizeForThirdSection();
 	controller()->showSection(std::move(memento), params.withThirdColumn());
@@ -3995,7 +3999,7 @@ void HistoryWidget::pushTabbedSelectorToThirdSection(
 }
 
 void HistoryWidget::toggleBettergramTabsMode() {
-	if (_bettergramTabsPanel) {
+	if (_bettergramTabbedPanel) {
 		if (controller()->canShowThirdSection()
 			&& !Adaptive::OneColumn()) {
 			Auth().settings().setBettergramTabsSectionEnabled(true);
@@ -4004,7 +4008,7 @@ void HistoryWidget::toggleBettergramTabsMode() {
 				Window::SectionShow::Way::ClearStack);
 		}
 		else {
-			_bettergramTabsPanel->toggleAnimated();
+			_bettergramTabbedPanel->toggleAnimated();
 		}
 	}
 	else {
@@ -4028,14 +4032,14 @@ void HistoryWidget::toggleTabbedSelectorMode() {
 	}
 }
 
-void HistoryWidget::returnBettergramTabsSelector(
-	object_ptr<TabbedSelector> selector) {
-	_bettergramTabsPanel.create(
+void HistoryWidget::returnBettergramTabbedSelector(
+	object_ptr<BettergramTabbedSelector> selector) {
+	_bettergramTabbedPanel.create(
 		this,
 		controller(),
 		std::move(selector));
-	_bettergramTabsPanel->hide();
-	_bettergramTabsToggle->installEventFilter(_bettergramTabsPanel);
+	_bettergramTabbedPanel->hide();
+	_bettergramTabsToggle->installEventFilter(_bettergramTabbedPanel);
 	_bettergramTabsToggle->setColorOverrides(nullptr, nullptr, nullptr);
 	moveFieldControls();
 }
@@ -4098,8 +4102,8 @@ void HistoryWidget::moveFieldControls() {
 	if (_inlineResults) {
 		_inlineResults->moveBottom(_field->y() - st::historySendPadding);
 	}
-	if (_bettergramTabsPanel) {
-		_bettergramTabsPanel->moveBottom(buttonsBottom);
+	if (_bettergramTabbedPanel) {
+		_bettergramTabbedPanel->moveBottom(buttonsBottom);
 	}
 	if (_tabbedPanel) {
 		_tabbedPanel->moveBottom(buttonsBottom);

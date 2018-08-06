@@ -63,6 +63,8 @@ namespace ChatHelpers {
 class TabbedPanel;
 class TabbedSection;
 class TabbedSelector;
+class BettergramTabbedPanel;
+class BettergramTabbedSelector;
 } // namespace ChatHelpers
 
 namespace Storage {
@@ -434,6 +436,8 @@ private slots:
 private:
 	using TabbedPanel = ChatHelpers::TabbedPanel;
 	using TabbedSelector = ChatHelpers::TabbedSelector;
+	using BettergramTabbedPanel = ChatHelpers::BettergramTabbedPanel;
+	using BettergramTabbedSelector = ChatHelpers::BettergramTabbedSelector;
 	using DragState = Storage::MimeDataState;
 
 	void send();
@@ -441,7 +445,7 @@ private:
 	void fullPeerUpdated(PeerData *peer);
 	void toggleBettergramTabsMode();
 	void toggleTabbedSelectorMode();
-	void returnBettergramTabsSelector(object_ptr<TabbedSelector> selector);
+	void returnBettergramTabbedSelector(object_ptr<BettergramTabbedSelector> selector);
 	void returnTabbedSelector(object_ptr<TabbedSelector> selector);
 	void recountChatWidth();
 	void setReportSpamStatus(DBIPeerReportSpamStatus status);
@@ -847,7 +851,8 @@ private:
 	QTimer _membersDropdownShowTimer;
 
 	object_ptr<InlineBots::Layout::Widget> _inlineResults = { nullptr };
-	object_ptr<TabbedPanel> _bettergramTabsPanel;
+	object_ptr<BettergramTabbedPanel> _bettergramTabbedPanel;
+	QPointer<BettergramTabbedSelector> _bettergramTabbedSelector;
 	object_ptr<TabbedPanel> _tabbedPanel;
 	QPointer<TabbedSelector> _tabbedSelector;
 	DragState _attachDragState;
