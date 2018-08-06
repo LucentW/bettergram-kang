@@ -37,6 +37,7 @@ class Instance;
 } // namespace Calls
 
 namespace ChatHelpers {
+enum class BettergramSelectorTab;
 enum class SelectorTab;
 } // namespace ChatHelpers
 
@@ -63,6 +64,12 @@ public:
 	}
 	SendFilesWay sendFilesWay() const {
 		return _variables.sendFilesWay;
+	}
+	ChatHelpers::BettergramSelectorTab bettergramSelectorTab() const {
+		return _variables.bettergramSelectorTab;
+	}
+	void setBettergramSelectorTab(ChatHelpers::BettergramSelectorTab tab) {
+		_variables.bettergramSelectorTab = tab;
 	}
 	ChatHelpers::SelectorTab selectorTab() const {
 		return _variables.selectorTab;
@@ -157,6 +164,7 @@ private:
 
 		bool lastSeenWarningSeen = false;
 		SendFilesWay sendFilesWay;
+		ChatHelpers::BettergramSelectorTab bettergramSelectorTab; // per-window
 		ChatHelpers::SelectorTab selectorTab; // per-window
 		bool bettergramTabsSectionEnabled = false; // per-window
 		bool tabbedSelectorSectionEnabled = false; // per-window

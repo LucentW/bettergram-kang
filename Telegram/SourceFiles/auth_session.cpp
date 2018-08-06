@@ -21,6 +21,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "platform/platform_specific.h"
 #include "calls/calls_instance.h"
 #include "window/section_widget.h"
+#include "chat_helpers/bettergram_tabbed_selector.h"
 #include "chat_helpers/tabbed_selector.h"
 #include "boxes/send_files_box.h"
 
@@ -32,12 +33,19 @@ constexpr auto kAutoLockTimeoutLateMs = TimeMs(3000);
 
 AuthSessionSettings::Variables::Variables()
 : sendFilesWay(SendFilesWay::Album)
-, selectorTab(ChatHelpers::SelectorTab::Emoji)
+, bettergramSelectorTab(ChatHelpers::BettergramSelectorTab::Prices)
+, selectorTab(ChatHelpers::SelectorTab::Prices)
 , floatPlayerColumn(Window::Column::Second)
 , floatPlayerCorner(RectPart::TopRight) {
 }
 
 QByteArray AuthSessionSettings::serialize() const {
+	// Because we can not use App::self()->phone() here we can not use settings group
+	// and we have to save these settings for all accounts
+	QSettings settings;
+	settings.setValue("bettergramSelectorTab", static_cast<qint32>(_variables.bettergramSelectorTab));
+	settings.setValue("bettergramTabsSectionEnabled", _variables.bettergramTabsSectionEnabled);
+
 	auto size = sizeof(qint32) * 10;
 	for (auto i = _variables.soundOverrides.cbegin(), e = _variables.soundOverrides.cend(); i != e; ++i) {
 		size += Serialize::stringSize(i.key()) + Serialize::stringSize(i.value());
@@ -51,7 +59,6 @@ QByteArray AuthSessionSettings::serialize() const {
 		stream.setVersion(QDataStream::Qt_5_1);
 		stream << static_cast<qint32>(_variables.selectorTab);
 		stream << qint32(_variables.lastSeenWarningSeen ? 1 : 0);
-		stream << qint32(_variables.bettergramTabsSectionEnabled ? 1 : 0);
 		stream << qint32(_variables.tabbedSelectorSectionEnabled ? 1 : 0);
 		stream << qint32(_variables.soundOverrides.size());
 		for (auto i = _variables.soundOverrides.cbegin(), e = _variables.soundOverrides.cend(); i != e; ++i) {
@@ -78,15 +85,20 @@ QByteArray AuthSessionSettings::serialize() const {
 }
 
 void AuthSessionSettings::constructFromSerialized(const QByteArray &serialized) {
+	// Because we can not use App::self()->phone() here we can not use settings group
+	// and we have to load these settings for all accounts
+	QSettings settings;
+	qint32 bettergramSelectorTab = settings.value("bettergramSelectorTab", static_cast<qint32>(ChatHelpers::BettergramSelectorTab::Prices)).toInt();
+	qint32 bettergramTabsSectionEnabled = settings.value("bettergramTabsSectionEnabled").toInt();
+
 	if (serialized.isEmpty()) {
 		return;
 	}
 
 	QDataStream stream(serialized);
 	stream.setVersion(QDataStream::Qt_5_1);
-	qint32 selectorTab = static_cast<qint32>(ChatHelpers::SelectorTab::Emoji);
+	qint32 selectorTab = static_cast<qint32>(ChatHelpers::SelectorTab::Prices);
 	qint32 lastSeenWarningSeen = 0;
-	qint32 bettergramTabsSectionEnabled = 0;
 	qint32 tabbedSelectorSectionEnabled = 1;
 	qint32 tabbedSelectorSectionTooltipShown = 0;
 	qint32 floatPlayerColumn = static_cast<qint32>(Window::Column::Second);
@@ -101,9 +113,6 @@ void AuthSessionSettings::constructFromSerialized(const QByteArray &serialized) 
 	qint32 sendFilesWay = static_cast<qint32>(_variables.sendFilesWay);
 	stream >> selectorTab;
 	stream >> lastSeenWarningSeen;
-	if (!stream.atEnd()) {
-		stream >> bettergramTabsSectionEnabled;
-	}
 	if (!stream.atEnd()) {
 		stream >> tabbedSelectorSectionEnabled;
 	}
@@ -156,8 +165,17 @@ void AuthSessionSettings::constructFromSerialized(const QByteArray &serialized) 
 		return;
 	}
 
+	ChatHelpers::BettergramSelectorTab bettergramCheckedTab = static_cast<ChatHelpers::BettergramSelectorTab>(bettergramSelectorTab);
+	switch (bettergramCheckedTab) {
+	case ChatHelpers::BettergramSelectorTab::Prices:
+	case ChatHelpers::BettergramSelectorTab::News:
+	case ChatHelpers::BettergramSelectorTab::Icos:
+	case ChatHelpers::BettergramSelectorTab::Resources: _variables.bettergramSelectorTab = bettergramCheckedTab; break;
+	}
+
 	auto uncheckedTab = static_cast<ChatHelpers::SelectorTab>(selectorTab);
 	switch (uncheckedTab) {
+	case ChatHelpers::SelectorTab::Prices:
 	case ChatHelpers::SelectorTab::Emoji:
 	case ChatHelpers::SelectorTab::Stickers:
 	case ChatHelpers::SelectorTab::Gifs: _variables.selectorTab = uncheckedTab; break;
