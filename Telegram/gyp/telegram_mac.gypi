@@ -282,9 +282,7 @@
         '--deep',
         '-s',
         '<!(cat ../../../TelegramPrivate/mac_certificate_identity)',
-        '${BUILT_PRODUCTS_DIR}/Bettergram - Crypto Chat App.app',
-        '--entitlements',
-        '../Telegram/Telegram Desktop.entitlements'
+        '${BUILT_PRODUCTS_DIR}/Bettergram - Crypto Chat App.app'
       ],
     }]
   }]],

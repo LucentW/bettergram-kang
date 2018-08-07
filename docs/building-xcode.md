@@ -194,8 +194,11 @@ To build the `Bettergram.app` for Apple App Store you should do the following st
 2. Create new file `Telegram/build/target` with content: `macstore`
 3. Call `Telegram/gyp/refresh.sh` script
 4. Open `Telegram/Telegram.xcodeproj` in XCode
-5. `Product`->`Archive`
-6. And wait...
+5. Open `Capabilities->App Sandbox` and check the `Incomning Connections (Server)`
+6. A new file `Bettergram - Crypto Chat App.entitlements` should be appeared at the project files (left panel)
+7. Open the new file `Bettergram - Crypto Chat App.entitlements` as a source code and paste there content of the `Telegram/Telegram Desktop.entitlements` file
+8. `Product`->`Archive`
+9. And wait...
 
 ### Utils
 
