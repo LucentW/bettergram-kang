@@ -19,7 +19,6 @@ BUILD_TARGET_GENERAL_DESCRIPTION="You can change the build target at the Telegra
 
 MAC_STORE_DESCRIPTION="It will make .app directory ready for Apple App Store.
 You also need the following files:
-* TelegramPrivate/mac_certificate_identity
 * TelegramPrivate/mac_development_team"
 
 MAC_DMG_DESCRIPTION="It will make and sign .app directory and .dmg file.

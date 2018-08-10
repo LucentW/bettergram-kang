@@ -190,15 +190,16 @@ After you have placed all the files at the `TelegramPrivate` directory you shoul
 
 To build the `Bettergram.app` for Apple App Store you should do the following steps:
 
-1. Place `mac_certificate_identity` and `mac_development_team` files to `TelegramPrivate` directory. See the previous paragraph
+1. Place `mac_development_team` file to `TelegramPrivate` directory. See the previous paragraph
 2. Create new file `Telegram/build/target` with content: `macstore`
 3. Call `Telegram/gyp/refresh.sh` script
 4. Open `Telegram/Telegram.xcodeproj` in XCode
-5. Open `Capabilities->App Sandbox` and check the `Incomning Connections (Server)`
-6. A new file `Bettergram - Crypto Chat App.entitlements` should be appeared at the project files (left panel)
-7. Open the new file `Bettergram - Crypto Chat App.entitlements` as a source code and paste there content of the `Telegram/Telegram Desktop.entitlements` file
-8. `Product`->`Archive`
-9. And wait...
+5. Open `General` tab at the project settings and enable `Automatically manage signing` option
+6. Open `Capabilities->App Sandbox` and check the `Incomning Connections (Server)`
+7. A new file `Bettergram - Crypto Chat App.entitlements` should be appeared at the project files (left panel)
+8. Open the new file `Bettergram - Crypto Chat App.entitlements` as a source code and paste there content of the `Telegram/Telegram Desktop.entitlements` file
+9. `Product`->`Archive`
+10. And wait...
 
 ### Utils
 
