@@ -816,6 +816,12 @@
 <(src_loc)/bettergram/cryptoprice.h
 <(src_loc)/bettergram/cryptopricelist.cpp
 <(src_loc)/bettergram/cryptopricelist.h
+<(src_loc)/bettergram/rssitem.cpp
+<(src_loc)/bettergram/rssitem.h
+<(src_loc)/bettergram/rsschannel.cpp
+<(src_loc)/bettergram/rsschannel.h
+<(src_loc)/bettergram/rsschannellist.cpp
+<(src_loc)/bettergram/rsschannellist.h
 <(emoji_suggestions_loc)/emoji_suggestions.cpp
 <(emoji_suggestions_loc)/emoji_suggestions.h
 
