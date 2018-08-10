@@ -54,32 +54,34 @@ if [ "$MySystem" == "Linux" ]; then
   cmake .
   cd ../../Telegram/gyp
 else
-  if [ -n "$BuildTarget" ]; then
-    echo "Build target:" $BuildTarget
-  fi
+  if [ "$MySystem" == "Darwin" ]; then
+    if [ -n "$BuildTarget" ]; then
+      echo "Build target:" $BuildTarget
+    fi
 
-  if [ "$BuildTarget" == "macstore" ]; then
-    echo ""
-    echo "$MAC_STORE_DESCRIPTION"
-    echo ""
-    echo "$BUILD_TARGET_GENERAL_DESCRIPTION"
-    echo "$CHANGE_TO_MAC_DMG_DESCRIPTION"
-    echo "$CHANGE_TO_EMTPY_DESCRIPTION"
-  else if [ "$BuildTarget" == "macdmg" ]; then
-    echo ""
-    echo "$MAC_DMG_DESCRIPTION"
-    echo ""
-    echo "$BUILD_TARGET_GENERAL_DESCRIPTION"
-    echo "$CHANGE_TO_MAC_STORE_DESCRIPTION"
-    echo "$CHANGE_TO_EMTPY_DESCRIPTION"
-  else
-    echo ""
-    echo "At macOS you can build the application for Apple App Store or deliver it though your site."
-    echo "$BUILD_TARGET_GENERAL_DESCRIPTION"
-    echo "$CHANGE_TO_MAC_STORE_DESCRIPTION"
-    echo "$CHANGE_TO_MAC_DMG_DESCRIPTION"
-    echo "$CHANGE_TO_EMTPY_DESCRIPTION"
-  fi
+    if [ "$BuildTarget" == "macstore" ]; then
+      echo ""
+      echo "$MAC_STORE_DESCRIPTION"
+      echo ""
+      echo "$BUILD_TARGET_GENERAL_DESCRIPTION"
+      echo "$CHANGE_TO_MAC_DMG_DESCRIPTION"
+      echo "$CHANGE_TO_EMTPY_DESCRIPTION"
+    else if [ "$BuildTarget" == "macdmg" ]; then
+      echo ""
+      echo "$MAC_DMG_DESCRIPTION"
+      echo ""
+      echo "$BUILD_TARGET_GENERAL_DESCRIPTION"
+      echo "$CHANGE_TO_MAC_STORE_DESCRIPTION"
+      echo "$CHANGE_TO_EMTPY_DESCRIPTION"
+    else
+      echo ""
+      echo "At macOS you can build the application for Apple App Store or deliver it though your site."
+      echo "$BUILD_TARGET_GENERAL_DESCRIPTION"
+      echo "$CHANGE_TO_MAC_STORE_DESCRIPTION"
+      echo "$CHANGE_TO_MAC_DMG_DESCRIPTION"
+      echo "$CHANGE_TO_EMTPY_DESCRIPTION"
+    fi
+    fi
   fi
 
   #gyp --depth=. --generator-output=../.. -Goutput_dir=out Telegram.gyp --format=ninja
