@@ -169,11 +169,11 @@ emojiSwitchEmoji: icon {{ "emoji_switch-flip_horizontal", emojiSwitchColor }};
 pricesPanPadding: emojiPanPadding;
 pricesPanHeader: emojiPanPadding;
 pricesPanTablePadding: 6px;
-pricesPanTableHeaderHeight: 50;
-pricesPanTableRowHeight: 50;
-pricesPanTableImageSize: 24;
-pricesPanColumnPriceWidth: 85;
-pricesPanColumn24hWidth: 70;
+pricesPanTableHeaderHeight: 50px;
+pricesPanTableRowHeight: 50px;
+pricesPanTableImageSize: 24px;
+pricesPanColumnPriceWidth: 85px;
+pricesPanColumn24hWidth: 70px;
 pricesPanHover: windowBgOver; // background of selected row in prices panel
 
 // Site name icon at the PricesListWidget.
