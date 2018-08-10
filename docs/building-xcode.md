@@ -153,3 +153,43 @@ You can build `Bettergram.icns` from the icon set [Telegram/Telegram/Images.xcas
 `$ iconutil -c icns <iconset filename>`
 
 You can find the example of the `.json` file here: [node-appdmg](https://github.com/LinusU/node-appdmg). Also use this project to build the `Bettergram.dmg` file.
+
+Also you can build the signed `.app` and `.dmg` files automatically. To do that you need to place the following files to `TelegramPrivate` directory:
+
+* `Bettergram.icns`
+* `BettergramDmg.json`
+* `mac_certificate_identity`
+* `mac_development_team`
+
+Where `mac_certificate_identity` contains name of your certificate, for example:
+
+`Developer ID Application: Bettergram LLC (XACK216ZA8)`
+
+And `mac_development_team` contains your Team ID, for example:
+
+`XACK216ZA8`
+
+You can find your Team ID here: [Apple Developer Account Membership](https://developer.apple.com/account/#/membership)
+
+After you have placed all the files at the `TelegramPrivate` directory you should do the following steps:
+
+1. Create new file `Telegram/build/target` with content: `macdmg`
+2. Call `Telegram/gyp/refresh.sh` script
+3. Open `Telegram/Telegram.xcodeproj` in XCode
+4. `Product`->`Scheme`->`Edit Scheme...`
+5. Select `Run` configuration
+6. Set up `Build Configuration` to `Release` and click to `Close` button
+7. `Product`->`Clean`
+8. `Product`->`Build For`->`Running`
+9. And wait...
+
+### Building the Bettergram.app for Apple App Store
+
+To build the `Bettergram.app` for Apple App Store you should do the following steps:
+
+1. Place `mac_certificate_identity` and `mac_development_team` files to `TelegramPrivate` directory. See the previous paragraph
+2. Create new file `Telegram/build/target` with content: `macstore`
+3. Call `Telegram/gyp/refresh.sh` script
+4. Open `Telegram/Telegram.xcodeproj` in XCode
+5. `Product`->`Archive`
+6. And wait...
