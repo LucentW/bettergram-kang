@@ -24,6 +24,8 @@ public:
 	const QSharedPointer<RssChannel> &at(int index) const;
 	int count() const;
 
+	void add(const QUrl &channelLink);
+
 	void parse();
 
 public slots:

@@ -9,6 +9,12 @@ RssChannel::RssChannel(QObject *parent) :
 {
 }
 
+RssChannel::RssChannel(const QUrl &link, QObject *parent) :
+	QObject(parent),
+	_link(link)
+{
+}
+
 const QString &RssChannel::title() const
 {
 	return _title;

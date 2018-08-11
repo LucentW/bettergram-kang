@@ -16,6 +16,7 @@ public:
 	typedef QList<RssItem*>::const_iterator const_iterator;
 
 	explicit RssChannel(QObject *parent = nullptr);
+	explicit RssChannel(const QUrl &link, QObject *parent = nullptr);
 
 	const QString &title() const;
 	void setTitle(const QString &title);
