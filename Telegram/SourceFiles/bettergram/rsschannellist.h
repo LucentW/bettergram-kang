@@ -13,15 +13,18 @@ class RssChannelList : public QObject {
 	Q_OBJECT
 
 public:
-	typedef QList<RssChannel*>::const_iterator const_iterator;
+	typedef QList<QSharedPointer<RssChannel>>::const_iterator const_iterator;
 
 	explicit RssChannelList(QObject *parent = nullptr);
 
 	const_iterator begin() const;
 	const_iterator end() const;
 
-	RssChannel *at(int index) const;
+	/// Can throw std::out_of_range() exception
+	const QSharedPointer<RssChannel> &at(int index) const;
 	int count() const;
+
+	void parse();
 
 public slots:
 
@@ -30,7 +33,7 @@ signals:
 protected:
 
 private:
-	QList<RssChannel*> _list;
+	QList<QSharedPointer<RssChannel>> _list;
 };
 
 } // namespace Bettergram

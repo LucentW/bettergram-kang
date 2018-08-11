@@ -1,6 +1,8 @@
 #include "bettergramsettings.h"
 #include "cryptopricelist.h"
 #include "cryptoprice.h"
+#include "rsschannellist.h"
+#include "rsschannel.h"
 #include "aditem.h"
 
 #include <QTimer>
@@ -30,10 +32,12 @@ BettergramSettings *BettergramSettings::instance()
 Bettergram::BettergramSettings::BettergramSettings(QObject *parent) :
 	QObject(parent),
 	_cryptoPriceList(new CryptoPriceList(this)),
+	_rssChannelList(new RssChannelList(this)),
 	_currentAd(new AdItem(this))
 {
 	getIsPaid();
 	getNextAd(true);
+	getRssFeeds();
 }
 
 bool BettergramSettings::isPaid() const
@@ -69,6 +73,11 @@ void BettergramSettings::setBillingPlan(BillingPlan billingPlan)
 CryptoPriceList *BettergramSettings::cryptoPriceList() const
 {
 	return _cryptoPriceList;
+}
+
+RssChannelList *BettergramSettings::rssChannelList() const
+{
+	return _rssChannelList;
 }
 
 AdItem *BettergramSettings::currentAd() const
@@ -124,6 +133,51 @@ void BettergramSettings::getCryptoPriceList()
 			this, &BettergramSettings::onGetCryptoPriceListSslFailed);
 }
 
+void BettergramSettings::getRssFeeds()
+{
+	for (const QSharedPointer<RssChannel> &channel : *_rssChannelList) {
+		if (channel->isMayFetchNewData()) {
+			getRssFeeds(channel);
+		}
+	}
+}
+
+void BettergramSettings::getRssFeeds(const QSharedPointer<RssChannel> &channel)
+{
+	channel->startFetching();
+
+	QNetworkRequest request;
+	request.setUrl(channel->link());
+
+	QNetworkReply *reply = _networkManager.get(request);
+
+	connect(reply, &QNetworkReply::finished, this, [this, reply, channel] {
+		if(reply->error() == QNetworkReply::NoError) {
+			channel->fetchingSucceed(QString::fromUtf8(reply->readAll()));
+		} else {
+			LOG(("Can not get RSS feeds from the channel %1. %2 (%3)")
+				.arg(channel->link().toString())
+				.arg(reply->errorString())
+				.arg(reply->error()));
+
+			channel->fetchingFailed();
+		}
+
+		_rssChannelList->parse();
+
+		reply->deleteLater();
+	});
+
+	connect(reply, &QNetworkReply::sslErrors, this, [channel] (QList<QSslError> errors) {
+		LOG(("Got SSL errors in during getting RSS feeds from the channel: %1")
+			.arg(channel->link().toString()));
+
+		for(const QSslError &error : errors) {
+			LOG(("%1").arg(error.errorString()));
+		}
+	});
+}
+
 void BettergramSettings::parseCryptoPriceList(const QByteArray &byteArray)
 {
 	if (byteArray.isEmpty()) {
@@ -136,9 +190,9 @@ void BettergramSettings::parseCryptoPriceList(const QByteArray &byteArray)
 
 	if (!doc.isObject()) {
 		LOG(("Can not get crypto price list. Response is wrong. %1 (%2). Response: %3")
-					  .arg(parseError.errorString())
-					  .arg(parseError.error)
-					  .arg(QString::fromUtf8(byteArray)));
+			.arg(parseError.errorString())
+			.arg(parseError.error)
+			.arg(QString::fromUtf8(byteArray)));
 		return;
 	}
 
@@ -222,8 +276,8 @@ void BettergramSettings::onGetCryptoPriceListFinished()
 		parseCryptoPriceList(reply->readAll());
 	} else {
 		LOG(("Can not get crypto price list. %1 (%2)")
-					  .arg(reply->errorString())
-					  .arg(reply->error()));
+			.arg(reply->errorString())
+			.arg(reply->error()));
 	}
 
 	reply->deleteLater();
@@ -297,9 +351,9 @@ bool BettergramSettings::parseNextAd(const QByteArray &byteArray)
 
 	if (!doc.isObject()) {
 		LOG(("Can not get next ad. Response is wrong. %1 (%2). Response: %3")
-					  .arg(parseError.errorString())
-					  .arg(parseError.error)
-					  .arg(QString::fromUtf8(byteArray)));
+			.arg(parseError.errorString())
+			.arg(parseError.error)
+			.arg(QString::fromUtf8(byteArray)));
 		return false;
 	}
 
@@ -349,7 +403,7 @@ bool BettergramSettings::parseNextAd(const QByteArray &byteArray)
 
 	_currentAd->update(adItem);
 
-	 return true;
+	return true;
 }
 
 void BettergramSettings::onGetNextAdFinished()
@@ -364,9 +418,9 @@ void BettergramSettings::onGetNextAdFinished()
 			getNextAdLater(true);
 		}
 	} else {
-        //	LOG(("Can not get next ad item. %1 (%2)")
-        //				  .arg(reply->errorString())
-        //				  .arg(reply->error()));
+		//	LOG(("Can not get next ad item. %1 (%2)")
+		//				  .arg(reply->errorString())
+		//				  .arg(reply->error()));
 
 		getNextAdLater();
 	}

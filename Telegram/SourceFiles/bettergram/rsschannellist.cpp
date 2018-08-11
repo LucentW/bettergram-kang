@@ -19,11 +19,11 @@ RssChannelList::const_iterator RssChannelList::end() const
 	return _list.end();
 }
 
-RssChannel *RssChannelList::at(int index) const
+const QSharedPointer<RssChannel> &RssChannelList::at(int index) const
 {
 	if (index < 0 || index >= _list.size()) {
 		LOG(("Index is out of bounds"));
-		return nullptr;
+		throw std::out_of_range("rss channel index is out of range");
 	}
 
 	return _list.at(index);
@@ -32,6 +32,19 @@ RssChannel *RssChannelList::at(int index) const
 int RssChannelList::count() const
 {
 	return _list.count();
+}
+
+void RssChannelList::parse()
+{
+	for (const QSharedPointer<RssChannel> &channel : _list) {
+		if (channel->isFetching()) {
+			return;
+		}
+	}
+
+	for (const QSharedPointer<RssChannel> &channel : _list) {
+		channel->parse();
+	}
 }
 
 } // namespace Bettergrams
