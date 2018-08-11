@@ -8,6 +8,8 @@
 namespace Bettergram {
 
 class CryptoPriceList;
+class RssChannelList;
+class RssChannel;
 class AdItem;
 
 /**
@@ -31,6 +33,7 @@ public:
 	BillingPlan billingPlan() const;
 
 	CryptoPriceList *cryptoPriceList() const;
+	RssChannelList *rssChannelList() const;
 	AdItem *currentAd() const;
 
 	bool isWindowActive() const;
@@ -40,6 +43,7 @@ public:
 	base::Observable<void> &billingPlanObservable();
 
 	void getCryptoPriceList();
+	void getRssFeeds();
 
 public slots:
 
@@ -58,6 +62,7 @@ private:
 	BillingPlan _billingPlan = BillingPlan::Unknown;
 
 	CryptoPriceList *_cryptoPriceList = nullptr;
+	RssChannelList *_rssChannelList = nullptr;
 	AdItem *_currentAd = nullptr;
 	bool _isWindowActive = true;
 	std::function<void()> _isWindowActiveHandler = nullptr;
@@ -76,6 +81,8 @@ private:
 
 	void parseCryptoPriceList(const QByteArray &byteArray);
 	bool parseNextAd(const QByteArray &byteArray);
+
+	void getRssFeeds(const QSharedPointer<RssChannel> &channel);
 
 private slots:
 	void onGetCryptoPriceListFinished();

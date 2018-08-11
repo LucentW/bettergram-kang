@@ -56,12 +56,21 @@ public:
 	const QUrl &image() const;
 	void setImage(const QUrl &image);
 
+	bool isFetching() const;
+
 	const_iterator begin() const;
 	const_iterator end() const;
 
 	RssItem *at(int index) const;
 	int count() const;
 
+	bool isMayFetchNewData() const;
+
+	void startFetching();
+	void fetchingSucceed(const QString &source);
+	void fetchingFailed();
+
+	void parse();
 	void updateData(const QList<RssItem*> &rssItems);
 
 public slots:
@@ -87,7 +96,12 @@ private:
 	QUrl _link;
 	QUrl _image;
 
+	QString _source;
+	bool _isFetching = false;
+
 	QList<RssItem*> _list;
+
+	void setIsFetching(bool isFetching);
 };
 
 } // namespace Bettergram

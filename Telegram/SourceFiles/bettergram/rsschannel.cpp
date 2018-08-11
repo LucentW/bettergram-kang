@@ -139,6 +139,16 @@ void RssChannel::setImage(const QUrl &image)
 	_image = image;
 }
 
+bool RssChannel::isFetching() const
+{
+	return _isFetching;
+}
+
+void RssChannel::setIsFetching(bool isFetching)
+{
+	_isFetching = isFetching;
+}
+
 RssChannel::const_iterator RssChannel::begin() const
 {
 	return _list.begin();
@@ -164,8 +174,37 @@ int RssChannel::count() const
 	return _list.count();
 }
 
+bool RssChannel::isMayFetchNewData() const
+{
+	//TODO: bettergram: realize RssChannel::isMayFetchNewData() method
+	return true;
+}
+
+void RssChannel::startFetching()
+{
+	setIsFetching(true);
+}
+
+void RssChannel::fetchingSucceed(const QString &source)
+{
+	_source = source;
+	setIsFetching(false);
+}
+
+void RssChannel::fetchingFailed()
+{
+	_source.clear();
+	setIsFetching(false);
+}
+
+void RssChannel::parse()
+{
+	//TODO: bettergram: realize RssChannel::parse() method
+}
+
 void RssChannel::updateData(const QList<RssItem*> &rssItems)
 {
+	//TODO: bettergram: realize RssChannel::updateData() method
 }
 
 } // namespace Bettergrams
