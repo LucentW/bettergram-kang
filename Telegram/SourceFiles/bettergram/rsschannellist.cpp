@@ -34,6 +34,17 @@ int RssChannelList::count() const
 	return _list.count();
 }
 
+void RssChannelList::add(const QUrl &channelLink)
+{
+	if (channelLink.isEmpty()) {
+		LOG(("Unable to add empty RSS channel"));
+		return;
+	}
+
+	QSharedPointer<RssChannel> channel(new RssChannel(channelLink, nullptr));
+	_list.push_back(channel);
+}
+
 void RssChannelList::parse()
 {
 	for (const QSharedPointer<RssChannel> &channel : _list) {
