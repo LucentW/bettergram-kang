@@ -2,6 +2,8 @@
 
 #include <QObject>
 
+class QXmlStreamReader;
+
 namespace Bettergram {
 
 class RssItem;
@@ -68,11 +70,10 @@ public:
 	bool isMayFetchNewData() const;
 
 	void startFetching();
-	void fetchingSucceed(const QString &source);
+	void fetchingSucceed(const QByteArray &source);
 	void fetchingFailed();
 
 	void parse();
-	void updateData(const QList<RssItem*> &rssItems);
 
 public slots:
 
@@ -89,20 +90,34 @@ private:
 	QString _editorEmail;
 	QString _webMasterEmail;
 	QStringList _categoryList;
+
+	//TODO: bettergram: use publish date and last build date properties
 	QDateTime _publishDate;
 	QDateTime _lastBuildDate;
+
+	//TODO: bettergram: use skip hours and skip days properties
 	QString _skipHours;
 	QString _skipDays;
 
 	QUrl _link;
 	QUrl _image;
 
-	QString _source;
+	QByteArray _source;
+	QByteArray _lastSourceHash;
 	bool _isFetching = false;
 
 	QList<RssItem*> _list;
 
 	void setIsFetching(bool isFetching);
+
+	QByteArray countSourceHash(const QByteArray &source) const;
+
+	void parseRss(QXmlStreamReader &xml);
+	void parseChannel(QXmlStreamReader &xml);
+	void parseChannelImage(QXmlStreamReader &xml);
+	void parseItem(QXmlStreamReader &xml);
+
+	void merge(RssItem *item);
 };
 
 } // namespace Bettergram

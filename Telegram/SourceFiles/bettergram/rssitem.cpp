@@ -1,24 +1,36 @@
 #include "rssitem.h"
+#include <QXmlStreamReader>
 
 namespace Bettergram {
 
-RssItem::RssItem(const QString &title,
+RssItem::RssItem(QObject *parent) : QObject(parent)
+{
+}
+
+RssItem::RssItem(const QString &guid,
+				 const QString &title,
 				 const QString &description,
 				 const QString &author,
 				 const QStringList &categoryList,
-				 const QUrl &url,
-				 const QUrl &commentsUrl,
+				 const QUrl &link,
+				 const QUrl &commentsLink,
 				 const QDateTime &publishDate,
 				 QObject *parent) :
 	QObject(parent),
+	_guid(guid),
 	_title(title),
 	_description(description),
 	_author(author),
 	_categoryList(categoryList),
-	_url(url),
-	_commentsUrl(commentsUrl),
+	_link(link),
+	_commentsLink(commentsLink),
 	_publishDate(publishDate)
 {
+}
+
+const QString &RssItem::guid() const
+{
+	return _guid;
 }
 
 const QString &RssItem::title() const
@@ -41,14 +53,14 @@ const QStringList &RssItem::categoryList() const
 	return _categoryList;
 }
 
-const QUrl &RssItem::url() const
+const QUrl &RssItem::link() const
 {
-	return _url;
+	return _link;
 }
 
-const QUrl &RssItem::commentsUrl() const
+const QUrl &RssItem::commentsLink() const
 {
-	return _commentsUrl;
+	return _commentsLink;
 }
 
 const QDateTime &RssItem::publishDate() const
@@ -60,6 +72,33 @@ bool RssItem::isValid() const
 {
 	//TODO: bettergram: realize RssItem::isValid() method
 	return true;
+}
+
+void RssItem::parseItem(QXmlStreamReader &xml)
+{
+	_categoryList.clear();
+
+	while (xml.readNextStartElement()) {
+		if (xml.name() == QLatin1String("guid")) {
+			_guid = xml.readElementText();
+		} else if (xml.name() == QLatin1String("title")) {
+			_title = xml.readElementText();
+		} else if (xml.name() == QLatin1String("description")) {
+			_description = xml.readElementText();
+		} else if (xml.name() == QLatin1String("author")) {
+			_author = xml.readElementText();
+		} else if (xml.name() == QLatin1String("category")) {
+			_categoryList.push_back(xml.readElementText());
+		} else if (xml.name() == QLatin1String("link")) {
+			_link = xml.readElementText();
+		} else if (xml.name() == QLatin1String("comments")) {
+			_commentsLink = xml.readElementText();
+		} else if (xml.name() == QLatin1String("pubDate")) {
+			_publishDate = QDateTime::fromString(xml.readElementText(), Qt::RFC2822Date);
+		} else {
+			xml.skipCurrentElement();
+		}
+	}
 }
 
 } // namespace Bettergrams

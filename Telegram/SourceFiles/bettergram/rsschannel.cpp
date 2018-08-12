@@ -1,6 +1,9 @@
 #include "rsschannel.h"
 #include "rssitem.h"
 #include <logs.h>
+#include <QDateTime>
+#include <QCryptographicHash>
+#include <QXmlStreamReader>
 
 namespace Bettergram {
 
@@ -155,6 +158,11 @@ void RssChannel::setIsFetching(bool isFetching)
 	_isFetching = isFetching;
 }
 
+QByteArray RssChannel::countSourceHash(const QByteArray &source) const
+{
+	return QCryptographicHash::hash(source, QCryptographicHash::Sha256);
+}
+
 RssChannel::const_iterator RssChannel::begin() const
 {
 	return _list.begin();
@@ -191,9 +199,15 @@ void RssChannel::startFetching()
 	setIsFetching(true);
 }
 
-void RssChannel::fetchingSucceed(const QString &source)
+void RssChannel::fetchingSucceed(const QByteArray &source)
 {
-	_source = source;
+	qDebug() << QString("fetching succeed for %1").arg(_link.toString());
+
+	// Update source only if it has been changed
+	if (countSourceHash(source) != _lastSourceHash) {
+		_source = source;
+	}
+
 	setIsFetching(false);
 }
 
@@ -205,12 +219,119 @@ void RssChannel::fetchingFailed()
 
 void RssChannel::parse()
 {
-	//TODO: bettergram: realize RssChannel::parse() method
+
+	if (_source.isEmpty()) {
+		return;
+	}
+
+	_categoryList.clear();
+
+	QXmlStreamReader xml;
+	xml.addData(_source);
+
+	while (xml.readNextStartElement()) {
+		if (xml.name() == QLatin1String("rss")) {
+			parseRss(xml);
+		} else {
+			xml.skipCurrentElement();
+		}
+	}
+
+	// readNextStartElement() does not handle end of a document correctly,
+	// so we ignore PrematureEndOfDocumentError
+	if (xml.hasError() && xml.error() != QXmlStreamReader::PrematureEndOfDocumentError) {
+		LOG(("Unable to parse RSS feed from %1. %2 (%3)")
+			.arg(_link.toString())
+			.arg(xml.errorString())
+			.arg(xml.error()));
+	}
+
+	_lastSourceHash = countSourceHash(_source);
+	_source.clear();
 }
 
-void RssChannel::updateData(const QList<RssItem*> &rssItems)
+void RssChannel::parseRss(QXmlStreamReader &xml)
 {
-	//TODO: bettergram: realize RssChannel::updateData() method
+	while (xml.readNextStartElement()) {
+		if (xml.name() == QLatin1String("channel")) {
+			parseChannel(xml);
+		} else {
+			xml.skipCurrentElement();
+		}
+	}
+}
+
+void RssChannel::parseChannel(QXmlStreamReader &xml)
+{
+	while (xml.readNextStartElement()) {
+		if (xml.name() == QLatin1String("item")) {
+			parseItem(xml);
+		} else if (xml.name() == QLatin1String("title")) {
+			setTitle(xml.readElementText());
+		} else if (xml.name() == QLatin1String("link")) {
+			setLink(xml.readElementText());
+		} else if (xml.name() == QLatin1String("description")) {
+			setDescription(xml.readElementText());
+		} else if (xml.name() == QLatin1String("image")) {
+			parseChannelImage(xml);
+		} else if (xml.name() == QLatin1String("language")) {
+			setLanguage(xml.readElementText());
+		} else if (xml.name() == QLatin1String("copyright")) {
+			setCopyright(xml.readElementText());
+		} else if (xml.name() == QLatin1String("managingEditor")) {
+			setEditorEmail(xml.readElementText());
+		} else if (xml.name() == QLatin1String("webmaster")) {
+			setWebMasterEmail(xml.readElementText());
+		} else if (xml.name() == QLatin1String("pubDate")) {
+			// Please note that thid property may not exist
+			setPublishDate(QDateTime::fromString(xml.readElementText(), Qt::RFC2822Date));
+		} else if (xml.name() == QLatin1String("lastBuildDate")) {
+			setLastBuildDate(QDateTime::fromString(xml.readElementText(), Qt::RFC2822Date));
+		} else if (xml.name() == QLatin1String("skipHours")) {
+			setSkipHours(xml.readElementText());
+		} else if (xml.name() == QLatin1String("skipDays")) {
+			setSkipDays(xml.readElementText());
+		} else if (xml.name() == QLatin1String("category")) {
+			_categoryList.push_back(xml.readElementText());
+		} else {
+			xml.skipCurrentElement();
+		}
+	}
+}
+
+void RssChannel::parseChannelImage(QXmlStreamReader &xml)
+{
+	while (xml.readNextStartElement()) {
+		if (xml.name() == QLatin1String("url")) {
+			setImage(xml.readElementText());
+		} else {
+			xml.skipCurrentElement();
+		}
+	}
+}
+
+void RssChannel::parseItem(QXmlStreamReader &xml)
+{
+	RssItem *item = new RssItem(this);
+	item->parseItem(xml);
+
+	if (xml.hasError()) {
+		LOG(("Unable to parse RSS feed item from %1. %2 (%3)")
+			.arg(_link.toString())
+			.arg(xml.errorString())
+			.arg(xml.error()));
+
+		item->deleteLater();
+	} else {
+		merge(item);
+	}
+}
+
+void RssChannel::merge(RssItem *item)
+{
+	//TODO: bettergram: realize RssChannel::merge() method
+
+	_list.push_back(item);
 }
 
 } // namespace Bettergrams
