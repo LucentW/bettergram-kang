@@ -159,7 +159,7 @@ void BettergramSettings::getRssFeeds(const QSharedPointer<RssChannel> &channel)
 
 	connect(reply, &QNetworkReply::finished, this, [this, reply, channel] {
 		if(reply->error() == QNetworkReply::NoError) {
-			channel->fetchingSucceed(QString::fromUtf8(reply->readAll()));
+			channel->fetchingSucceed(reply->readAll());
 		} else {
 			LOG(("Can not get RSS feeds from the channel %1. %2 (%3)")
 				.arg(channel->link().toString())

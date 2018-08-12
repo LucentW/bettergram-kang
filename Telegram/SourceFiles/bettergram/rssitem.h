@@ -2,6 +2,8 @@
 
 #include <QObject>
 
+class QXmlStreamReader;
+
 namespace Bettergram {
 
 /**
@@ -11,24 +13,30 @@ class RssItem : public QObject {
 	Q_OBJECT
 
 public:
-	explicit RssItem(const QString &title,
+	explicit RssItem(QObject *parent = nullptr);
+
+	explicit RssItem(const QString &guid,
+					 const QString &title,
 					 const QString &description,
 					 const QString &author,
 					 const QStringList &categoryList,
-					 const QUrl &url,
-					 const QUrl &commentsUrl,
+					 const QUrl &link,
+					 const QUrl &commentsLink,
 					 const QDateTime &publishDate,
 					 QObject *parent = nullptr);
 
+	const QString &guid() const;
 	const QString &title() const;
 	const QString &description() const;
 	const QString &author() const;
 	const QStringList &categoryList() const;
-	const QUrl &url() const;
-	const QUrl &commentsUrl() const;
+	const QUrl &link() const;
+	const QUrl &commentsLink() const;
 	const QDateTime &publishDate() const;
 
 	bool isValid() const;
+
+	void parseItem(QXmlStreamReader &xml);
 
 public slots:
 
@@ -37,14 +45,15 @@ signals:
 protected:
 
 private:
-	const QString _title;
-	const QString _description;
-	const QString _author;
-	const QStringList _categoryList;
+	QString _guid;
+	QString _title;
+	QString _description;
+	QString _author;
+	QStringList _categoryList;
 
-	const QUrl _url;
-	const QUrl _commentsUrl;
-	const QDateTime _publishDate;
+	QUrl _link;
+	QUrl _commentsLink;
+	QDateTime _publishDate;
 };
 
 } // namespace Bettergram
