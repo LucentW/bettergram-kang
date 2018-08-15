@@ -43,7 +43,7 @@ Bettergram::BettergramSettings::BettergramSettings(QObject *parent) :
 	_rssChannelList->add(QUrl("https://www.coindesk.com/feed/"));
 	_rssChannelList->add(QUrl("https://www.ccn.com/feed/"));
 
-	getRssFeeds();
+	getRssChannelList();
 }
 
 bool BettergramSettings::isPaid() const
@@ -139,7 +139,7 @@ void BettergramSettings::getCryptoPriceList()
 			this, &BettergramSettings::onGetCryptoPriceListSslFailed);
 }
 
-void BettergramSettings::getRssFeeds()
+void BettergramSettings::getRssChannelList()
 {
 	for (const QSharedPointer<RssChannel> &channel : *_rssChannelList) {
 		if (channel->isMayFetchNewData()) {
