@@ -73,8 +73,16 @@ void RssChannelList::parse()
 		}
 	}
 
+	bool isChanged = false;
+
 	for (const QSharedPointer<RssChannel> &channel : _list) {
-		channel->parse();
+		if (channel->parse()) {
+			isChanged = true;
+		}
+	}
+
+	if (isChanged) {
+		emit updated();
 	}
 }
 

@@ -73,7 +73,8 @@ public:
 	void fetchingSucceed(const QByteArray &source);
 	void fetchingFailed();
 
-	void parse();
+	/// Parse fetched source xml data and return true only when the data is changed
+	bool parse();
 
 public slots:
 
