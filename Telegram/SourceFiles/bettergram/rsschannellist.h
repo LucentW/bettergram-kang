@@ -17,6 +17,9 @@ public:
 
 	explicit RssChannelList(QObject *parent = nullptr);
 
+	int freq() const;
+	void setFreq(int freq);
+
 	const_iterator begin() const;
 	const_iterator end() const;
 
@@ -31,11 +34,18 @@ public:
 public slots:
 
 signals:
+	void freqChanged();
 
 protected:
 
 private:
+	/// Default frequency of updates in seconds
+	static const int _defaultFreq;
+
 	QList<QSharedPointer<RssChannel>> _list;
+
+	/// Frequency of updates in seconds
+	int _freq;
 };
 
 } // namespace Bettergram

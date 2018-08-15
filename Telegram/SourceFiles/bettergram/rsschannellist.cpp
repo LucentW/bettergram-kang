@@ -4,9 +4,29 @@
 
 namespace Bettergram {
 
+const int RssChannelList::_defaultFreq = 60;
+
 RssChannelList::RssChannelList(QObject *parent) :
-	QObject(parent)
+	QObject(parent),
+	_freq(_defaultFreq)
 {
+}
+
+int RssChannelList::freq() const
+{
+	return _freq;
+}
+
+void RssChannelList::setFreq(int freq)
+{
+	if (freq == 0) {
+		freq = _defaultFreq;
+	}
+
+	if (_freq != freq) {
+		_freq = freq;
+		emit freqChanged();
+	}
 }
 
 RssChannelList::const_iterator RssChannelList::begin() const
