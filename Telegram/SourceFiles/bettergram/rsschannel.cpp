@@ -213,15 +213,17 @@ void RssChannel::fetchingSucceed(const QByteArray &source)
 
 void RssChannel::fetchingFailed()
 {
+	qDebug() << QString("fetching failed for %1").arg(_link.toString());
 	_source.clear();
 	setIsFetching(false);
 }
 
-void RssChannel::parse()
+bool RssChannel::parse()
 {
+	qDebug() << QString("parsing for %1").arg(_link.toString());
 
 	if (_source.isEmpty()) {
-		return;
+		return false;
 	}
 
 	_categoryList.clear();
@@ -248,6 +250,8 @@ void RssChannel::parse()
 
 	_lastSourceHash = countSourceHash(_source);
 	_source.clear();
+
+	return true;
 }
 
 void RssChannel::parseRss(QXmlStreamReader &xml)

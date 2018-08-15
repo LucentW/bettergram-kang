@@ -35,6 +35,7 @@ public slots:
 
 signals:
 	void freqChanged();
+	void updated();
 
 protected:
 
