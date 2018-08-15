@@ -9,6 +9,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "bettergram_tabbed_selector.h"
 
 #include "prices_list_widget.h"
+#include "rss_widget.h"
 #include "styles/style_chat_helpers.h"
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/labels.h"
@@ -51,9 +52,9 @@ BettergramTabbedSelector::BettergramTabbedSelector(QWidget *parent, not_null<Win
 	, _scroll(this, st::emojiScroll)
 	, _tabs{ {
 			Tab{ BettergramSelectorTab::Prices, object_ptr<PricesListWidget>(this, controller) },
-			Tab{ BettergramSelectorTab::Prices, object_ptr<PricesListWidget>(this, controller) },
-			Tab{ BettergramSelectorTab::Prices, object_ptr<PricesListWidget>(this, controller) },
-			Tab{ BettergramSelectorTab::Prices, object_ptr<PricesListWidget>(this, controller) },
+			Tab{ BettergramSelectorTab::News, object_ptr<RssWidget>(this, controller) },
+			Tab{ BettergramSelectorTab::Icos, object_ptr<PricesListWidget>(this, controller) },
+			Tab{ BettergramSelectorTab::Resources, object_ptr<PricesListWidget>(this, controller) },
 		} }
 		, _currentTabType(Auth().settings().bettergramSelectorTab()) {
 	resize(st::emojiPanWidth, st::emojiPanMaxHeight);
