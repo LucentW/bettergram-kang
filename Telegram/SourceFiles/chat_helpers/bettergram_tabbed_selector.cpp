@@ -320,9 +320,9 @@ void BettergramTabbedSelector::setRoundRadius(int radius) {
 void BettergramTabbedSelector::createTabsSlider() {
 	auto sections = QStringList();
 	sections.push_back(lang(lng_switch_prices).toUpper());
-	sections.push_back(lang(lng_switch_emoji).toUpper());
-	sections.push_back(lang(lng_switch_stickers).toUpper());
-	sections.push_back(lang(lng_switch_gifs).toUpper());
+	sections.push_back(lang(lng_switch_news).toUpper());
+	sections.push_back(lang(lng_switch_icos).toUpper());
+	sections.push_back(lang(lng_switch_resources).toUpper());
 	_tabsSlider->setSections(sections);
 
 	_tabsSlider->setActiveSectionFast(static_cast<int>(_currentTabType));
