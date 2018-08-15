@@ -42,8 +42,11 @@ public:
 	base::Observable<void> &isPaidObservable();
 	base::Observable<void> &billingPlanObservable();
 
+	/// Download and parse crypto price list
 	void getCryptoPriceList();
-	void getRssFeeds();
+
+	/// Download and parse all RSS feeds
+	void getRssChannelList();
 
 public slots:
 
