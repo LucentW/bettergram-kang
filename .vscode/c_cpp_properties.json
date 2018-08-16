@@ -4,9 +4,12 @@
 			"name": "Linux",
 			"includePath": [
 				"${workspaceFolder}/**",
+				"${workspaceFolder}/Telegram/SourceFiles",
 				"${workspaceFolder}/Telegram/ThirdParty/crl/src",
+				"${workspaceFolder}/Telegram/ThirdParty/GSL/include",
 				"${workspaceFolder}/Telegram/ThirdParty/variant/include",
-				"${workspaceFolder}/out/*/obj/gen",
+				"${workspaceFolder}/out/Debug/obj/gen",
+				"${workspaceFolder}/out/Release/obj/gen",
 				"${workspaceFolder}/../Libraries/range-v3/include",
 				"/usr/local/tdesktop/Qt-5.6.2/include",
 				"/usr/local/tdesktop/Qt-5.6.2/include/**",
