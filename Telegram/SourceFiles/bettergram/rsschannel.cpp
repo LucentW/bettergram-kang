@@ -212,8 +212,7 @@ int RssChannel::countUnread() const
 
 bool RssChannel::isMayFetchNewData() const
 {
-	//TODO: bettergram: realize RssChannel::isMayFetchNewData() method
-	return true;
+	return !_isFetching;
 }
 
 void RssChannel::startFetching()
