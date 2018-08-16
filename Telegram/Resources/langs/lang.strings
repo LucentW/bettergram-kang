@@ -969,6 +969,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_prices_header_price" = "Price";
 "lng_prices_header_24h" = "24h";
 
+"lng_news_footer" = "Visit the Site";
+
 "lng_switch_stickers" = "Stickers";
 "lng_switch_prices" = "Prices";
 "lng_switch_news" = "News";
