@@ -209,6 +209,32 @@ pricesPanMarketCapLabel: FlatLabel(defaultFlatLabel) {
         }
 }
 
+newsPanPadding: pricesPanPadding;
+newsPanHeader: pricesPanHeader;
+newsPanRowHeight: 50px;
+
+// Market capitalization label at the PricesListWidget
+newsPanLastUpdateLabel: FlatLabel(defaultFlatLabel) {
+        align: align(left);
+	textFg: newsPanHeaderFg;
+	style: TextStyle(defaultTextStyle) {
+	}
+	palette: TextPalette(defaultTextPalette) {
+	        linkFg: newsPanHeaderFg;
+		}
+}
+
+// Market capitalization label at the PricesListWidget
+newsPanGroupBySiteLabel: FlatLabel(defaultFlatLabel) {
+        align: align(left);
+	textFg: newsPanHeaderFg;
+	style: TextStyle(defaultTextStyle) {
+	}
+	palette: TextPalette(defaultTextPalette) {
+	        linkFg: newsPanHeaderFg;
+		}
+}
+
 // Ascending icon at the table column header.
 tableColumnSortAscending: IconButton {
         width: 13px;
