@@ -197,6 +197,19 @@ int RssChannel::count() const
 	return _list.count();
 }
 
+int RssChannel::countUnread() const
+{
+	int result = 0;
+
+	for (const RssItem *item : _list) {
+		if (item->isRead()) {
+			result++;
+		}
+	}
+
+	return  result;
+}
+
 bool RssChannel::isMayFetchNewData() const
 {
 	//TODO: bettergram: realize RssChannel::isMayFetchNewData() method

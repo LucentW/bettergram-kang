@@ -26,6 +26,8 @@ public:
 	/// Can throw std::out_of_range() exception
 	const QSharedPointer<RssChannel> &at(int index) const;
 	int count() const;
+	int countAllItems() const;
+	int countAllUnreadItems() const;
 
 	void add(const QUrl &channelLink);
 
