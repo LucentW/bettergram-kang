@@ -45,6 +45,38 @@
 				"fileLocation": "absolute"
 			}
 		]
+	},
+	{
+		"label": "run debug",
+		"type": "shell",
+		"command": "${workspaceRoot}/out/Debug/Bettergram",
+		"group": "build",
+		"presentation": {
+			"reveal": "always",
+			"panel": "new"
+		},
+		"problemMatcher": [
+			"$gcc"
+		],
+		"dependsOn": [
+			"make debug"
+		]
+	},
+	{
+		"label": "run release",
+		"type": "shell",
+		"command": "${workspaceRoot}/out/Release/Bettergram",
+		"group": "build",
+		"presentation": {
+			"reveal": "always",
+			"panel": "new"
+		},
+		"problemMatcher": [
+			"$gcc"
+		],
+		"dependsOn": [
+			"make release"
+		]
 	}
   ]
 }
