@@ -36,6 +36,11 @@ public:
 
 	bool isValid() const;
 
+	/// Return true if user marks this news as read
+	bool isRead() const;
+	void markAsRead();
+	void markAsUnRead();
+
 	void parseItem(QXmlStreamReader &xml);
 
 public slots:
@@ -54,6 +59,10 @@ private:
 	QUrl _link;
 	QUrl _commentsLink;
 	QDateTime _publishDate;
+
+	bool _isRead = false;
+
+	void setIsRead(bool isRead);
 };
 
 } // namespace Bettergram

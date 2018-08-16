@@ -69,6 +69,7 @@ public:
 
 	RssItem *at(int index) const;
 	int count() const;
+	int countUnread() const;
 
 	bool isMayFetchNewData() const;
 

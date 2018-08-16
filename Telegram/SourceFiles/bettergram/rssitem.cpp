@@ -74,6 +74,28 @@ bool RssItem::isValid() const
 	return true;
 }
 
+bool RssItem::isRead() const
+{
+	return _isRead;
+}
+
+void RssItem::setIsRead(bool isRead)
+{
+	if (_isRead != isRead) {
+		_isRead = isRead;
+	}
+}
+
+void RssItem::markAsRead()
+{
+	setIsRead(true);
+}
+
+void RssItem::markAsUnRead()
+{
+	setIsRead(false);
+}
+
 void RssItem::parseItem(QXmlStreamReader &xml)
 {
 	_categoryList.clear();

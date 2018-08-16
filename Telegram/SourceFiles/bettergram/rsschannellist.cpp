@@ -54,6 +54,28 @@ int RssChannelList::count() const
 	return _list.count();
 }
 
+int RssChannelList::countAllItems() const
+{
+	int result = 0;
+
+	for (const QSharedPointer<RssChannel> &channel : _list) {
+		result += channel->count();
+	}
+
+	return result;
+}
+
+int RssChannelList::countAllUnreadItems() const
+{
+	int result = 0;
+
+	for (const QSharedPointer<RssChannel> &channel : _list) {
+		result += channel->countUnread();
+	}
+
+	return result;
+}
+
 void RssChannelList::add(const QUrl &channelLink)
 {
 	if (channelLink.isEmpty()) {
