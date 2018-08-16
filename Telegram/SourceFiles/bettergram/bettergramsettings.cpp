@@ -153,7 +153,7 @@ void BettergramSettings::getRssFeeds(const QSharedPointer<RssChannel> &channel)
 	channel->startFetching();
 
 	QNetworkRequest request;
-	request.setUrl(channel->link());
+	request.setUrl(channel->feedLink());
 
 	QNetworkReply *reply = _networkManager.get(request);
 
@@ -162,7 +162,7 @@ void BettergramSettings::getRssFeeds(const QSharedPointer<RssChannel> &channel)
 			channel->fetchingSucceed(reply->readAll());
 		} else {
 			LOG(("Can not get RSS feeds from the channel %1. %2 (%3)")
-				.arg(channel->link().toString())
+				.arg(channel->feedLink().toString())
 				.arg(reply->errorString())
 				.arg(reply->error()));
 
@@ -176,7 +176,7 @@ void BettergramSettings::getRssFeeds(const QSharedPointer<RssChannel> &channel)
 
 	connect(reply, &QNetworkReply::sslErrors, this, [channel] (QList<QSslError> errors) {
 		LOG(("Got SSL errors in during getting RSS feeds from the channel: %1")
-			.arg(channel->link().toString()));
+			.arg(channel->feedLink().toString()));
 
 		for(const QSslError &error : errors) {
 			LOG(("%1").arg(error.errorString()));

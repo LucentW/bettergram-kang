@@ -12,9 +12,9 @@ RssChannel::RssChannel(QObject *parent) :
 {
 }
 
-RssChannel::RssChannel(const QUrl &link, QObject *parent) :
+RssChannel::RssChannel(const QUrl &feedLink, QObject *parent) :
 	QObject(parent),
-	_link(link)
+	_feedLink(feedLink)
 {
 }
 
@@ -127,6 +127,15 @@ void RssChannel::setSkipDays(const QString &skipDays)
 {
 	_skipDays = skipDays;
 }
+const QUrl &RssChannel::feedLink() const
+{
+	return _feedLink;
+}
+
+void RssChannel::setFeedLink(const QUrl &feedLink)
+{
+	_feedLink = feedLink;
+}
 
 const QUrl &RssChannel::link() const
 {
@@ -201,7 +210,7 @@ void RssChannel::startFetching()
 
 void RssChannel::fetchingSucceed(const QByteArray &source)
 {
-	qDebug() << QString("fetching succeed for %1").arg(_link.toString());
+	qDebug() << QString("fetching succeed for %1").arg(_feedLink.toString());
 
 	// Update source only if it has been changed
 	if (countSourceHash(source) != _lastSourceHash) {
@@ -213,14 +222,14 @@ void RssChannel::fetchingSucceed(const QByteArray &source)
 
 void RssChannel::fetchingFailed()
 {
-	qDebug() << QString("fetching failed for %1").arg(_link.toString());
+	qDebug() << QString("fetching failed for %1").arg(_feedLink.toString());
 	_source.clear();
 	setIsFetching(false);
 }
 
 bool RssChannel::parse()
 {
-	qDebug() << QString("parsing for %1").arg(_link.toString());
+	qDebug() << QString("parsing for %1").arg(_feedLink.toString());
 
 	if (_source.isEmpty()) {
 		return false;
@@ -243,7 +252,7 @@ bool RssChannel::parse()
 	// so we ignore PrematureEndOfDocumentError
 	if (xml.hasError() && xml.error() != QXmlStreamReader::PrematureEndOfDocumentError) {
 		LOG(("Unable to parse RSS feed from %1. %2 (%3)")
-			.arg(_link.toString())
+			.arg(_feedLink.toString())
 			.arg(xml.errorString())
 			.arg(xml.error()));
 	}
@@ -321,7 +330,7 @@ void RssChannel::parseItem(QXmlStreamReader &xml)
 
 	if (xml.hasError()) {
 		LOG(("Unable to parse RSS feed item from %1. %2 (%3)")
-			.arg(_link.toString())
+			.arg(_feedLink.toString())
 			.arg(xml.errorString())
 			.arg(xml.error()));
 

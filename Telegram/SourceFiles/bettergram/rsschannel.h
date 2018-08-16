@@ -18,7 +18,7 @@ public:
 	typedef QList<RssItem*>::const_iterator const_iterator;
 
 	explicit RssChannel(QObject *parent = nullptr);
-	explicit RssChannel(const QUrl &link, QObject *parent = nullptr);
+	explicit RssChannel(const QUrl &feedLink, QObject *parent = nullptr);
 
 	const QString &title() const;
 	void setTitle(const QString &title);
@@ -52,6 +52,9 @@ public:
 
 	const QString &skipDays() const;
 	void setSkipDays(const QString &skipDays);
+
+	const QUrl &feedLink() const;
+	void setFeedLink(const QUrl &link);
 
 	const QUrl &link() const;
 	void setLink(const QUrl &link);
@@ -100,6 +103,7 @@ private:
 	QString _skipHours;
 	QString _skipDays;
 
+	QUrl _feedLink;
 	QUrl _link;
 	QUrl _image;
 
