@@ -556,6 +556,9 @@ pricesPanTableCryptoShortNameFg: windowSubTextFg; // prices panel table cryptocu
 pricesPanTableUpFg: historyPeer2NameFg; // prices panel table price text in case of up (green)
 pricesPanTableDownFg: attentionButtonFg; // prices panel table price text in case of down (red)
 
+newsPanBg: pricesPanBg; // prices panel background
+newsPanHeaderFg: pricesPanHeaderFg; // prices panel header text
+
 tableHeaderBg: emojiPanCategories; // table header background
 tableHeaderFg: windowSubTextFg; // table header foreground
 tableColumnSortInactiveFg: #00000010 | dialogsMenuIconFg;
