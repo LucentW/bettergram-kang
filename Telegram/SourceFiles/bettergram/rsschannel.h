@@ -15,7 +15,7 @@ class RssChannel : public QObject {
 	Q_OBJECT
 
 public:
-	typedef QList<RssItem*>::const_iterator const_iterator;
+	typedef QList<QSharedPointer<RssItem>>::const_iterator const_iterator;
 
 	explicit RssChannel(QObject *parent = nullptr);
 	explicit RssChannel(const QUrl &feedLink, QObject *parent = nullptr);
@@ -67,7 +67,7 @@ public:
 	const_iterator begin() const;
 	const_iterator end() const;
 
-	RssItem *at(int index) const;
+	const QSharedPointer<RssItem> &at(int index) const;
 	int count() const;
 	int countUnread() const;
 
@@ -112,7 +112,7 @@ private:
 	QByteArray _lastSourceHash;
 	bool _isFetching = false;
 
-	QList<RssItem*> _list;
+	QList<QSharedPointer<RssItem>> _list;
 
 	void setIsFetching(bool isFetching);
 
@@ -123,7 +123,7 @@ private:
 	void parseChannelImage(QXmlStreamReader &xml);
 	void parseItem(QXmlStreamReader &xml);
 
-	void merge(RssItem *item);
+	void merge(const QSharedPointer<RssItem> &item);
 };
 
 } // namespace Bettergram

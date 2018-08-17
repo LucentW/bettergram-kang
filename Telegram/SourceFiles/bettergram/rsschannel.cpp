@@ -182,11 +182,10 @@ RssChannel::const_iterator RssChannel::end() const
 	return _list.end();
 }
 
-RssItem *RssChannel::at(int index) const
+const QSharedPointer<RssItem> &RssChannel::at(int index) const
 {
 	if (index < 0 || index >= _list.size()) {
-		LOG(("Index is out of bounds"));
-		return nullptr;
+		throw std::out_of_range("Unable to get RssItem at wrong index");
 	}
 
 	return _list.at(index);
@@ -201,7 +200,7 @@ int RssChannel::countUnread() const
 {
 	int result = 0;
 
-	for (const RssItem *item : _list) {
+	for (const QSharedPointer<RssItem> &item : _list) {
 		if (item->isRead()) {
 			result++;
 		}
@@ -337,7 +336,7 @@ void RssChannel::parseChannelImage(QXmlStreamReader &xml)
 
 void RssChannel::parseItem(QXmlStreamReader &xml)
 {
-	RssItem *item = new RssItem(this);
+	QSharedPointer<RssItem> item(new RssItem(this));
 	item->parseItem(xml);
 
 	if (xml.hasError()) {
@@ -352,7 +351,7 @@ void RssChannel::parseItem(QXmlStreamReader &xml)
 	}
 }
 
-void RssChannel::merge(RssItem *item)
+void RssChannel::merge(const QSharedPointer<RssItem> &item)
 {
 	//TODO: bettergram: realize RssChannel::merge() method
 
