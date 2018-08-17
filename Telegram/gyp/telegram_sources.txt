@@ -132,6 +132,8 @@
 <(src_loc)/chat_helpers/rss_widget.h
 <(src_loc)/chat_helpers/list_row.cpp
 <(src_loc)/chat_helpers/list_row.h
+<(src_loc)/chat_helpers/list_row_array.cpp
+<(src_loc)/chat_helpers/list_row_array.h
 <(src_loc)/chat_helpers/stickers.cpp
 <(src_loc)/chat_helpers/stickers.h
 <(src_loc)/chat_helpers/stickers_list_widget.cpp
