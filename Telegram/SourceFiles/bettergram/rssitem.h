@@ -33,6 +33,7 @@ public:
 	const QUrl &link() const;
 	const QUrl &commentsLink() const;
 	const QDateTime &publishDate() const;
+	const QString publishDateString() const;
 
 	bool isValid() const;
 

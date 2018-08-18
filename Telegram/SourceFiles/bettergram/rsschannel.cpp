@@ -180,6 +180,16 @@ void RssChannel::setIsFetching(bool isFetching)
 	_isFetching = isFetching;
 }
 
+bool RssChannel::isFailed() const
+{
+	return _isFailed;
+}
+
+void RssChannel::setIsFailed(bool isFailed)
+{
+	_isFailed = isFailed;
+}
+
 QByteArray RssChannel::countSourceHash(const QByteArray &source) const
 {
 	return QCryptographicHash::hash(source, QCryptographicHash::Sha256);
@@ -242,6 +252,7 @@ void RssChannel::fetchingSucceed(const QByteArray &source)
 	}
 
 	setIsFetching(false);
+	setIsFailed(false);
 }
 
 void RssChannel::fetchingFailed()
@@ -249,6 +260,7 @@ void RssChannel::fetchingFailed()
 	qDebug() << QString("fetching failed for %1").arg(_feedLink.toString());
 	_source.clear();
 	setIsFetching(false);
+	setIsFailed(true);
 }
 
 bool RssChannel::parse()

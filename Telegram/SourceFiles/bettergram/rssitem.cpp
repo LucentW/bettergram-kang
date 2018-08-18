@@ -68,6 +68,11 @@ const QDateTime &RssItem::publishDate() const
 	return _publishDate;
 }
 
+const QString RssItem::publishDateString() const
+{
+	return _publishDate.isNull() ? QString() : _publishDate.toString("hh:mm");
+}
+
 bool RssItem::isValid() const
 {
 	//TODO: bettergram: realize RssItem::isValid() method
