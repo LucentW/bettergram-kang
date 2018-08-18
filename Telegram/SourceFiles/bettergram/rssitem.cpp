@@ -128,9 +128,9 @@ void RssItem::parseItem(QXmlStreamReader &xml)
 		if (xml.name() == QLatin1String("guid")) {
 			_guid = xml.readElementText();
 		} else if (xml.name() == QLatin1String("title")) {
-			_title = xml.readElementText();
+			_title = removeHtmlTags(xml.readElementText());
 		} else if (xml.name() == QLatin1String("description")) {
-			_description = xml.readElementText();
+			_description = removeHtmlTags(xml.readElementText());
 		} else if (xml.name() == QLatin1String("author")) {
 			_author = xml.readElementText();
 		} else if (xml.name() == QLatin1String("category")) {
@@ -145,6 +145,13 @@ void RssItem::parseItem(QXmlStreamReader &xml)
 			xml.skipCurrentElement();
 		}
 	}
+}
+
+QString RssItem::removeHtmlTags(QString text)
+{
+	QTextDocument textDocument;
+	textDocument.setHtml(text);
+	return textDocument.toPlainText();
 }
 
 } // namespace Bettergrams
