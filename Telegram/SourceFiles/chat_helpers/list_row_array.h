@@ -112,6 +112,11 @@ public:
 		_list.clear();
 	}
 
+	void add(const TUserData &userData, int height)
+	{
+		_list.push_back(Row(userData, bottom() + _spacing, height));
+	}
+
 private:
 	int _top = 0;
 	int _spacing = 0;
@@ -123,8 +128,8 @@ private:
 		int rowTop = _top;
 
 		for (Row &row : _list) {
-			row->setTop(rowTop);
-			rowTop += row->height() + _spacing;
+			row.setTop(rowTop);
+			rowTop += row.height() + _spacing;
 		}
 	}
 };
