@@ -5,7 +5,20 @@
 #include <QCryptographicHash>
 #include <QXmlStreamReader>
 
+#undef LOG
+#define LOG(msg) (qDebug() << (QString msg))
+
 namespace Bettergram {
+
+void RssChannel::sort(QList<QSharedPointer<RssItem>> &items)
+{
+	std::sort(items.begin(), items.end(), &RssChannel::compare);
+}
+
+bool RssChannel::compare(const QSharedPointer<RssItem> &a, const QSharedPointer<RssItem> &b)
+{
+	return a->publishDate() > b->publishDate();
+}
 
 RssChannel::RssChannel(QObject *parent) :
 	QObject(parent)
@@ -270,6 +283,8 @@ bool RssChannel::parse()
 
 	_lastSourceHash = countSourceHash(_source);
 	_source.clear();
+
+	sort(_list);
 
 	return true;
 }

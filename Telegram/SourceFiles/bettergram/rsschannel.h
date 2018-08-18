@@ -17,6 +17,8 @@ class RssChannel : public QObject {
 public:
 	typedef QList<QSharedPointer<RssItem>>::const_iterator const_iterator;
 
+	static void sort(QList<QSharedPointer<RssItem>> &items);
+
 	explicit RssChannel(QObject *parent = nullptr);
 	explicit RssChannel(const QUrl &feedLink, QObject *parent = nullptr);
 
@@ -113,6 +115,8 @@ private:
 	bool _isFetching = false;
 
 	QList<QSharedPointer<RssItem>> _list;
+
+	static bool compare(const QSharedPointer<RssItem> &a, const QSharedPointer<RssItem> &b);
 
 	void setIsFetching(bool isFetching);
 
