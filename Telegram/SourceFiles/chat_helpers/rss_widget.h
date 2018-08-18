@@ -125,6 +125,7 @@ private:
 
 private slots:
 	void onLastUpdateChanged();
+	void onIconChanged();
 	void onRssUpdated();
 };
 

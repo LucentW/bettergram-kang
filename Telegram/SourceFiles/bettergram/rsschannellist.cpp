@@ -94,6 +94,9 @@ void RssChannelList::add(const QUrl &channelLink)
 	}
 
 	QSharedPointer<RssChannel> channel(new RssChannel(channelLink, nullptr));
+
+	connect(channel.data(), &RssChannel::iconChanged, this, &RssChannelList::iconChanged);
+
 	_list.push_back(channel);
 }
 
