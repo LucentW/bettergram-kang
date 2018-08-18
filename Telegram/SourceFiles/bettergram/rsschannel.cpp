@@ -214,6 +214,24 @@ const QSharedPointer<RssItem> &RssChannel::at(int index) const
 	return _list.at(index);
 }
 
+const QList<QSharedPointer<RssItem>> &RssChannel::getAllItems() const
+{
+	return _list;
+}
+
+QList<QSharedPointer<RssItem>> RssChannel::getAllUnreadItems() const
+{
+	QList<QSharedPointer<RssItem>> result;
+
+	for (const QSharedPointer<RssItem> &item : _list) {
+		if (!item->isRead()) {
+			result.push_back(item);
+		}
+	}
+
+	return result;
+}
+
 int RssChannel::count() const
 {
 	return _list.count();
