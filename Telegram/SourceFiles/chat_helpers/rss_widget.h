@@ -1,5 +1,7 @@
 #pragma once
-#include "chat_helpers/tabbed_selector.h"
+
+#include "tabbed_selector.h"
+#include "list_row_array.h"
 
 namespace Window {
 class Controller;
@@ -9,6 +11,11 @@ namespace Ui {
 class FlatLabel;
 class IconButton;
 } // namespace Ui
+
+namespace Bettergram {
+class RssItem;
+class RssChannel;
+} // namespace Bettergram
 
 namespace ChatHelpers {
 
@@ -21,6 +28,7 @@ class RssWidget : public TabbedSelector::Inner
 
 public:
 	RssWidget(QWidget* parent, not_null<Window::Controller*> controller);
+
 	void refreshRecent() override;
 	void clearSelection() override;
 	object_ptr<TabbedSelector::InnerFooter> createFooter() override;
@@ -28,12 +36,8 @@ public:
 	void afterShown() override;
 	void beforeHiding() override;
 
-public slots:
-
-	//signals:
-
 protected:
-	TabbedSelector::InnerFooter* getFooter() const override;
+	TabbedSelector::InnerFooter *getFooter() const override;
 	int countDesiredHeight(int newWidth) override;
 
 	void mousePressEvent(QMouseEvent *e) override;
@@ -49,36 +53,78 @@ protected:
 private:
 	class Footer;
 
+	/**
+	 * @brief Row class is used to group RSS news by RSS channels
+	 */
+	class Row
+	{
+	public:
+		explicit Row(const QSharedPointer<Bettergram::RssItem> &item) : _item(item)
+		{}
+
+		explicit Row(const QSharedPointer<Bettergram::RssChannel> &channel) : _channel(channel)
+		{}
+
+		bool isItem() const
+		{
+			return !_item.isNull();
+		}
+
+		bool isChannel() const
+		{
+			return !_channel.isNull();
+		}
+
+		const QSharedPointer<Bettergram::RssItem> &item() const
+		{
+			return _item;
+		}
+
+		const QSharedPointer<Bettergram::RssChannel> &channel() const
+		{
+			return _channel;
+		}
+
+	private:
+		QSharedPointer<Bettergram::RssItem> _item;
+		QSharedPointer<Bettergram::RssChannel> _channel;
+	};
+
+	ListRowArray<Row> _rows;
+
 	int _timerId = 0;
 	int _selectedRow = -1;
 	int _pressedRow = -1;
+	bool _isSortBySite = false;
 
-	Ui::IconButton *_siteName = nullptr;
-	Ui::FlatLabel *_marketCap = nullptr;
+	Ui::FlatLabel *_lastUpdate = nullptr;
+	Ui::FlatLabel *_sortMode = nullptr;
 	Footer *_footer = nullptr;
 
+	ClickHandlerPtr getSortModeClickHandler();
+
+	void toggleIsSortBySite();
+	void setIsSortBySite(bool isSortBySite);
 	void setSelectedRow(int selectedRow);
 
-	int getTableTop() const;
-	int getTableBottom() const;
-	int getTableContentTop() const;
-	int getTableContentHeight() const;
-	int getRowTop(int row) const;
-
-	QRect getTableRectangle() const;
-	QRect getTableHeaderRectangle() const;
-	QRect getTableContentRectangle() const;
-	QRect getRowRectangle(int row) const;
+	int getListAreaTop() const;
 
 	void countSelectedRow(const QPoint &point);
 
 	void updateControlsGeometry();
-	void updateMarketCap();
+	void updateLastUpdateLabel();
+	void updateSortModeLabel();
 
 	void startRssTimer();
 	void stopRssTimer();
 
+	void fillRowsInSortByTimeMode();
+	void fillRowsInSortBySiteMode();
+
+	void updateRows();
+
 private slots:
+	void onLastUpdateChanged();
 	void onRssUpdated();
 };
 

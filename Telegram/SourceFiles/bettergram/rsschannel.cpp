@@ -5,9 +5,6 @@
 #include <QCryptographicHash>
 #include <QXmlStreamReader>
 
-#undef LOG
-#define LOG(msg) (qDebug() << (QString msg))
-
 namespace Bettergram {
 
 void RssChannel::sort(QList<QSharedPointer<RssItem>> &items)
