@@ -55,7 +55,7 @@ public:
 		return bottom() - top();
 	}
 
-	bool contains(int y)
+	bool contains(int y) const
 	{
 		if (y >= top() && y <= bottom()) {
 			//TODO: bettergram: we can optimize this by using dichotomy for example
@@ -67,6 +67,20 @@ public:
 		}
 
 		return false;
+	}
+
+	int findRowIndex(int y) const
+	{
+		if (y >= top() && y <= bottom()) {
+			//TODO: bettergram: we can optimize this by using dichotomy for example
+			for (int i = 0; i < _list.count(); i++) {
+				if (_list.at(i).contains(y)) {
+					return i;
+				}
+			}
+		}
+
+		return -1;
 	}
 
 	const_iterator begin() const
@@ -91,6 +105,11 @@ public:
 		}
 
 		return _list.at(index);
+	}
+
+	void clear()
+	{
+		_list.clear();
 	}
 
 private:
