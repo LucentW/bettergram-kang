@@ -55,7 +55,7 @@ public:
 		}
 	}
 
-	bool contains(int y)
+	bool contains(int y) const
 	{
 		return y >= _top && y <= (_top + _height);
 	}
