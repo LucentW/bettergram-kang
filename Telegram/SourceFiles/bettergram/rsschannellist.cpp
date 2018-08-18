@@ -97,6 +97,30 @@ void RssChannelList::add(const QUrl &channelLink)
 	_list.push_back(channel);
 }
 
+QList<QSharedPointer<RssItem>> RssChannelList::getAllItems() const
+{
+	QList<QSharedPointer<RssItem>> result;
+	result.reserve(countAllItems());
+
+	for (const QSharedPointer<RssChannel> &channel : _list) {
+		result.append(channel->getAllItems());
+	}
+
+	return result;
+}
+
+QList<QSharedPointer<RssItem>> RssChannelList::getAllUnreadItems() const
+{
+	QList<QSharedPointer<RssItem>> result;
+	result.reserve(countAllUnreadItems());
+
+	for (const QSharedPointer<RssChannel> &channel : _list) {
+		result.append(channel->getAllUnreadItems());
+	}
+
+	return result;
+}
+
 void RssChannelList::parse()
 {
 	for (const QSharedPointer<RssChannel> &channel : _list) {

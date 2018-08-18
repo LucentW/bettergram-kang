@@ -5,6 +5,7 @@
 namespace Bettergram {
 
 class RssChannel;
+class RssItem;
 
 /**
  * @brief The RssChannelList class contains list of RssChannel instances.
@@ -34,6 +35,9 @@ public:
 	int countAllUnreadItems() const;
 
 	void add(const QUrl &channelLink);
+
+	QList<QSharedPointer<RssItem>> getAllItems() const;
+	QList<QSharedPointer<RssItem>> getAllUnreadItems() const;
 
 	void parse();
 

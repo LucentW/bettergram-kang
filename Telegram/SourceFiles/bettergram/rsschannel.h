@@ -71,6 +71,10 @@ public:
 	const_iterator end() const;
 
 	const QSharedPointer<RssItem> &at(int index) const;
+
+	const QList<QSharedPointer<RssItem>> &getAllItems() const;
+	QList<QSharedPointer<RssItem>> getAllUnreadItems() const;
+
 	int count() const;
 	int countUnread() const;
 
