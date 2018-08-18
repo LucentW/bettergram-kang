@@ -68,6 +68,8 @@ private:
 
 	bool _isRead = false;
 
+	static QString removeHtmlTags(QString text);
+
 	void setIsRead(bool isRead);
 };
 
