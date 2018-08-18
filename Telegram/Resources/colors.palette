@@ -556,8 +556,10 @@ pricesPanTableCryptoShortNameFg: windowSubTextFg; // prices panel table cryptocu
 pricesPanTableUpFg: historyPeer2NameFg; // prices panel table price text in case of up (green)
 pricesPanTableDownFg: attentionButtonFg; // prices panel table price text in case of down (red)
 
-newsPanBg: pricesPanBg; // prices panel background
-newsPanHeaderFg: pricesPanHeaderFg; // prices panel header text
+newsPanBg: pricesPanBg; // news panel background
+newsPanSiteNameFg: windowSubTextFg; // news panel site name text
+newsPanNewsHeaderFg: windowFg; // news panel news header text
+newsPanNewsBodyFg: windowSubTextFg; // news panel news body text
 
 tableHeaderBg: emojiPanCategories; // table header background
 tableHeaderFg: windowSubTextFg; // table header foreground

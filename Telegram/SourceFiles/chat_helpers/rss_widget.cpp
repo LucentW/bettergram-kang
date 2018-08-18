@@ -7,6 +7,7 @@
 
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/labels.h"
+#include "ui/text/text_helper.h"
 #include "lang/lang_keys.h"
 #include "styles/style_window.h"
 #include "core/click_handler_types.h"
@@ -37,7 +38,7 @@ private:
 RssWidget::Footer::Footer(not_null<RssWidget*> parent)
 	:  InnerFooter(parent)
 	, _parent(parent)
-	, _link(object_ptr<Ui::LinkButton>(this, lang(lng_prices_footer), st::largeLinkButton))
+	, _link(object_ptr<Ui::LinkButton>(this, lang(lng_news_footer), st::largeLinkButton))
 {
 	_link->setClickedCallback([this] { onFooterClicked(); });
 }
@@ -53,28 +54,52 @@ void RssWidget::Footer::processPanelHideFinished()
 
 void RssWidget::Footer::onFooterClicked()
 {
-	QDesktopServices::openUrl(QUrl("https://www.livecoinwatch.com"));
+	QDesktopServices::openUrl(QUrl("https://bettergram.io"));
 }
 
 RssWidget::RssWidget(QWidget* parent, not_null<Window::Controller*> controller)
 	: Inner(parent, controller)
 {
-	_siteName = new Ui::IconButton(this, st::pricesPanSiteNameIcon);
-	_siteName->setClickedCallback([] { QDesktopServices::openUrl(QUrl("https://www.livecoinwatch.com")); });
-
-	_marketCap = new Ui::FlatLabel(this, st::pricesPanMarketCapLabel);
-//	_marketCap->setRichText(textcmdLink(1, lang(lng_prices_market_cap)
-//										.arg(BettergramSettings::instance()->cryptoPriceList()->marketCapString())));
-	_marketCap->setLink(1, std::make_shared<UrlClickHandler>(qsl("https://www.livecoinwatch.com")));
+	_lastUpdate = new Ui::FlatLabel(this, st::newsPanLastUpdateLabel);
+	_sortMode = new Ui::FlatLabel(this, st::newsPanSortModeLabel);
 
 	BettergramSettings::instance()->getRssChannelList();
 
 	updateControlsGeometry();
+	updateLastUpdateLabel();
+	updateSortModeLabel();
 
 	RssChannelList *rssChannelList = BettergramSettings::instance()->rssChannelList();
-	connect(rssChannelList, &RssChannelList::updated, this, &RssWidget::onRssUpdated);
+
+	connect(rssChannelList, &RssChannelList::updated,
+			this, &RssWidget::onRssUpdated);
+
+	connect(rssChannelList, &RssChannelList::lastUpdateChanged,
+			this, &RssWidget::onLastUpdateChanged);
 
 	setMouseTracking(true);
+}
+
+ClickHandlerPtr RssWidget::getSortModeClickHandler()
+{
+	return std::make_shared<LambdaClickHandler>([this] {
+		toggleIsSortBySite();
+	});
+}
+
+void RssWidget::toggleIsSortBySite()
+{
+	setIsSortBySite(!_isSortBySite);
+}
+
+void RssWidget::setIsSortBySite(bool isSortBySite)
+{
+	if (_isSortBySite != isSortBySite) {
+		_isSortBySite = isSortBySite;
+
+		updateSortModeLabel();
+		updateRows();
+	}
 }
 
 void RssWidget::refreshRecent()
@@ -149,91 +174,29 @@ void RssWidget::setSelectedRow(int selectedRow)
 	}
 }
 
-int RssWidget::getTableTop() const
+int RssWidget::getListAreaTop() const
 {
-	//TODO: bettergram: realize it?
-	return 0;
-	//return _marketCap->y() + _marketCap->height() + st::pricesPanPadding;
-}
-
-int RssWidget::getTableBottom() const
-{
-	//TODO: bettergram: realize it?
-	return 0;
-	//return getTableContentTop() + getTableContentHeight();
-}
-
-int RssWidget::getTableContentTop() const
-{
-	return getTableTop() + st::pricesPanTableHeaderHeight;
-}
-
-int RssWidget::getRowTop(int row) const
-{
-	return getTableContentTop() + row * st::pricesPanTableRowHeight;
-}
-
-QRect RssWidget::getTableRectangle() const
-{
-	return QRect(0,
-				 getTableTop(),
-				 width(),
-				 getTableBottom());
-}
-
-QRect RssWidget::getTableHeaderRectangle() const
-{
-	return QRect(0,
-				 getTableTop(),
-				 width(),
-				 st::pricesPanTableHeaderHeight);
-}
-
-QRect RssWidget::getTableContentRectangle() const
-{
-	//TODO: bettergram: realize it?
-	return QRect();
-//	return QRect(0,
-//				 getTableContentTop(),
-//				 width(),
-//				 getTableContentHeight());
-}
-
-QRect RssWidget::getRowRectangle(int row) const
-{
-	return QRect(0,
-				 getRowTop(row),
-				 width(),
-				 st::pricesPanTableRowHeight);
+	return _sortMode->y() + _sortMode->height() + st::pricesPanPadding;
 }
 
 void RssWidget::countSelectedRow(const QPoint &point)
 {
-	if (_selectedRow == -1) {
-		if (!getTableContentRectangle().contains(point)) {
-			// Nothing changed
-			return;
-		}
-	} else if (getRowRectangle(_selectedRow).contains(point)) {
-		// Nothing changed
-		return;
-	}
-
-	if (!getTableContentRectangle().contains(point)) {
+	if (point.x() < 0 || point.x() >= width()) {
 		setSelectedRow(-1);
 		return;
 	}
 
-	int rowCount = BettergramSettings::instance()->rssChannelList()->count();
-
-	for (int row = 0; row < rowCount; row++) {
-		if (getRowRectangle(row).contains(point)) {
-			setSelectedRow(row);
+	if (_selectedRow == -1) {
+		if (!_rows.contains(point.y())) {
+			// Nothing changed
 			return;
 		}
+	} else if (_rows.at(_selectedRow).contains(point.y())) {
+		// Nothing changed
+		return;
 	}
 
-	setSelectedRow(-1);
+	setSelectedRow(_rows.findRowIndex(point.y()));
 }
 
 TabbedSelector::InnerFooter* RssWidget::getFooter() const
@@ -245,7 +208,7 @@ int RssWidget::countDesiredHeight(int newWidth)
 {
 	Q_UNUSED(newWidth);
 
-	return getTableBottom();
+	return _rows.bottom();
 }
 
 void RssWidget::mousePressEvent(QMouseEvent *e)
@@ -265,14 +228,27 @@ void RssWidget::mouseReleaseEvent(QMouseEvent *e)
 	countSelectedRow(QPoint(static_cast<int>(qRound(point.x())),
 							static_cast<int>(qRound(point.y()))));
 
-//	RssChannelList *rssChannelList = BettergramSettings::instance()->cryptoPriceList();
+	if (_pressedRow >= 0 && _pressedRow < _rows.count() && _pressedRow == _selectedRow) {
+		const Row &row = _rows.at(_pressedRow).userData();
 
-//	if (_pressedRow >= 0 && _pressedRow < priceList->count() && _pressedRow == _selectedRow) {
-//		QUrl url = priceList->at(_pressedRow)->url();
-//		if (!url.isEmpty()) {
-//			QDesktopServices::openUrl(url);
-//		}
-//	}
+		QUrl link;
+
+		if (row.isItem()) {
+			link = row.item()->link();
+
+			//TODO: bettergram: mark the rss item as read and remove it from the list
+			row.item()->markAsRead();
+		} else if(row.isChannel()) {
+			link = row.channel()->link();
+		} else {
+			LOG(("Unable to recognize row content"));
+			return;
+		}
+
+		if (!link.isEmpty()) {
+			QDesktopServices::openUrl(link);
+		}
+	}
 }
 
 void RssWidget::mouseMoveEvent(QMouseEvent *e)
@@ -304,80 +280,86 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 		painter.setClipRect(r);
 	}
 
-	painter.fillRect(r, st::pricesPanBg);
+	painter.fillRect(r, st::newsPanBg);
 
-	int top = getTableContentTop();
+	const int iconLeft = st::newsPanPadding;
+	const int iconSize = st::newsPanImageSize;
 
-//	int columnCoinWidth = _coinHeader->width()
-//			- _coinHeader->contentsMargins().left()
-//			- _coinHeader->contentsMargins().right()
-//			- st::pricesPanTableImageSize
-//			- st::pricesPanTablePadding;
+	const int textLeft = iconLeft + iconSize + st::newsPanPadding;
+	const int textRight = width();
+	const int textWidth = textRight - textLeft;
 
-//	int columnPriceWidth = _priceHeader->width()
-//			- _priceHeader->contentsMargins().left()
-//			- _priceHeader->contentsMargins().right();
+	// Draw rows
 
-//	int column24hWidth = _24hHeader->width()
-//			- _24hHeader->contentsMargins().left()
-//			- _24hHeader->contentsMargins().right();
+	for (int i = 0; i < _rows.count(); i++) {
+		const ListRow<Row> &row = _rows.at(i);
 
-//	int columnCoinLeft = _coinHeader->x() + _coinHeader->contentsMargins().left();
-//	int columnPriceLeft = _priceHeader->x() + _priceHeader->contentsMargins().left();
-//	int column24hLeft = _24hHeader->x() + _24hHeader->contentsMargins().left();
+		if (i == _selectedRow) {
+			QRect rowRectangle(0, row.top(), width(), row.height());
+			App::roundRect(painter, rowRectangle, st::newsPanHover, StickerHoverCorners);
+		}
 
-//	// Draw rows
+		if (row.userData().isItem()) {
+			QRect rowRect(textLeft,
+						 row.top() + st::newsPanRowVerticalPadding,
+						 textWidth,
+						 row.height() - st::newsPanDateHeight - 2 * st::newsPanRowVerticalPadding);
 
-//	int columnCoinTextLeft = columnCoinLeft + st::pricesPanTableImageSize + st::pricesPanTablePadding;
-//	int rowCount = BettergramSettings::instance()->cryptoPriceList()->count();
+			painter.setFont(st::semiboldFont);
+			painter.setPen(st::newsPanNewsHeaderFg);
 
-//	if (_selectedRow != -1 && _selectedRow < rowCount) {
-//		QRect rowRectangle(0, getRowTop(_selectedRow), width(), st::pricesPanTableRowHeight);
-//		App::roundRect(painter, rowRectangle, st::pricesPanHover, StickerHoverCorners);
-//	}
+			int titleFlags = Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap;
+			const QString &title = row.userData().item()->title();
 
-//	painter.setFont(st::semiboldFont);
+			QRect boundingRect = painter.boundingRect(rowRect, titleFlags, title);
 
-//	for (const CryptoPrice *price : *BettergramSettings::instance()->cryptoPriceList()) {
-//		if (!price->icon().isNull()) {
-//			QRect targetRect(columnCoinLeft,
-//							 top + (st::pricesPanTableRowHeight - st::pricesPanTableImageSize) / 2,
-//							 st::pricesPanTableImageSize,
-//							 st::pricesPanTableImageSize);
+			if (boundingRect.height() >= rowRect.height()) {
+				boundingRect.setHeight(rowRect.height());
+				TextHelper::drawElidedText(painter, rowRect, title);
 
-//			painter.drawPixmap(targetRect, price->icon());
-//		}
+				painter.setFont(st::normalFont);
+				painter.setPen(st::newsPanNewsBodyFg);
+			} else {
+				painter.drawText(boundingRect, titleFlags, title, &boundingRect);
 
-//		painter.setPen(st::pricesPanTableCryptoNameFg);
+				painter.setFont(st::normalFont);
+				painter.setPen(st::newsPanNewsBodyFg);
 
-//		painter.drawText(columnCoinTextLeft, top, columnCoinWidth, st::pricesPanTableRowHeight / 2,
-//						 Qt::AlignLeft | Qt::AlignBottom, price->name());
+				QRect descriptionRect(textLeft, boundingRect.bottom(),
+						 textWidth, rowRect.bottom() - boundingRect.bottom());
 
-//		painter.setPen(st::pricesPanTableCryptoShortNameFg);
+				TextHelper::drawElidedText(painter,
+						 descriptionRect,
+						 row.userData().item()->description());
+			}
 
-//		painter.drawText(columnCoinTextLeft, top + st::pricesPanTableRowHeight / 2, columnCoinWidth, st::pricesPanTableRowHeight / 2,
-//						 Qt::AlignLeft | Qt::AlignTop, price->shortName());
+			painter.drawText(textLeft,
+						 row.bottom() - st::newsPanDateHeight - st::newsPanRowVerticalPadding,
+						 textWidth,
+						 st::newsPanDateHeight,
+						 Qt::AlignLeft | Qt::AlignBottom,
+						 row.userData().item()->publishDateString());
+		} else if (row.userData().isChannel()) {
+			painter.setFont(st::semiboldFont);
+			painter.setPen(st::newsPanSiteNameFg);
 
-//		if (price->isCurrentPriceGrown()) {
-//			painter.setPen(st::pricesPanTableUpFg);
-//		} else {
-//			painter.setPen(st::pricesPanTableDownFg);
-//		}
+			painter.drawText(textLeft, row.top(), textWidth, row.height(),
+						 Qt::AlignLeft | Qt::AlignVCenter | Qt::TextWordWrap,
+						 row.userData().channel()->title());
+		} else {
+			LOG(("Unable to recognize row content"));
+			continue;
+		}
 
-//		painter.drawText(columnPriceLeft, top, columnPriceWidth, st::pricesPanTableRowHeight,
-//						 Qt::AlignRight | Qt::AlignVCenter, price->currentPriceString());
+		//if (!price->icon().isNull()) {
+		//	QRect targetRect(columnCoinLeft,
+		//	top + (st::pricesPanTableRowHeight - st::pricesPanTableImageSize) / 2,
+		//	st::pricesPanTableImageSize,
+		//	st::pricesPanTableImageSize);
 
-//		if (price->isChangeFor24HoursGrown()) {
-//			painter.setPen(st::pricesPanTableUpFg);
-//		} else {
-//			painter.setPen(st::pricesPanTableDownFg);
-//		}
-
-//		painter.drawText(column24hLeft, top, column24hWidth, st::pricesPanTableRowHeight,
-//						 Qt::AlignRight | Qt::AlignVCenter, price->changeFor24HoursString());
-
-//		top += st::pricesPanTableRowHeight;
-//	}
+		//	painter.drawPixmap(targetRect, price->icon());
+		//}
+	}
 }
 
 void RssWidget::resizeEvent(QResizeEvent *e)
@@ -387,29 +369,80 @@ void RssWidget::resizeEvent(QResizeEvent *e)
 
 void RssWidget::updateControlsGeometry()
 {
-	_siteName->moveToLeft((width() - _siteName->width()) / 2, st::pricesPanHeader);
+	_lastUpdate->moveToLeft(st::newsPanPadding, st::newsPanHeader);
+	_sortMode->moveToLeft(st::newsPanPadding,
+							 _lastUpdate->y() + _lastUpdate->height() + st::newsPanPadding / 2);
 
-	updateMarketCap();
-
-	int columnCoinWidth = width() - st::pricesPanColumnPriceWidth - st::pricesPanColumn24hWidth;
-
-	int headerTop = getTableTop();
+	updateLastUpdateLabel();
+	updateSortModeLabel();
 }
 
-void RssWidget::updateMarketCap()
+void RssWidget::updateLastUpdateLabel()
 {
-//	_marketCap->setRichText(textcmdLink(1, lang(lng_prices_market_cap)
-//										.arg(BettergramSettings::instance()->cryptoPriceList()->marketCapString())));
-//	_marketCap->setLink(1, std::make_shared<UrlClickHandler>(qsl("https://www.livecoinwatch.com")));
+	_lastUpdate->setText(lang(lng_news_last_update)
+		.arg(BettergramSettings::instance()->rssChannelList()->lastUpdateString()));
+}
 
-//	_marketCap->moveToLeft((width() - _marketCap->width()) / 2,
-//						   _siteName->y() + _siteName->height() + st::pricesPanPadding);
+void RssWidget::updateSortModeLabel()
+{
+	if (_isSortBySite) {
+		_sortMode->setRichText(textcmdLink(1, lang(lng_news_sort_by_time)));
+	} else {
+		_sortMode->setRichText(textcmdLink(1, lang(lng_news_sort_by_site)));
+	}
+
+	_sortMode->setLink(1, getSortModeClickHandler());
+}
+
+void RssWidget::fillRowsInSortByTimeMode()
+{
+	RssChannelList *channelList = BettergramSettings::instance()->rssChannelList();
+	QList<QSharedPointer<RssItem>> items = channelList->getAllItems();
+
+	RssChannel::sort(items);
+
+	// We use getAllItems() instead of getAllUnreadItems() because we just fetched them
+	for (const QSharedPointer<RssItem> &item : items) {
+		_rows.add(Row(item), st::newsPanRowHeight);
+	}
+}
+
+void RssWidget::fillRowsInSortBySiteMode()
+{
+	RssChannelList *channelList = BettergramSettings::instance()->rssChannelList();
+
+	for (const QSharedPointer<RssChannel> &channel : *channelList) {
+		_rows.add(Row(channel), st::newsPanChannelRowHeight);
+
+		// We use getAllItems() instead of getAllUnreadItems() because we just fetched them
+		for (const QSharedPointer<RssItem> &item : channel->getAllItems()) {
+			_rows.add(Row(item), st::newsPanRowHeight);
+		}
+	}
+}
+
+void RssWidget::updateRows()
+{
+	_rows.clear();
+	_rows.setTop(getListAreaTop());
+
+	if (_isSortBySite) {
+		fillRowsInSortBySiteMode();
+	} else {
+		fillRowsInSortByTimeMode();
+	}
+
+	update();
+}
+
+void RssWidget::onLastUpdateChanged()
+{
+	updateLastUpdateLabel();
 }
 
 void RssWidget::onRssUpdated()
 {
-	updateMarketCap();
-	update();
+	updateRows();
 }
 
 } // namespace ChatHelpers
