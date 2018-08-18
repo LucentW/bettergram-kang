@@ -6,6 +6,8 @@ class QXmlStreamReader;
 
 namespace Bettergram {
 
+class RssChannel;
+
 /**
  * @brief The RssItem class contains information from a RSS item.
  */
@@ -13,7 +15,7 @@ class RssItem : public QObject {
 	Q_OBJECT
 
 public:
-	explicit RssItem(QObject *parent = nullptr);
+	explicit RssItem(RssChannel *channel);
 
 	explicit RssItem(const QString &guid,
 					 const QString &title,
@@ -23,7 +25,7 @@ public:
 					 const QUrl &link,
 					 const QUrl &commentsLink,
 					 const QDateTime &publishDate,
-					 QObject *parent = nullptr);
+					 RssChannel *channel);
 
 	const QString &guid() const;
 	const QString &title() const;
@@ -34,6 +36,7 @@ public:
 	const QUrl &commentsLink() const;
 	const QDateTime &publishDate() const;
 	const QString publishDateString() const;
+	const QPixmap &icon() const;
 
 	bool isValid() const;
 
@@ -51,6 +54,8 @@ signals:
 protected:
 
 private:
+	RssChannel *const _channel;
+
 	QString _guid;
 	QString _title;
 	QString _description;

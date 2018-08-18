@@ -71,11 +71,14 @@ RssWidget::RssWidget(QWidget* parent, not_null<Window::Controller*> controller)
 
 	RssChannelList *rssChannelList = BettergramSettings::instance()->rssChannelList();
 
-	connect(rssChannelList, &RssChannelList::updated,
-			this, &RssWidget::onRssUpdated);
-
 	connect(rssChannelList, &RssChannelList::lastUpdateChanged,
 			this, &RssWidget::onLastUpdateChanged);
+
+	connect(rssChannelList, &RssChannelList::iconChanged,
+			this, &RssWidget::onIconChanged);
+
+	connect(rssChannelList, &RssChannelList::updated,
+			this, &RssWidget::onRssUpdated);
 
 	setMouseTracking(true);
 }
@@ -339,6 +342,15 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 						 st::newsPanDateHeight,
 						 Qt::AlignLeft | Qt::AlignBottom,
 						 row.userData().item()->publishDateString());
+
+			if (!row.userData().item()->icon().isNull()) {
+				QRect targetRect(iconLeft,
+								 rowRect.top() + (rowRect.height() - st::newsPanImageSize) / 2,
+								 st::newsPanImageSize,
+								 st::newsPanImageSize);
+
+				painter.drawPixmap(targetRect, row.userData().item()->icon());
+			}
 		} else if (row.userData().isChannel()) {
 			painter.setFont(st::semiboldFont);
 			painter.setPen(st::newsPanSiteNameFg);
@@ -346,19 +358,19 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 			painter.drawText(textLeft, row.top(), textWidth, row.height(),
 						 Qt::AlignLeft | Qt::AlignVCenter | Qt::TextWordWrap,
 						 row.userData().channel()->title());
+
+			if (!row.userData().channel()->icon().isNull()) {
+				QRect targetRect(iconLeft,
+								 row.top() + (row.height() - st::newsPanImageSize) / 2,
+								 st::newsPanImageSize,
+								 st::newsPanImageSize);
+
+				painter.drawPixmap(targetRect, row.userData().channel()->icon());
+			}
 		} else {
 			LOG(("Unable to recognize row content"));
 			continue;
 		}
-
-		//if (!price->icon().isNull()) {
-		//	QRect targetRect(columnCoinLeft,
-		//	top + (st::pricesPanTableRowHeight - st::pricesPanTableImageSize) / 2,
-		//	st::pricesPanTableImageSize,
-		//	st::pricesPanTableImageSize);
-
-		//	painter.drawPixmap(targetRect, price->icon());
-		//}
 	}
 }
 
@@ -438,6 +450,11 @@ void RssWidget::updateRows()
 void RssWidget::onLastUpdateChanged()
 {
 	updateLastUpdateLabel();
+}
+
+void RssWidget::onIconChanged()
+{
+	update();
 }
 
 void RssWidget::onRssUpdated()

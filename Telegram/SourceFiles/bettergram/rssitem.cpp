@@ -1,10 +1,16 @@
 #include "rssitem.h"
+#include "rsschannel.h"
 #include <QXmlStreamReader>
 
 namespace Bettergram {
 
-RssItem::RssItem(QObject *parent) : QObject(parent)
+RssItem::RssItem(RssChannel *channel) :
+	QObject(channel),
+	_channel(channel)
 {
+	if (!_channel) {
+		throw std::invalid_argument("RSS Channel is null");
+	}
 }
 
 RssItem::RssItem(const QString &guid,
@@ -15,8 +21,9 @@ RssItem::RssItem(const QString &guid,
 				 const QUrl &link,
 				 const QUrl &commentsLink,
 				 const QDateTime &publishDate,
-				 QObject *parent) :
-	QObject(parent),
+				 RssChannel *channel) :
+	QObject(channel),
+	_channel(channel),
 	_guid(guid),
 	_title(title),
 	_description(description),
@@ -26,6 +33,9 @@ RssItem::RssItem(const QString &guid,
 	_commentsLink(commentsLink),
 	_publishDate(publishDate)
 {
+	if (!_channel) {
+		throw std::invalid_argument("RSS Channel is null");
+	}
 }
 
 const QString &RssItem::guid() const
@@ -71,6 +81,15 @@ const QDateTime &RssItem::publishDate() const
 const QString RssItem::publishDateString() const
 {
 	return _publishDate.isNull() ? QString() : _publishDate.toString("hh:mm");
+}
+
+const QPixmap &RssItem::icon() const
+{
+	if (!_channel) {
+		throw std::invalid_argument("RSS Channel is null");
+	}
+
+	return _channel->icon();
 }
 
 bool RssItem::isValid() const

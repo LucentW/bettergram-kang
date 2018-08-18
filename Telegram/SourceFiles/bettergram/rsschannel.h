@@ -58,11 +58,13 @@ public:
 	const QUrl &feedLink() const;
 	void setFeedLink(const QUrl &link);
 
+	const QUrl &iconLink() const;
+	void setIconLink(const QUrl &iconLink);
+
 	const QUrl &link() const;
 	void setLink(const QUrl &link);
 
-	const QUrl &image() const;
-	void setImage(const QUrl &image);
+	const QPixmap &icon() const;
 
 	bool isFetching() const;
 	bool isFailed() const;
@@ -90,6 +92,7 @@ public:
 public slots:
 
 signals:
+	void iconChanged();
 	void updated();
 
 protected:
@@ -112,8 +115,10 @@ private:
 	QString _skipDays;
 
 	QUrl _feedLink;
+	QUrl _iconLink;
 	QUrl _link;
-	QUrl _image;
+
+	QPixmap _icon;
 
 	QByteArray _source;
 	QByteArray _lastSourceHash;
@@ -127,6 +132,9 @@ private:
 	void setIsFetching(bool isFetching);
 	void setIsFailed(bool isFailed);
 
+	void setIcon(const QByteArray &byteArray);
+	void setIcon(const QPixmap &icon);
+
 	QByteArray countSourceHash(const QByteArray &source) const;
 
 	void parseRss(QXmlStreamReader &xml);
@@ -135,6 +143,8 @@ private:
 	void parseItem(QXmlStreamReader &xml);
 
 	void merge(const QSharedPointer<RssItem> &item);
+
+	void downloadIcon();
 };
 
 } // namespace Bettergram
