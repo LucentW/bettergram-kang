@@ -29,6 +29,16 @@ void RssChannelList::setFreq(int freq)
 	}
 }
 
+QTime RssChannelList::lastUpdate() const
+{
+	return _lastUpdate;
+}
+
+QString RssChannelList::lastUpdateString() const
+{
+	return _lastUpdate.isNull() ? QLatin1String("---") : _lastUpdate.toString("hh:mm:ss");
+}
+
 RssChannelList::const_iterator RssChannelList::begin() const
 {
 	return _list.begin();
@@ -96,15 +106,25 @@ void RssChannelList::parse()
 	}
 
 	bool isChanged = false;
+	bool isAtLeastOneUpdated = false;
 
 	for (const QSharedPointer<RssChannel> &channel : _list) {
-		if (channel->parse()) {
-			isChanged = true;
+		if (!channel->isFailed()) {
+			isAtLeastOneUpdated = true;
+
+			if (channel->parse()) {
+				isChanged = true;
+			}
 		}
 	}
 
 	if (isChanged) {
 		emit updated();
+	}
+
+	if (isAtLeastOneUpdated) {
+		_lastUpdate = QTime::currentTime();
+		emit lastUpdateChanged();
 	}
 }
 

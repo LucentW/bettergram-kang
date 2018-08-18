@@ -20,11 +20,15 @@ public:
 	int freq() const;
 	void setFreq(int freq);
 
+	QTime lastUpdate() const;
+	QString lastUpdateString() const;
+
 	const_iterator begin() const;
 	const_iterator end() const;
 
 	/// Can throw std::out_of_range() exception
 	const QSharedPointer<RssChannel> &at(int index) const;
+
 	int count() const;
 	int countAllItems() const;
 	int countAllUnreadItems() const;
@@ -37,6 +41,8 @@ public slots:
 
 signals:
 	void freqChanged();
+	void lastUpdateChanged();
+	
 	void updated();
 
 protected:
@@ -49,6 +55,8 @@ private:
 
 	/// Frequency of updates in seconds
 	int _freq;
+
+	QTime _lastUpdate;
 };
 
 } // namespace Bettergram

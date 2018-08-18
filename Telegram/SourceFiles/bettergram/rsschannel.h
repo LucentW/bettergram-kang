@@ -65,6 +65,7 @@ public:
 	void setImage(const QUrl &image);
 
 	bool isFetching() const;
+	bool isFailed() const;
 
 	const_iterator begin() const;
 	const_iterator end() const;
@@ -113,12 +114,14 @@ private:
 	QByteArray _source;
 	QByteArray _lastSourceHash;
 	bool _isFetching = false;
+	bool _isFailed = false;
 
 	QList<QSharedPointer<RssItem>> _list;
 
 	static bool compare(const QSharedPointer<RssItem> &a, const QSharedPointer<RssItem> &b);
 
 	void setIsFetching(bool isFetching);
+	void setIsFailed(bool isFailed);
 
 	QByteArray countSourceHash(const QByteArray &source) const;
 
