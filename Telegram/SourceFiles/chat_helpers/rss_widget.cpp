@@ -78,14 +78,16 @@ const style::color &RssWidget::getNewsBodyColor(const QSharedPointer<RssItem> &i
 RssWidget::RssWidget(QWidget* parent, not_null<Window::Controller*> controller)
 	: Inner(parent, controller)
 {
-	_lastUpdate = new Ui::FlatLabel(this, st::newsPanLastUpdateLabel);
-	_sortMode = new Ui::FlatLabel(this, st::newsPanSortModeLabel);
+	_lastUpdateLabel = new Ui::FlatLabel(this, st::newsPanLastUpdateLabel);
+	_sortModeLabel = new Ui::FlatLabel(this, st::newsPanSortModeLabel);
+	_isShowReadLabel = new Ui::FlatLabel(this, st::newsPanIsShowReadLabel);
 
 	BettergramSettings::instance()->getRssChannelList();
 
 	updateControlsGeometry();
 	updateLastUpdateLabel();
 	updateSortModeLabel();
+	updateIsShowReadLabel();
 
 	RssChannelList *rssChannelList = BettergramSettings::instance()->rssChannelList();
 
@@ -108,6 +110,13 @@ ClickHandlerPtr RssWidget::getSortModeClickHandler()
 	});
 }
 
+ClickHandlerPtr RssWidget::getIsShowReadClickHandler()
+{
+	return std::make_shared<LambdaClickHandler>([this] {
+		toggleIsShowRead();
+	});
+}
+
 void RssWidget::toggleIsSortBySite()
 {
 	setIsSortBySite(!_isSortBySite);
@@ -119,6 +128,24 @@ void RssWidget::setIsSortBySite(bool isSortBySite)
 		_isSortBySite = isSortBySite;
 
 		updateSortModeLabel();
+		updateRows();
+		resizeToWidth(width());
+	}
+}
+
+void RssWidget::toggleIsShowRead()
+{
+	setIsShowRead(!_isShowRead);
+}
+
+void RssWidget::setIsShowRead(bool isShowRead)
+{
+	if (_isShowRead != isShowRead) {
+		_isShowRead = isShowRead;
+
+		updateIsShowReadLabel();
+		_isShowReadLabel->moveToRight(st::newsPanPadding, _sortModeLabel->y());
+
 		updateRows();
 		resizeToWidth(width());
 	}
@@ -198,7 +225,7 @@ void RssWidget::setSelectedRow(int selectedRow)
 
 int RssWidget::getListAreaTop() const
 {
-	return _sortMode->y() + _sortMode->height() + st::pricesPanPadding;
+	return _sortModeLabel->y() + _sortModeLabel->height() + st::pricesPanPadding;
 }
 
 void RssWidget::countSelectedRow(const QPoint &point)
@@ -258,6 +285,10 @@ void RssWidget::mouseReleaseEvent(QMouseEvent *e)
 		if (row.isItem()) {
 			link = row.item()->link();
 			row.item()->markAsRead();
+
+			if (!_isShowRead) {
+				updateRows();
+			}
 		} else if(row.isChannel()) {
 			link = row.channel()->link();
 		} else {
@@ -406,9 +437,13 @@ void RssWidget::resizeEvent(QResizeEvent *e)
 
 void RssWidget::updateControlsGeometry()
 {
-	_lastUpdate->moveToLeft(st::newsPanPadding, st::newsPanHeader);
-	_sortMode->moveToLeft(st::newsPanPadding,
-							 _lastUpdate->y() + _lastUpdate->height() + st::newsPanPadding / 2);
+	updateIsShowReadLabel();
+
+	_lastUpdateLabel->moveToLeft(st::newsPanPadding, st::newsPanHeader);
+	_sortModeLabel->moveToLeft(st::newsPanPadding,
+							 _lastUpdateLabel->y() + _lastUpdateLabel->height() + st::newsPanPadding / 2);
+
+	_isShowReadLabel->moveToRight(st::newsPanPadding, _sortModeLabel->y());
 
 	updateLastUpdateLabel();
 	updateSortModeLabel();
@@ -416,29 +451,45 @@ void RssWidget::updateControlsGeometry()
 
 void RssWidget::updateLastUpdateLabel()
 {
-	_lastUpdate->setText(lang(lng_news_last_update)
+	_lastUpdateLabel->setText(lang(lng_news_last_update)
 		.arg(BettergramSettings::instance()->rssChannelList()->lastUpdateString()));
 }
 
 void RssWidget::updateSortModeLabel()
 {
 	if (_isSortBySite) {
-		_sortMode->setRichText(textcmdLink(1, lang(lng_news_sort_by_time)));
+		_sortModeLabel->setRichText(textcmdLink(1, lang(lng_news_sort_by_time)));
 	} else {
-		_sortMode->setRichText(textcmdLink(1, lang(lng_news_sort_by_site)));
+		_sortModeLabel->setRichText(textcmdLink(1, lang(lng_news_sort_by_site)));
 	}
 
-	_sortMode->setLink(1, getSortModeClickHandler());
+	_sortModeLabel->setLink(1, getSortModeClickHandler());
+}
+
+void RssWidget::updateIsShowReadLabel()
+{
+	if (_isShowRead) {
+		_isShowReadLabel->setRichText(textcmdLink(1, lang(lng_news_show_only_unread_news)));
+	} else {
+		_isShowReadLabel->setRichText(textcmdLink(1, lang(lng_news_show_all_news)));
+	}
+
+	_isShowReadLabel->setLink(1, getIsShowReadClickHandler());
 }
 
 void RssWidget::fillRowsInSortByTimeMode()
 {
 	RssChannelList *channelList = BettergramSettings::instance()->rssChannelList();
-	QList<QSharedPointer<RssItem>> items = channelList->getAllItems();
+	QList<QSharedPointer<RssItem>> items;
+
+	if (_isShowRead) {
+		items = channelList->getAllItems();
+	} else {
+		items = channelList->getAllUnreadItems();
+	}
 
 	RssChannel::sort(items);
 
-	// We use getAllItems() instead of getAllUnreadItems() because we just fetched them
 	for (const QSharedPointer<RssItem> &item : items) {
 		_rows.add(Row(item), st::newsPanRowHeight);
 	}
@@ -451,8 +502,15 @@ void RssWidget::fillRowsInSortBySiteMode()
 	for (const QSharedPointer<RssChannel> &channel : *channelList) {
 		_rows.add(Row(channel), st::newsPanChannelRowHeight);
 
-		// We use getAllItems() instead of getAllUnreadItems() because we just fetched them
-		for (const QSharedPointer<RssItem> &item : channel->getAllItems()) {
+		QList<QSharedPointer<RssItem>> items;
+
+		if (_isShowRead) {
+			items = channel->getAllItems();
+		} else {
+			items = channel->getAllUnreadItems();
+		}
+
+		for (const QSharedPointer<RssItem> &item : items) {
 			_rows.add(Row(item), st::newsPanRowHeight);
 		}
 	}

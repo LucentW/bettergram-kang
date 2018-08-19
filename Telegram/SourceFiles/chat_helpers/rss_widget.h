@@ -96,18 +96,25 @@ private:
 	int _selectedRow = -1;
 	int _pressedRow = -1;
 	bool _isSortBySite = false;
+	bool _isShowRead = true;
 
-	Ui::FlatLabel *_lastUpdate = nullptr;
-	Ui::FlatLabel *_sortMode = nullptr;
+	Ui::FlatLabel *_lastUpdateLabel = nullptr;
+	Ui::FlatLabel *_sortModeLabel = nullptr;
+	Ui::FlatLabel *_isShowReadLabel = nullptr;
 	Footer *_footer = nullptr;
 
 	static const style::color &getNewsHeaderColor(const QSharedPointer<Bettergram::RssItem> &item);
 	static const style::color &getNewsBodyColor(const QSharedPointer<Bettergram::RssItem> &item);
 
 	ClickHandlerPtr getSortModeClickHandler();
+	ClickHandlerPtr getIsShowReadClickHandler();
 
 	void toggleIsSortBySite();
 	void setIsSortBySite(bool isSortBySite);
+
+	void toggleIsShowRead();
+	void setIsShowRead(bool isShowRead);
+
 	void setSelectedRow(int selectedRow);
 
 	int getListAreaTop() const;
@@ -117,6 +124,7 @@ private:
 	void updateControlsGeometry();
 	void updateLastUpdateLabel();
 	void updateSortModeLabel();
+	void updateIsShowReadLabel();
 
 	void startRssTimer();
 	void stopRssTimer();
