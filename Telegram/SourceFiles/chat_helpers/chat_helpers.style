@@ -218,25 +218,36 @@ newsPanDateHeight: 16px;
 newsPanImageSize: 32px;
 newsPanHover: pricesPanHover; // background of selected row in news panel
 
-// Market capitalization label at the PricesListWidget
+// Last update label at the RssWidget
 newsPanLastUpdateLabel: FlatLabel(defaultFlatLabel) {
-        align: align(left);
+		align: align(left);
 		textFg: windowSubTextFg;
 		style: TextStyle(defaultTextStyle) {
 		}
 		palette: TextPalette(defaultTextPalette) {
-	        linkFg: windowSubTextFg;
+			linkFg: windowSubTextFg;
 		}
 }
 
-// Market capitalization label at the PricesListWidget
+// Sort model label at the RssWidget
 newsPanSortModeLabel: FlatLabel(defaultFlatLabel) {
         align: align(left);
 		textFg: windowSubTextFg;
 		style: TextStyle(defaultTextStyle) {
 		}
 		palette: TextPalette(defaultTextPalette) {
-	        linkFg: windowSubTextFg;
+			linkFg: windowSubTextFg;
+		}
+}
+
+// Show unread news label at the RssWidget
+newsPanIsShowReadLabel: FlatLabel(defaultFlatLabel) {
+		align: align(right);
+		textFg: windowSubTextFg;
+		style: TextStyle(defaultTextStyle) {
+		}
+		palette: TextPalette(defaultTextPalette) {
+			linkFg: windowSubTextFg;
 		}
 }
 
