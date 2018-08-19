@@ -297,6 +297,14 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 	for (int i = 0; i < _rows.count(); i++) {
 		const ListRow<Row> &row = _rows.at(i);
 
+		if (row.bottom() < r.top()) {
+			continue;
+		}
+
+		if (row.top() > r.bottom()) {
+			break;
+		}
+
 		if (i == _selectedRow) {
 			QRect rowRectangle(0, row.top(), width(), row.height());
 			App::roundRect(painter, rowRectangle, st::newsPanHover, StickerHoverCorners);
