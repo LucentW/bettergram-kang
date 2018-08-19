@@ -57,6 +57,24 @@ void RssWidget::Footer::onFooterClicked()
 	QDesktopServices::openUrl(QUrl("https://bettergram.io"));
 }
 
+const style::color &RssWidget::getNewsHeaderColor(const QSharedPointer<RssItem> &item)
+{
+	if (item->isRead()) {
+		return st::newsPanNewsReadFg;
+	} else {
+		return st::newsPanNewsHeaderFg;
+	}
+}
+
+const style::color &RssWidget::getNewsBodyColor(const QSharedPointer<RssItem> &item)
+{
+	if (item->isRead()) {
+		return st::newsPanNewsReadFg;
+	} else {
+		return st::newsPanNewsBodyFg;
+	}
+}
+
 RssWidget::RssWidget(QWidget* parent, not_null<Window::Controller*> controller)
 	: Inner(parent, controller)
 {
@@ -238,8 +256,6 @@ void RssWidget::mouseReleaseEvent(QMouseEvent *e)
 
 		if (row.isItem()) {
 			link = row.item()->link();
-
-			//TODO: bettergram: mark the rss item as read and remove it from the list
 			row.item()->markAsRead();
 		} else if(row.isChannel()) {
 			link = row.channel()->link();
@@ -317,7 +333,7 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 						 row.height() - st::newsPanDateHeight - 2 * st::newsPanRowVerticalPadding);
 
 			painter.setFont(st::semiboldFont);
-			painter.setPen(st::newsPanNewsHeaderFg);
+			painter.setPen(getNewsHeaderColor(row.userData().item()));
 
 			int titleFlags = Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap;
 			const QString &title = row.userData().item()->title();
@@ -329,12 +345,12 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 				TextHelper::drawElidedText(painter, rowRect, title);
 
 				painter.setFont(st::normalFont);
-				painter.setPen(st::newsPanNewsBodyFg);
+				painter.setPen(getNewsBodyColor(row.userData().item()));
 			} else {
 				painter.drawText(boundingRect, titleFlags, title, &boundingRect);
 
 				painter.setFont(st::normalFont);
-				painter.setPen(st::newsPanNewsBodyFg);
+				painter.setPen(getNewsBodyColor(row.userData().item()));
 
 				QRect descriptionRect(textLeft, boundingRect.bottom(),
 						 textWidth, rowRect.bottom() - boundingRect.bottom());

@@ -560,6 +560,7 @@ newsPanBg: pricesPanBg; // news panel background
 newsPanSiteNameFg: windowSubTextFg; // news panel site name text
 newsPanNewsHeaderFg: windowFg; // news panel news header text
 newsPanNewsBodyFg: windowSubTextFg; // news panel news body text
+newsPanNewsReadFg: windowSubTextFg; // news panel already read news text
 
 tableHeaderBg: emojiPanCategories; // table header background
 tableHeaderFg: windowSubTextFg; // table header foreground
