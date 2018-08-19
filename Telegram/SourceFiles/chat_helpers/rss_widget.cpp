@@ -120,6 +120,7 @@ void RssWidget::setIsSortBySite(bool isSortBySite)
 
 		updateSortModeLabel();
 		updateRows();
+		resizeToWidth(width());
 	}
 }
 
