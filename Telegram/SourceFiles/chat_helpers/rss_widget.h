@@ -101,6 +101,9 @@ private:
 	Ui::FlatLabel *_sortMode = nullptr;
 	Footer *_footer = nullptr;
 
+	static const style::color &getNewsHeaderColor(const QSharedPointer<Bettergram::RssItem> &item);
+	static const style::color &getNewsBodyColor(const QSharedPointer<Bettergram::RssItem> &item);
+
 	ClickHandlerPtr getSortModeClickHandler();
 
 	void toggleIsSortBySite();
