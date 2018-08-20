@@ -372,6 +372,14 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 
 			QRect boundingRect = painter.boundingRect(rowRect, titleFlags, title);
 
+			// We decided do not show description text, only title
+#if 1
+			boundingRect.setHeight(rowRect.height());
+			TextHelper::drawElidedText(painter, rowRect, title);
+
+			painter.setFont(st::normalFont);
+			painter.setPen(getNewsBodyColor(row.userData().item()));
+#else
 			if (boundingRect.height() >= rowRect.height()) {
 				boundingRect.setHeight(rowRect.height());
 				TextHelper::drawElidedText(painter, rowRect, title);
@@ -391,6 +399,7 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 						 descriptionRect,
 						 row.userData().item()->description());
 			}
+#endif
 
 			painter.drawText(textLeft,
 						 row.bottom() - st::newsPanDateHeight - st::newsPanRowVerticalPadding,

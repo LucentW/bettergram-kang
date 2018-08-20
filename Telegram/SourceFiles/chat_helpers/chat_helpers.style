@@ -211,7 +211,7 @@ pricesPanMarketCapLabel: FlatLabel(defaultFlatLabel) {
 
 newsPanPadding: pricesPanPadding;
 newsPanHeader: pricesPanHeader;
-newsPanRowHeight: 104px;
+newsPanRowHeight: 64px;
 newsPanRowVerticalPadding: 4px;
 newsPanChannelRowHeight: 64;
 newsPanDateHeight: 16px;
