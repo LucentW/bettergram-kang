@@ -971,7 +971,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_prices_header_24h" = "24h";
 
 "lng_news_footer" = "Visit the Site";
-"lng_news_last_update" = "Last update: %1";
+"lng_news_last_update" = "%1";
 "lng_news_sort_by_site" = "Sort by site";
 "lng_news_sort_by_time" = "Sort by time";
 "lng_news_show_all_news" = "Show all news";
