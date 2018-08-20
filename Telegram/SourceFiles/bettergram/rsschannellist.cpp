@@ -6,11 +6,12 @@
 namespace Bettergram {
 
 const int RssChannelList::_defaultFreq = 60;
+const QString RssChannelList::_defaultLastUpdateString = "...";
 
 QString RssChannelList::countLastUpdateString(const QDateTime &dateTime)
 {
 	if (dateTime.isNull()) {
-		return QString();
+		return _defaultLastUpdateString;
 	}
 
 	qint64 daysBefore = QDateTime::currentDateTime().daysTo(dateTime);
@@ -30,7 +31,8 @@ QString RssChannelList::countLastUpdateString(const QDateTime &dateTime)
 
 RssChannelList::RssChannelList(QObject *parent) :
 	QObject(parent),
-	_freq(_defaultFreq)
+	_freq(_defaultFreq),
+	_lastUpdateString(_defaultLastUpdateString)
 {
 }
 

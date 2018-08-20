@@ -55,6 +55,7 @@ protected:
 private:
 	/// Default frequency of updates in seconds
 	static const int _defaultFreq;
+	static const QString _defaultLastUpdateString;
 
 	QList<QSharedPointer<RssChannel>> _list;
 
