@@ -446,6 +446,8 @@ void RssWidget::resizeEvent(QResizeEvent *e)
 
 void RssWidget::updateControlsGeometry()
 {
+	updateLastUpdateLabel();
+	updateSortModeLabel();
 	updateIsShowReadLabel();
 
 	_lastUpdateLabel->moveToLeft(st::newsPanPadding, st::newsPanHeader);
@@ -453,9 +455,6 @@ void RssWidget::updateControlsGeometry()
 							 _lastUpdateLabel->y() + _lastUpdateLabel->height() + st::newsPanPadding / 2);
 
 	_isShowReadLabel->moveToRight(st::newsPanPadding, _sortModeLabel->y());
-
-	updateLastUpdateLabel();
-	updateSortModeLabel();
 }
 
 void RssWidget::updateLastUpdateLabel()
