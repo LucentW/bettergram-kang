@@ -65,10 +65,12 @@ private:
 	QUrl _link;
 	QUrl _commentsLink;
 	QDateTime _publishDate;
+	QString _publishDateString;
 
 	bool _isRead = false;
 
 	static QString removeHtmlTags(QString text);
+	static QString countPublishDateString(const QDateTime &dateTime);
 
 	void setIsRead(bool isRead);
 };
