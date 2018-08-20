@@ -21,7 +21,7 @@ public:
 	int freq() const;
 	void setFreq(int freq);
 
-	QTime lastUpdate() const;
+	QDateTime lastUpdate() const;
 	QString lastUpdateString() const;
 
 	const_iterator begin() const;
@@ -61,7 +61,10 @@ private:
 	/// Frequency of updates in seconds
 	int _freq;
 
-	QTime _lastUpdate;
+	QDateTime _lastUpdate;
+	QString _lastUpdateString;
+
+	static QString countLastUpdateString(const QDateTime &dateTime);
 };
 
 } // namespace Bettergram
