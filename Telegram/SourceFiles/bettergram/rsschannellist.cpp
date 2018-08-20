@@ -1,10 +1,32 @@
 #include "rsschannellist.h"
 #include "rsschannel.h"
+#include <lang/lang_keys.h>
 #include <logs.h>
 
 namespace Bettergram {
 
 const int RssChannelList::_defaultFreq = 60;
+
+QString RssChannelList::countLastUpdateString(const QDateTime &dateTime)
+{
+	if (dateTime.isNull()) {
+		return QString();
+	}
+
+	qint64 daysBefore = QDateTime::currentDateTime().daysTo(dateTime);
+	const QString timeString = dateTime.toString("hh:mm:ss");
+
+	if (daysBefore == 0) {
+		return lng_player_message_today(lt_time, timeString);
+	} else if (daysBefore == -1) {
+		return lng_player_message_yesterday(lt_time, timeString);
+	} else {
+		return lng_player_message_date(lt_date,
+									   langDayOfMonthFull(dateTime.date()),
+									   lt_time,
+									   timeString);
+	}
+}
 
 RssChannelList::RssChannelList(QObject *parent) :
 	QObject(parent),
@@ -29,14 +51,14 @@ void RssChannelList::setFreq(int freq)
 	}
 }
 
-QTime RssChannelList::lastUpdate() const
+QDateTime RssChannelList::lastUpdate() const
 {
 	return _lastUpdate;
 }
 
 QString RssChannelList::lastUpdateString() const
 {
-	return _lastUpdate.isNull() ? QLatin1String("---") : _lastUpdate.toString("hh:mm:ss");
+	return _lastUpdateString;
 }
 
 RssChannelList::const_iterator RssChannelList::begin() const
@@ -150,7 +172,9 @@ void RssChannelList::parse()
 	}
 
 	if (isAtLeastOneUpdated) {
-		_lastUpdate = QTime::currentTime();
+		_lastUpdate = QDateTime::currentDateTime();
+		_lastUpdateString = countLastUpdateString(_lastUpdate);
+
 		emit lastUpdateChanged();
 	}
 }
