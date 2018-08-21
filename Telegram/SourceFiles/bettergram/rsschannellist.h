@@ -42,6 +42,7 @@ public:
 	QList<QSharedPointer<RssItem>> getAllItems() const;
 	QList<QSharedPointer<RssItem>> getAllUnreadItems() const;
 
+	void load();
 	void parse();
 
 public slots:
@@ -69,6 +70,8 @@ private:
 	QString _lastUpdateString;
 
 	static QString countLastUpdateString(const QDateTime &dateTime);
+
+	void save();
 
 private slots:
 	void onIsReadChanged();
