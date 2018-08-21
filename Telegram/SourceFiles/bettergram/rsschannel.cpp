@@ -304,6 +304,19 @@ bool RssChannel::isMayFetchNewData() const
 	return !_isFetching;
 }
 
+void RssChannel::markAsRead()
+{
+	for (QSharedPointer<RssItem> &item : _list) {
+		disconnect(item.data(), &RssItem::isReadChanged, this, &RssChannel::isReadChanged);
+
+		item->markAsRead();
+
+		connect(item.data(), &RssItem::isReadChanged, this, &RssChannel::isReadChanged);
+	}
+
+	emit isReadChanged();
+}
+
 void RssChannel::startFetching()
 {
 	setIsFetching(true);
@@ -449,6 +462,12 @@ void RssChannel::merge(const QSharedPointer<RssItem> &item)
 {
 	//TODO: bettergram: realize RssChannel::merge() method
 
+	add(item);
+}
+
+void RssChannel::add(const QSharedPointer<RssItem> &item)
+{
+	connect(item->data(), &RssItem::isReadChanged, this, &RssChannel::isReadChanged);
 	_list.push_back(item);
 }
 

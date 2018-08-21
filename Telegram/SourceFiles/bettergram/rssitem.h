@@ -43,6 +43,7 @@ public:
 	/// Return true if user marks this news as read
 	bool isRead() const;
 	void markAsRead();
+	void markAllNewsAtSiteAsRead();
 	void markAsUnRead();
 
 	void parseItem(QXmlStreamReader &xml);
@@ -50,6 +51,7 @@ public:
 public slots:
 
 signals:
+	void isReadChanged();
 
 protected:
 

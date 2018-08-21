@@ -82,6 +82,8 @@ public:
 
 	bool isMayFetchNewData() const;
 
+	void markAsRead();
+
 	void startFetching();
 	void fetchingSucceed(const QByteArray &source);
 	void fetchingFailed();
@@ -93,6 +95,7 @@ public slots:
 
 signals:
 	void iconChanged();
+	void isReadChanged();
 	void updated();
 
 protected:
@@ -143,6 +146,7 @@ private:
 	void parseItem(QXmlStreamReader &xml);
 
 	void merge(const QSharedPointer<RssItem> &item);
+	void add(const QSharedPointer<RssItem> &item);
 
 	void downloadIcon();
 };
