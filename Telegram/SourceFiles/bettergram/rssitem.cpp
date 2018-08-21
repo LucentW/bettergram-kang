@@ -109,12 +109,22 @@ void RssItem::setIsRead(bool isRead)
 {
 	if (_isRead != isRead) {
 		_isRead = isRead;
+		emit isReadChanged();
 	}
 }
 
 void RssItem::markAsRead()
 {
 	setIsRead(true);
+}
+
+void RssItem::markAllNewsAtSiteAsRead()
+{
+	if (!_channel) {
+		throw std::invalid_argument("RSS Channel is null");
+	}
+
+	_channel->markAsRead();
 }
 
 void RssItem::markAsUnRead()

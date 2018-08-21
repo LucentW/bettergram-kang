@@ -83,6 +83,11 @@ const QSharedPointer<RssChannel> &RssChannelList::at(int index) const
 	return _list.at(index);
 }
 
+bool RssChannelList::isEmpty() const
+{
+	return _list.isEmpty();
+}
+
 int RssChannelList::count() const
 {
 	return _list.count();
@@ -120,8 +125,22 @@ void RssChannelList::add(const QUrl &channelLink)
 	QSharedPointer<RssChannel> channel(new RssChannel(channelLink, nullptr));
 
 	connect(channel.data(), &RssChannel::iconChanged, this, &RssChannelList::iconChanged);
+	connect(channel.data(), &RssChannel::isReadChanged, this, &RssChannelList::onIsReadChanged);
 
 	_list.push_back(channel);
+}
+
+void RssChannelList::markAsRead()
+{
+	for (QSharedPointer<RssChannel> &channel : _list) {
+		disconnect(channel.data(), &RssChannel::isReadChanged, this, &RssChannelList::onIsReadChanged);
+
+		channel->markAsRead();
+
+		connect(channel.data(), &RssChannel::isReadChanged, this, &RssChannelList::onIsReadChanged);
+	}
+
+	onIsReadChanged();
 }
 
 QList<QSharedPointer<RssItem>> RssChannelList::getAllItems() const
@@ -179,6 +198,11 @@ void RssChannelList::parse()
 
 		emit lastUpdateChanged();
 	}
+}
+
+
+void RssChannelList::onIsReadChanged()
+{
 }
 
 } // namespace Bettergrams

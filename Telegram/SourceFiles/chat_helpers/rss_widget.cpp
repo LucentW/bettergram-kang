@@ -1,18 +1,20 @@
 #include "rss_widget.h"
 
-#include "bettergram/bettergramsettings.h"
-#include "bettergram/rsschannellist.h"
-#include "bettergram/rsschannel.h"
-#include "bettergram/rssitem.h"
+#include <bettergram/bettergramsettings.h>
+#include <bettergram/rsschannellist.h>
+#include <bettergram/rsschannel.h>
+#include <bettergram/rssitem.h>
 
-#include "ui/widgets/buttons.h"
-#include "ui/widgets/labels.h"
-#include "ui/text/text_helper.h"
-#include "lang/lang_keys.h"
-#include "styles/style_window.h"
-#include "core/click_handler_types.h"
-#include "styles/style_chat_helpers.h"
-#include "styles/style_widgets.h"
+#include <application.h>
+#include <ui/widgets/buttons.h>
+#include <ui/widgets/labels.h>
+#include <ui/widgets/popup_menu.h>
+#include <ui/text/text_helper.h>
+#include <lang/lang_keys.h>
+#include <styles/style_window.h>
+#include <core/click_handler_types.h>
+#include <styles/style_chat_helpers.h>
+#include <styles/style_widgets.h>
 
 #include <QMouseEvent>
 
@@ -321,6 +323,78 @@ void RssWidget::leaveEventHook(QEvent *e)
 	Q_UNUSED(e);
 
 	setSelectedRow(-1);
+}
+
+void RssWidget::contextMenuEvent(QContextMenuEvent *e)
+{
+	if (_selectedRow < 0 || _selectedRow >= _rows.count()) {
+		return;
+	}
+
+	const ListRow<Row> &row = _rows.at(_selectedRow);
+
+	_menu = base::make_unique_q<Ui::PopupMenu>(nullptr);
+
+	_menu->addAction(lang(lng_menu_news_copy_link), [row] {
+		QString link;
+
+		if (row.userData().isItem()) {
+			link = row.userData().item()->link().toString();
+		} else if (row.userData().isChannel()) {
+			link = row.userData().channel()->link().toString();
+		} else {
+			LOG(("Unable to recognize type of row content"));
+			return;
+		}
+
+		Application::clipboard()->setText(link);
+	});
+
+	_menu->addAction(lang(lng_menu_news_copy_title), [row] {
+		QString title;
+
+		if (row.userData().isItem()) {
+			title = row.userData().item()->title();
+		} else if (row.userData().isChannel()) {
+			title = row.userData().channel()->title();
+		} else {
+			LOG(("Unable to recognize type of row content"));
+			return;
+		}
+
+		Application::clipboard()->setText(title);
+	});
+
+	if (row.userData().isItem()) {
+		_menu->addAction(lang(lng_menu_news_mark_as_read), [row] {
+			if (row.userData().isItem()) {
+				row.userData().item()->markAsRead();
+			} else {
+				LOG(("Unable to recognize type of row content"));
+			}
+		});
+	}
+
+	_menu->addAction(lang(lng_menu_news_mark_all_site_news_as_read), [row] {
+		if (row.userData().isItem()) {
+			row.userData().item()->markAllNewsAtSiteAsRead();
+		} else if (row.userData().isChannel()) {
+			row.userData().channel()->markAsRead();
+		} else {
+			LOG(("Unable to recognize type of row content"));
+		}
+	});
+
+	_menu->addAction(lang(lng_menu_news_mark_all_news_as_read), [] {
+		BettergramSettings::instance()->rssChannelList()->markAsRead();
+	});
+
+	connect(_menu.get(), &QObject::destroyed, [this] {
+		leaveEventHook(nullptr);
+	});
+
+	_menu->popup(e->globalPos());
+	e->accept();
 }
 
 void RssWidget::paintEvent(QPaintEvent *event) {

@@ -10,6 +10,7 @@ class Controller;
 namespace Ui {
 class FlatLabel;
 class IconButton;
+class PopupMenu;
 } // namespace Ui
 
 namespace Bettergram {
@@ -45,6 +46,7 @@ protected:
 	void mouseMoveEvent(QMouseEvent *e) override;
 	void enterEventHook(QEvent *e) override;
 	void leaveEventHook(QEvent *e) override;
+	void contextMenuEvent(QContextMenuEvent *e) override;
 
 	void paintEvent(QPaintEvent *event) override;
 	void resizeEvent(QResizeEvent *e) override;
@@ -102,6 +104,7 @@ private:
 	Ui::FlatLabel *_sortModeLabel = nullptr;
 	Ui::FlatLabel *_isShowReadLabel = nullptr;
 	Footer *_footer = nullptr;
+	base::unique_qptr<Ui::PopupMenu> _menu = nullptr;
 
 	static const style::color &getNewsHeaderColor(const QSharedPointer<Bettergram::RssItem> &item);
 	static const style::color &getNewsBodyColor(const QSharedPointer<Bettergram::RssItem> &item);

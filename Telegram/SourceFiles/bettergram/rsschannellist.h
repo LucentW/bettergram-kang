@@ -30,11 +30,14 @@ public:
 	/// Can throw std::out_of_range() exception
 	const QSharedPointer<RssChannel> &at(int index) const;
 
+	bool isEmpty() const;
 	int count() const;
 	int countAllItems() const;
 	int countAllUnreadItems() const;
 
 	void add(const QUrl &channelLink);
+
+	void markAsRead();
 
 	QList<QSharedPointer<RssItem>> getAllItems() const;
 	QList<QSharedPointer<RssItem>> getAllUnreadItems() const;
@@ -66,6 +69,9 @@ private:
 	QString _lastUpdateString;
 
 	static QString countLastUpdateString(const QDateTime &dateTime);
+
+private slots:
+	void onIsReadChanged();
 };
 
 } // namespace Bettergram
