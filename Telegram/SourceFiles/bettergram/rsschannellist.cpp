@@ -189,6 +189,7 @@ void RssChannelList::parse()
 	}
 
 	if (isChanged) {
+		save();
 		emit updated();
 	}
 
@@ -200,9 +201,19 @@ void RssChannelList::parse()
 	}
 }
 
+void RssChannelList::save()
+{
+	//TODO: bettergram: realize RssChannelList::save() method
+}
+
+void RssChannelList::load()
+{
+	//TODO: bettergram: realize RssChannelList::load() method
+}
 
 void RssChannelList::onIsReadChanged()
 {
+	save();
 }
 
 } // namespace Bettergrams

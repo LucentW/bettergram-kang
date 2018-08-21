@@ -38,10 +38,14 @@ Bettergram::BettergramSettings::BettergramSettings(QObject *parent) :
 	getIsPaid();
 	getNextAd(true);
 
-	_rssChannelList->add(QUrl("https://news.livecoinwatch.com/feed/"));
-	_rssChannelList->add(QUrl("https://coincentral.com/feed/"));
-	_rssChannelList->add(QUrl("https://www.coindesk.com/feed/"));
-	_rssChannelList->add(QUrl("https://www.ccn.com/feed/"));
+	_rssChannelList->load();
+
+	if (_rssChannelList->isEmpty()) {
+		_rssChannelList->add(QUrl("https://news.livecoinwatch.com/feed/"));
+		_rssChannelList->add(QUrl("https://coincentral.com/feed/"));
+		_rssChannelList->add(QUrl("https://www.coindesk.com/feed/"));
+		_rssChannelList->add(QUrl("https://www.ccn.com/feed/"));
+	}
 
 	getRssChannelList();
 }
