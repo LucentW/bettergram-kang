@@ -71,6 +71,9 @@ private:
 
 	static QString countLastUpdateString(const QDateTime &dateTime);
 
+	void setLastUpdate(const QDateTime &lastUpdate);
+	void add(QSharedPointer<RssChannel> &channel);
+
 	void save();
 
 private slots:

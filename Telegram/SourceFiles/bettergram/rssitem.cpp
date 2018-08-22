@@ -132,7 +132,7 @@ void RssItem::markAsUnRead()
 	setIsRead(false);
 }
 
-void RssItem::parseItem(QXmlStreamReader &xml)
+void RssItem::parse(QXmlStreamReader &xml)
 {
 	_categoryList.clear();
 
@@ -158,6 +158,35 @@ void RssItem::parseItem(QXmlStreamReader &xml)
 			xml.skipCurrentElement();
 		}
 	}
+}
+
+void RssItem::load(QSettings &settings)
+{
+	_guid =  settings.value("guid").toString();
+	_title = settings.value("title").toString();
+	_description = settings.value("description").toString();
+	_author =  settings.value("author").toString();
+	_categoryList = settings.value("categoryList").toStringList();
+
+	_link = settings.value("link").toUrl();
+	_commentsLink = settings.value("commentsLink").toUrl();
+	_publishDate = settings.value("publishDate").toDateTime();
+
+	setIsRead(settings.value("isRead").toBool());
+}
+
+void RssItem::save(QSettings &settings)
+{
+	settings.setValue("guid", guid());
+	settings.setValue("title", title());
+	settings.setValue("description", description());
+	settings.setValue("author", author());
+	settings.setValue("categoryList", categoryList());
+
+	settings.setValue("link", link());
+	settings.setValue("commentsLink", commentsLink());
+	settings.setValue("publishDate", publishDate());
+	settings.setValue("isRead", isRead());
 }
 
 QString RssItem::removeHtmlTags(QString text)
