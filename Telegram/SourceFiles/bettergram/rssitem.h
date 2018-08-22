@@ -46,7 +46,10 @@ public:
 	void markAllNewsAtSiteAsRead();
 	void markAsUnRead();
 
-	void parseItem(QXmlStreamReader &xml);
+	void parse(QXmlStreamReader &xml);
+
+	void load(QSettings &settings);
+	void save(QSettings &settings);
 
 public slots:
 

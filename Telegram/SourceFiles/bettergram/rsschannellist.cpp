@@ -63,6 +63,16 @@ QString RssChannelList::lastUpdateString() const
 	return _lastUpdateString;
 }
 
+void RssChannelList::setLastUpdate(const QDateTime &lastUpdate)
+{
+	if (_lastUpdate != lastUpdate) {
+		_lastUpdate = lastUpdate;
+
+		_lastUpdateString = countLastUpdateString(_lastUpdate);
+		emit lastUpdateChanged();
+	}
+}
+
 RssChannelList::const_iterator RssChannelList::begin() const
 {
 	return _list.begin();
@@ -123,7 +133,11 @@ void RssChannelList::add(const QUrl &channelLink)
 	}
 
 	QSharedPointer<RssChannel> channel(new RssChannel(channelLink, nullptr));
+	add(channel);
+}
 
+void RssChannelList::add(QSharedPointer<RssChannel> &channel)
+{
 	connect(channel.data(), &RssChannel::iconChanged, this, &RssChannelList::iconChanged);
 	connect(channel.data(), &RssChannel::isReadChanged, this, &RssChannelList::onIsReadChanged);
 
@@ -194,21 +208,55 @@ void RssChannelList::parse()
 	}
 
 	if (isAtLeastOneUpdated) {
-		_lastUpdate = QDateTime::currentDateTime();
-		_lastUpdateString = countLastUpdateString(_lastUpdate);
-
-		emit lastUpdateChanged();
+		setLastUpdate(QDateTime::currentDateTime());
 	}
 }
 
 void RssChannelList::save()
 {
-	//TODO: bettergram: realize RssChannelList::save() method
+	//TODO: bettergram: save rss channel list to local file, not in the Windows Registry
+
+	QSettings settings;
+
+	settings.beginGroup("news");
+
+	settings.setValue("lastUpdate", _lastUpdate);
+	settings.setValue("frequency", _freq);
+	settings.beginWriteArray("channels", _list.size());
+
+	for (int i = 0; i < _list.size(); i++) {
+		const QSharedPointer<RssChannel> &channel = _list.at(i);
+
+		settings.setArrayIndex(i);
+		channel->save(settings);
+	}
+
+	settings.endArray();
+	settings.endGroup();
 }
 
 void RssChannelList::load()
 {
-	//TODO: bettergram: realize RssChannelList::load() method
+	QSettings settings;
+
+	settings.beginGroup("news");
+
+	setLastUpdate(settings.value("lastUpdate").toDateTime());
+	setFreq(settings.value("frequency", _defaultFreq).toInt());
+
+	int size = settings.beginReadArray("channels");
+
+	for (int i = 0; i < size; i++) {
+		QSharedPointer<RssChannel> channel(new RssChannel(this));
+
+		settings.setArrayIndex(i);
+		channel->load(settings);
+
+		add(channel);
+	}
+
+	settings.endArray();
+	settings.endGroup();
 }
 
 void RssChannelList::onIsReadChanged()

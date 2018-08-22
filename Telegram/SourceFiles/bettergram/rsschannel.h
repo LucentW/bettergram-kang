@@ -91,6 +91,9 @@ public:
 	/// Parse fetched source xml data and return true only when the data is changed
 	bool parse();
 
+	void load(QSettings &settings);
+	void save(QSettings &settings);
+
 public slots:
 
 signals:

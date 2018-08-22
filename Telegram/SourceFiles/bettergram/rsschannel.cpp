@@ -444,7 +444,7 @@ void RssChannel::parseChannelImage(QXmlStreamReader &xml)
 void RssChannel::parseItem(QXmlStreamReader &xml)
 {
 	QSharedPointer<RssItem> item(new RssItem(this));
-	item->parseItem(xml);
+	item->parse(xml);
 
 	if (xml.hasError()) {
 		LOG(("Unable to parse RSS feed item from %1. %2 (%3)")
@@ -458,6 +458,67 @@ void RssChannel::parseItem(QXmlStreamReader &xml)
 	}
 }
 
+void RssChannel::load(QSettings &settings)
+{
+	setFeedLink(settings.value("feedLink").toUrl());
+	setIconLink(settings.value("iconLink").toUrl());
+	setLink(settings.value("link").toUrl());
+
+	setTitle(settings.value("title").toString());
+	setDescription(settings.value("description").toString());
+	setLanguage(settings.value("language").toString());
+	setCopyright(settings.value("copyright").toString());
+	setEditorEmail(settings.value("editorEmail").toString());
+	setWebMasterEmail(settings.value("webMasterEmail").toString());
+	setPublishDate(settings.value("publishDate").toDateTime());
+	setLastBuildDate(settings.value("lastBuildDate").toDateTime());
+	setSkipHours(settings.value("skipHours").toString());
+	setSkipDays(settings.value("skipDays").toString());
+	setCategoryList(settings.value("categoryList").toStringList());
+
+	int size = settings.beginReadArray("items");
+
+	for (int i = 0; i < size; i++) {
+		QSharedPointer<RssItem> item(new RssItem(this));
+
+		settings.setArrayIndex(i);
+		item->load(settings);
+		add(item);
+	}
+
+	settings.endArray();
+}
+
+void RssChannel::save(QSettings &settings)
+{
+	settings.setValue("feedLink", feedLink());
+	settings.setValue("iconLink", iconLink());
+	settings.setValue("link", link());
+
+	settings.setValue("title", title());
+	settings.setValue("description", description());
+	settings.setValue("language", language());
+	settings.setValue("copyright", copyright());
+	settings.setValue("editorEmail", editorEmail());
+	settings.setValue("webMasterEmail", webMasterEmail());
+	settings.setValue("publishDate", publishDate());
+	settings.setValue("lastBuildDate", lastBuildDate());
+	settings.setValue("skipHours", skipHours());
+	settings.setValue("skipDays", skipDays());
+	settings.setValue("categoryList", categoryList());
+
+	settings.beginWriteArray("items", _list.size());
+
+	for (int i = 0; i < _list.size(); i++) {
+		const QSharedPointer<RssItem> &item = _list.at(i);
+
+		settings.setArrayIndex(i);
+		item->save(settings);
+	}
+
+	settings.endArray();
+}
+
 void RssChannel::merge(const QSharedPointer<RssItem> &item)
 {
 	//TODO: bettergram: realize RssChannel::merge() method
@@ -467,7 +528,7 @@ void RssChannel::merge(const QSharedPointer<RssItem> &item)
 
 void RssChannel::add(const QSharedPointer<RssItem> &item)
 {
-	connect(item->data(), &RssItem::isReadChanged, this, &RssChannel::isReadChanged);
+	connect(item.data(), &RssItem::isReadChanged, this, &RssChannel::isReadChanged);
 	_list.push_back(item);
 }
 
