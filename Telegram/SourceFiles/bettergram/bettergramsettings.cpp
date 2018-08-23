@@ -5,6 +5,8 @@
 #include "rsschannel.h"
 #include "aditem.h"
 
+#include <lang/lang_keys.h>
+
 #include <QTimer>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -14,6 +16,7 @@
 namespace Bettergram {
 
 BettergramSettings *BettergramSettings::_instance = nullptr;
+const QString BettergramSettings::_defaultLastUpdateString = "...";
 
 BettergramSettings *BettergramSettings::init()
 {
@@ -27,6 +30,32 @@ BettergramSettings *BettergramSettings::instance()
 	}
 
 	return _instance;
+}
+
+const QString &BettergramSettings::defaultLastUpdateString()
+{
+	return _defaultLastUpdateString;
+}
+
+QString BettergramSettings::generateLastUpdateString(const QDateTime &dateTime)
+{
+	if (dateTime.isNull()) {
+		return _defaultLastUpdateString;
+	}
+
+	qint64 daysBefore = QDateTime::currentDateTime().daysTo(dateTime);
+	const QString timeString = dateTime.toString("hh:mm:ss");
+
+	if (daysBefore == 0) {
+		return lng_player_message_today(lt_time, timeString);
+	} else if (daysBefore == -1) {
+		return lng_player_message_yesterday(lt_time, timeString);
+	} else {
+		return lng_player_message_date(lt_date,
+									   langDayOfMonthFull(dateTime.date()),
+									   lt_time,
+									   timeString);
+	}
 }
 
 Bettergram::BettergramSettings::BettergramSettings(QObject *parent) :

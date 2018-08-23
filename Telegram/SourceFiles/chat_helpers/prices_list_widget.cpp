@@ -61,6 +61,8 @@ void PricesListWidget::Footer::onFooterClicked()
 PricesListWidget::PricesListWidget(QWidget* parent, not_null<Window::Controller*> controller)
 	: Inner(parent, controller)
 {
+	_lastUpdateLabel = new Ui::FlatLabel(this, st::pricesPanLastUpdateLabel);
+
 	_siteName = new Ui::IconButton(this, st::pricesPanSiteNameIcon);
 	_siteName->setClickedCallback([] { QDesktopServices::openUrl(QUrl("https://www.livecoinwatch.com")); });
 
@@ -93,6 +95,7 @@ PricesListWidget::PricesListWidget(QWidget* parent, not_null<Window::Controller*
 	BettergramSettings::instance()->getCryptoPriceList();
 
 	updateControlsGeometry();
+	updateLastUpdateLabel();
 
 	CryptoPriceList *priceList = BettergramSettings::instance()->cryptoPriceList();
 	connect(priceList, &CryptoPriceList::updated, this, &PricesListWidget::onPriceListUpdated);
@@ -409,7 +412,10 @@ void PricesListWidget::resizeEvent(QResizeEvent *e)
 
 void PricesListWidget::updateControlsGeometry()
 {
-	_siteName->moveToLeft((width() - _siteName->width()) / 2, st::pricesPanHeader);
+	_lastUpdateLabel->moveToLeft(st::pricesPanPadding, st::pricesPanHeader);
+
+	_siteName->moveToLeft((width() - _siteName->width()) / 2,
+						  _lastUpdateLabel->y() + _lastUpdateLabel->height() + st::pricesPanPadding / 2);
 
 	updateMarketCap();
 
@@ -429,6 +435,12 @@ void PricesListWidget::updateControlsGeometry()
 	_coinHeader->moveToLeft(0, headerTop);
 	_priceHeader->moveToLeft(_coinHeader->x() + _coinHeader->width(), headerTop);
 	_24hHeader->moveToLeft(_priceHeader->x() + _priceHeader->width(), headerTop);
+}
+
+void PricesListWidget::updateLastUpdateLabel()
+{
+	_lastUpdateLabel->setText(lang(lng_prices_last_update)
+		.arg(BettergramSettings::instance()->cryptoPriceList()->lastUpdateString()));
 }
 
 void PricesListWidget::updateMarketCap()
@@ -524,6 +536,7 @@ void PricesListWidget::on24hColumnSortOrderChanged()
 
 void PricesListWidget::onPriceListUpdated()
 {
+	updateLastUpdateLabel();
 	updateMarketCap();
 	update();
 }
