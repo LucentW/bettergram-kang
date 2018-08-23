@@ -169,7 +169,7 @@ void AuthSessionSettings::constructFromSerialized(const QByteArray &serialized) 
 	switch (bettergramCheckedTab) {
 	case ChatHelpers::BettergramSelectorTab::Prices:
 	case ChatHelpers::BettergramSelectorTab::News:
-	case ChatHelpers::BettergramSelectorTab::Icos:
+	//case ChatHelpers::BettergramSelectorTab::Icos:
 	case ChatHelpers::BettergramSelectorTab::Resources: _variables.bettergramSelectorTab = bettergramCheckedTab; break;
 	}
 
