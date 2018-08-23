@@ -343,6 +343,19 @@ void RssChannel::fetchingFailed()
 	setIsFailed(true);
 }
 
+void RssChannel::removeOldItems()
+{
+	QDateTime now = QDateTime::currentDateTime();
+
+	for (iterator it = _list.begin(); it < _list.end();) {
+		if ((*it)->isOld()) {
+			it = _list.erase(it);
+		} else {
+			++it;
+		}
+	}
+}
+
 bool RssChannel::parse()
 {
 	qDebug() << QString("parsing for %1").arg(_feedLink.toString());
@@ -352,6 +365,7 @@ bool RssChannel::parse()
 	}
 
 	_categoryList.clear();
+	removeOldItems();
 
 	QXmlStreamReader xml;
 	xml.addData(_source);
@@ -519,16 +533,46 @@ void RssChannel::save(QSettings &settings)
 	settings.endArray();
 }
 
+QSharedPointer<RssItem> RssChannel::find(const QSharedPointer<RssItem> &item)
+{
+	for (const QSharedPointer<RssItem> &existedItem : _list) {
+		if (existedItem->equalsTo(item)) {
+			return existedItem;
+		}
+	}
+
+	return QSharedPointer<RssItem>();
+}
+
 void RssChannel::merge(const QSharedPointer<RssItem> &item)
 {
-	//TODO: bettergram: realize RssChannel::merge() method
+	if (!item->isValid()) {
+		return;
+	}
 
-	add(item);
+	QSharedPointer<RssItem> existedItem = find(item);
+
+	if (existedItem.isNull()) {
+		if (!item->isOld()) {
+			add(item);
+		}
+	} else {
+		if (item->isOld()) {
+			_list.removeAll(existedItem);
+		} else {
+			existedItem->update(item);
+		}
+	}
 }
 
 void RssChannel::add(const QSharedPointer<RssItem> &item)
 {
+	if (!item->isValid()) {
+		return;
+	}
+
 	connect(item.data(), &RssItem::isReadChanged, this, &RssChannel::isReadChanged);
+
 	_list.push_back(item);
 }
 

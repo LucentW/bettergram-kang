@@ -39,12 +39,16 @@ public:
 	const QPixmap &icon() const;
 
 	bool isValid() const;
+	bool isOld(const QDateTime &now = QDateTime::currentDateTime()) const;
 
 	/// Return true if user marks this news as read
 	bool isRead() const;
 	void markAsRead();
 	void markAllNewsAtSiteAsRead();
 	void markAsUnRead();
+
+	bool equalsTo(const QSharedPointer<RssItem> &item);
+	void update(const QSharedPointer<RssItem> &item);
 
 	void parse(QXmlStreamReader &xml);
 
@@ -59,6 +63,9 @@ signals:
 protected:
 
 private:
+	/// Keep news only for the last hours
+	static const qint64 _maxLastHoursInMs;
+
 	RssChannel *const _channel;
 
 	QString _guid;
