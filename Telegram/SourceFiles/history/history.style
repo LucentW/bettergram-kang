@@ -211,6 +211,16 @@ historyAttachEmoji: IconButton(historyAttach) {
 historyAttachEmojiFgActive: windowActiveTextFg;
 historyAttachEmojiActive: icon {{ "send_control_emoji", historyAttachEmojiFgActive }};
 historyAttachEmojiTooltipDelta: 4px;
+
+historyAttachBettergram: IconButton(historyAttach) {
+	icon: icon {{ "bitcoin", historyComposeIconFg }};
+	iconOver: icon {{ "bitcoin", historyComposeIconFgOver }};
+	iconPosition: point(15px, 15px);
+}
+historyAttachBettergramFgActive: historyAttachEmojiFgActive;
+historyAttachBettergramActive: icon {{ "bitcoin", historyAttachBettergramFgActive }};
+historyAttachBettergramTooltipDelta: historyAttachEmojiTooltipDelta;
+
 historyEmojiCircle: size(20px, 20px);
 historyEmojiCirclePeriod: 1500;
 historyEmojiCircleDuration: 500;
