@@ -1,7 +1,7 @@
 #include "cryptopricelist.h"
 #include "cryptoprice.h"
 
-#include <bettergram/bettergramsettings.h>
+#include <bettergram/bettergramservice.h>
 #include <logs.h>
 
 namespace Bettergram {
@@ -11,7 +11,7 @@ const int CryptoPriceList::_defaultFreq = 60;
 CryptoPriceList::CryptoPriceList(QObject *parent) :
 	QObject(parent),
 	_freq(_defaultFreq),
-	_lastUpdateString(BettergramSettings::defaultLastUpdateString())
+	_lastUpdateString(BettergramService::defaultLastUpdateString())
 {
 }
 
@@ -88,7 +88,7 @@ void CryptoPriceList::setLastUpdate(const QDateTime &lastUpdate)
 	if (_lastUpdate != lastUpdate) {
 		_lastUpdate = lastUpdate;
 
-		_lastUpdateString = BettergramSettings::generateLastUpdateString(_lastUpdate);
+		_lastUpdateString = BettergramService::generateLastUpdateString(_lastUpdate);
 	}
 }
 

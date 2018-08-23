@@ -818,8 +818,8 @@
 <(src_loc)/shortcuts.h
 <(src_loc)/bettergram/aditem.cpp
 <(src_loc)/bettergram/aditem.h
-<(src_loc)/bettergram/bettergramsettings.cpp
-<(src_loc)/bettergram/bettergramsettings.h
+<(src_loc)/bettergram/bettergramservice.cpp
+<(src_loc)/bettergram/bettergramservice.h
 <(src_loc)/bettergram/cryptoprice.cpp
 <(src_loc)/bettergram/cryptoprice.h
 <(src_loc)/bettergram/cryptopricelist.cpp

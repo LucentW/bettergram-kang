@@ -1,4 +1,4 @@
-#include "bettergramsettings.h"
+#include "bettergramservice.h"
 #include "cryptopricelist.h"
 #include "cryptoprice.h"
 #include "rsschannellist.h"
@@ -15,29 +15,29 @@
 
 namespace Bettergram {
 
-BettergramSettings *BettergramSettings::_instance = nullptr;
-const QString BettergramSettings::_defaultLastUpdateString = "...";
+BettergramService *BettergramService::_instance = nullptr;
+const QString BettergramService::_defaultLastUpdateString = "...";
 
-BettergramSettings *BettergramSettings::init()
+BettergramService *BettergramService::init()
 {
 	return instance();
 }
 
-BettergramSettings *BettergramSettings::instance()
+BettergramService *BettergramService::instance()
 {
 	if (!_instance) {
-		_instance = new BettergramSettings();
+		_instance = new BettergramService();
 	}
 
 	return _instance;
 }
 
-const QString &BettergramSettings::defaultLastUpdateString()
+const QString &BettergramService::defaultLastUpdateString()
 {
 	return _defaultLastUpdateString;
 }
 
-QString BettergramSettings::generateLastUpdateString(const QDateTime &dateTime)
+QString BettergramService::generateLastUpdateString(const QDateTime &dateTime)
 {
 	if (dateTime.isNull()) {
 		return _defaultLastUpdateString;
@@ -58,7 +58,7 @@ QString BettergramSettings::generateLastUpdateString(const QDateTime &dateTime)
 	}
 }
 
-Bettergram::BettergramSettings::BettergramSettings(QObject *parent) :
+Bettergram::BettergramService::BettergramService(QObject *parent) :
 	QObject(parent),
 	_cryptoPriceList(new CryptoPriceList(this)),
 	_rssChannelList(new RssChannelList(this)),
@@ -79,12 +79,12 @@ Bettergram::BettergramSettings::BettergramSettings(QObject *parent) :
 	getRssChannelList();
 }
 
-bool BettergramSettings::isPaid() const
+bool BettergramService::isPaid() const
 {
 	return _isPaid;
 }
 
-void BettergramSettings::setIsPaid(bool isPaid)
+void BettergramService::setIsPaid(bool isPaid)
 {
 	if (_isPaid != isPaid) {
 		_isPaid = isPaid;
@@ -94,12 +94,12 @@ void BettergramSettings::setIsPaid(bool isPaid)
 	}
 }
 
-BettergramSettings::BillingPlan BettergramSettings::billingPlan() const
+BettergramService::BillingPlan BettergramService::billingPlan() const
 {
 	return _billingPlan;
 }
 
-void BettergramSettings::setBillingPlan(BillingPlan billingPlan)
+void BettergramService::setBillingPlan(BillingPlan billingPlan)
 {
 	if (_billingPlan != billingPlan) {
 		_billingPlan = billingPlan;
@@ -109,27 +109,27 @@ void BettergramSettings::setBillingPlan(BillingPlan billingPlan)
 	}
 }
 
-CryptoPriceList *BettergramSettings::cryptoPriceList() const
+CryptoPriceList *BettergramService::cryptoPriceList() const
 {
 	return _cryptoPriceList;
 }
 
-RssChannelList *BettergramSettings::rssChannelList() const
+RssChannelList *BettergramService::rssChannelList() const
 {
 	return _rssChannelList;
 }
 
-AdItem *BettergramSettings::currentAd() const
+AdItem *BettergramService::currentAd() const
 {
 	return _currentAd;
 }
 
-bool BettergramSettings::isWindowActive() const
+bool BettergramService::isWindowActive() const
 {
 	return _isWindowActive;
 }
 
-void BettergramSettings::setIsWindowActive(bool isWindowActive)
+void BettergramService::setIsWindowActive(bool isWindowActive)
 {
 	if (_isWindowActive != isWindowActive) {
 		_isWindowActive = isWindowActive;
@@ -140,23 +140,23 @@ void BettergramSettings::setIsWindowActive(bool isWindowActive)
 	}
 }
 
-base::Observable<void> &BettergramSettings::isPaidObservable()
+base::Observable<void> &BettergramService::isPaidObservable()
 {
 	return _isPaidObservable;
 }
 
-base::Observable<void> &BettergramSettings::billingPlanObservable()
+base::Observable<void> &BettergramService::billingPlanObservable()
 {
 	return _billingPlanObservable;
 }
 
-void BettergramSettings::getIsPaid()
+void BettergramService::getIsPaid()
 {
 	//TODO: bettergram: ask server and get know if the instance is paid or not and the current billing plan
 	//TODO: bettergram: if the application is not paid then call getNextAd();
 }
 
-void BettergramSettings::getCryptoPriceList()
+void BettergramService::getCryptoPriceList()
 {
 	QUrl url("https://http-api.livecoinwatch.com/bettergram/top10");
 
@@ -166,13 +166,13 @@ void BettergramSettings::getCryptoPriceList()
 	QNetworkReply *reply = _networkManager.get(request);
 
 	connect(reply, &QNetworkReply::finished,
-			this, &BettergramSettings::onGetCryptoPriceListFinished);
+			this, &BettergramService::onGetCryptoPriceListFinished);
 
 	connect(reply, &QNetworkReply::sslErrors,
-			this, &BettergramSettings::onGetCryptoPriceListSslFailed);
+			this, &BettergramService::onGetCryptoPriceListSslFailed);
 }
 
-void BettergramSettings::getRssChannelList()
+void BettergramService::getRssChannelList()
 {
 	for (const QSharedPointer<RssChannel> &channel : *_rssChannelList) {
 		if (channel->isMayFetchNewData()) {
@@ -181,7 +181,7 @@ void BettergramSettings::getRssChannelList()
 	}
 }
 
-void BettergramSettings::getRssFeeds(const QSharedPointer<RssChannel> &channel)
+void BettergramService::getRssFeeds(const QSharedPointer<RssChannel> &channel)
 {
 	channel->startFetching();
 
@@ -217,7 +217,7 @@ void BettergramSettings::getRssFeeds(const QSharedPointer<RssChannel> &channel)
 	});
 }
 
-void BettergramSettings::parseCryptoPriceList(const QByteArray &byteArray)
+void BettergramService::parseCryptoPriceList(const QByteArray &byteArray)
 {
 	if (byteArray.isEmpty()) {
 		LOG(("Can not get crypto price list. Response is emtpy"));
@@ -307,7 +307,7 @@ void BettergramSettings::parseCryptoPriceList(const QByteArray &byteArray)
 	_cryptoPriceList->updateData(marketCap, freq, priceList);
 }
 
-void BettergramSettings::onGetCryptoPriceListFinished()
+void BettergramService::onGetCryptoPriceListFinished()
 {
 	QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
 
@@ -322,14 +322,14 @@ void BettergramSettings::onGetCryptoPriceListFinished()
 	reply->deleteLater();
 }
 
-void BettergramSettings::onGetCryptoPriceListSslFailed(QList<QSslError> errors)
+void BettergramService::onGetCryptoPriceListSslFailed(QList<QSslError> errors)
 {
 	for(const QSslError &error : errors) {
 		LOG(("%1").arg(error.errorString()));
 	}
 }
 
-void BettergramSettings::getNextAd(bool reset)
+void BettergramService::getNextAd(bool reset)
 {
 	if(_isPaid) {
 		_currentAd->clear();
@@ -349,13 +349,13 @@ void BettergramSettings::getNextAd(bool reset)
 	QNetworkReply *reply = _networkManager.get(request);
 
 	connect(reply, &QNetworkReply::finished,
-			this, &BettergramSettings::onGetNextAdFinished);
+			this, &BettergramService::onGetNextAdFinished);
 
 	connect(reply, &QNetworkReply::sslErrors,
-			this, &BettergramSettings::onGetNextAdSslFailed);
+			this, &BettergramService::onGetNextAdSslFailed);
 }
 
-void BettergramSettings::getNextAdLater(bool reset)
+void BettergramService::getNextAdLater(bool reset)
 {
 	int delay = _currentAd->duration();
 
@@ -378,7 +378,7 @@ void BettergramSettings::getNextAdLater(bool reset)
 	});
 }
 
-bool BettergramSettings::parseNextAd(const QByteArray &byteArray)
+bool BettergramService::parseNextAd(const QByteArray &byteArray)
 {
 	if (byteArray.isEmpty()) {
 		LOG(("Can not get next ad. Response is emtpy"));
@@ -445,7 +445,7 @@ bool BettergramSettings::parseNextAd(const QByteArray &byteArray)
 	return true;
 }
 
-void BettergramSettings::onGetNextAdFinished()
+void BettergramService::onGetNextAdFinished()
 {
 	QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
 
@@ -467,7 +467,7 @@ void BettergramSettings::onGetNextAdFinished()
 	reply->deleteLater();
 }
 
-void BettergramSettings::onGetNextAdSslFailed(QList<QSslError> errors)
+void BettergramService::onGetNextAdSslFailed(QList<QSslError> errors)
 {
 	for(const QSslError &error : errors) {
 		LOG(("%1").arg(error.errorString()));
