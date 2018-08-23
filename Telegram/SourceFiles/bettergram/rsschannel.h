@@ -16,6 +16,7 @@ class RssChannel : public QObject {
 
 public:
 	typedef QList<QSharedPointer<RssItem>>::const_iterator const_iterator;
+	typedef QList<QSharedPointer<RssItem>>::iterator iterator;
 
 	static void sort(QList<QSharedPointer<RssItem>> &items);
 
@@ -143,11 +144,14 @@ private:
 
 	QByteArray countSourceHash(const QByteArray &source) const;
 
+	void removeOldItems();
+
 	void parseRss(QXmlStreamReader &xml);
 	void parseChannel(QXmlStreamReader &xml);
 	void parseChannelImage(QXmlStreamReader &xml);
 	void parseItem(QXmlStreamReader &xml);
 
+	QSharedPointer<RssItem> find(const QSharedPointer<RssItem> &item);
 	void merge(const QSharedPointer<RssItem> &item);
 	void add(const QSharedPointer<RssItem> &item);
 

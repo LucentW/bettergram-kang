@@ -6,6 +6,8 @@
 
 namespace Bettergram {
 
+const qint64 RssItem::_maxLastHoursInMs = 24 * 60 * 60 * 1000;
+
 RssItem::RssItem(RssChannel *channel) :
 	QObject(channel),
 	_channel(channel)
@@ -96,8 +98,12 @@ const QPixmap &RssItem::icon() const
 
 bool RssItem::isValid() const
 {
-	//TODO: bettergram: realize RssItem::isValid() method
-	return true;
+	return !_link.isEmpty() && !_title.isEmpty() && !_publishDate.isNull();
+}
+
+bool RssItem::isOld(const QDateTime &now) const
+{
+	return now.msecsTo(_publishDate) < -_maxLastHoursInMs;
 }
 
 bool RssItem::isRead() const
@@ -130,6 +136,26 @@ void RssItem::markAllNewsAtSiteAsRead()
 void RssItem::markAsUnRead()
 {
 	setIsRead(false);
+}
+
+bool RssItem::equalsTo(const QSharedPointer<RssItem> &item)
+{
+	return _link == item->link();
+}
+
+void RssItem::update(const QSharedPointer<RssItem> &item)
+{
+	_guid = item->_guid;
+	_title = item->_title;
+	_description = item->_description;
+	_author = item->_author;
+	_categoryList = item->_categoryList;
+	_link = item->_link;
+	_commentsLink = item->_commentsLink;
+	_publishDate = item->_publishDate;
+	_publishDateString = item->_publishDateString;
+
+	// We do not change _isRead field in this method
 }
 
 void RssItem::parse(QXmlStreamReader &xml)
