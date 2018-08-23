@@ -429,7 +429,7 @@ HistoryWidget::HistoryWidget(
 , _joinChannel(this, lang(lng_profile_join_channel).toUpper(), st::historyComposeButton)
 , _muteUnmute(this, lang(lng_channel_mute).toUpper(), st::historyComposeButton)
 , _attachToggle(this, st::historyAttach)
-, _bettergramTabsToggle(this, st::historyAttachEmoji)
+, _bettergramTabsToggle(this, st::historyAttachBettergram)
 , _tabbedSelectorToggle(this, st::historyAttachEmoji)
 , _botKeyboardShow(this, st::historyBotKeyboardShow)
 , _botKeyboardHide(this, st::historyBotKeyboardHide)
@@ -3957,7 +3957,7 @@ void HistoryWidget::pushBettergramTabsToThirdSection(
 	}
 	Auth().settings().setTabbedReplacedWithInfo(false);
 	_bettergramTabsToggle->setColorOverrides(
-		&st::historyAttachEmojiActive,
+		&st::historyAttachBettergramActive,
 		&st::historyRecordVoiceFgActive,
 		&st::historyRecordVoiceRippleBgActive);
 	auto destroyingPanel = std::move(_bettergramTabbedPanel);
