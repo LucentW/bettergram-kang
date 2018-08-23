@@ -53,7 +53,7 @@ BettergramTabbedSelector::BettergramTabbedSelector(QWidget *parent, not_null<Win
 	, _tabs{ {
 			Tab{ BettergramSelectorTab::Prices, object_ptr<PricesListWidget>(this, controller) },
 			Tab{ BettergramSelectorTab::News, object_ptr<RssWidget>(this, controller) },
-			Tab{ BettergramSelectorTab::Icos, object_ptr<PricesListWidget>(this, controller) },
+			//Tab{ BettergramSelectorTab::Icos, object_ptr<PricesListWidget>(this, controller) },
 			Tab{ BettergramSelectorTab::Resources, object_ptr<PricesListWidget>(this, controller) },
 		} }
 		, _currentTabType(Auth().settings().bettergramSelectorTab()) {
@@ -322,7 +322,7 @@ void BettergramTabbedSelector::createTabsSlider() {
 	auto sections = QStringList();
 	sections.push_back(lang(lng_switch_prices).toUpper());
 	sections.push_back(lang(lng_switch_news).toUpper());
-	sections.push_back(lang(lng_switch_icos).toUpper());
+	//sections.push_back(lang(lng_switch_icos).toUpper());
 	sections.push_back(lang(lng_switch_resources).toUpper());
 	_tabsSlider->setSections(sections);
 
