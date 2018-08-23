@@ -29,6 +29,9 @@ public:
 	static BettergramSettings *init();
 	static BettergramSettings *instance();
 
+	static const QString &defaultLastUpdateString();
+	static QString generateLastUpdateString(const QDateTime &dateTime);
+
 	bool isPaid() const;
 	BillingPlan billingPlan() const;
 
@@ -58,6 +61,7 @@ protected:
 
 private:
 	static BettergramSettings *_instance;
+	static const QString _defaultLastUpdateString;
 
 	QNetworkAccessManager _networkManager;
 

@@ -1,5 +1,7 @@
 #include "cryptopricelist.h"
 #include "cryptoprice.h"
+
+#include <bettergram/bettergramsettings.h>
 #include <logs.h>
 
 namespace Bettergram {
@@ -8,7 +10,8 @@ const int CryptoPriceList::_defaultFreq = 60;
 
 CryptoPriceList::CryptoPriceList(QObject *parent) :
 	QObject(parent),
-	_freq(_defaultFreq)
+	_freq(_defaultFreq),
+	_lastUpdateString(BettergramSettings::defaultLastUpdateString())
 {
 }
 
@@ -70,6 +73,25 @@ void CryptoPriceList::setFreq(int freq)
 	}
 }
 
+QDateTime CryptoPriceList::lastUpdate() const
+{
+	return _lastUpdate;
+}
+
+QString CryptoPriceList::lastUpdateString() const
+{
+	return _lastUpdateString;
+}
+
+void CryptoPriceList::setLastUpdate(const QDateTime &lastUpdate)
+{
+	if (_lastUpdate != lastUpdate) {
+		_lastUpdate = lastUpdate;
+
+		_lastUpdateString = BettergramSettings::generateLastUpdateString(_lastUpdate);
+	}
+}
+
 CryptoPriceList::const_iterator CryptoPriceList::begin() const
 {
 	return _list.begin();
@@ -114,6 +136,7 @@ void CryptoPriceList::updateData(double marketCap, int freq, const QList<CryptoP
 {
 	setMarketCap(marketCap);
 	setFreq(freq);
+	setLastUpdate(QDateTime::currentDateTime());
 
 	// Remove old crypto prices
 	for (QList<CryptoPrice*>::iterator it = _list.begin(); it != _list.end();) {

@@ -1,38 +1,17 @@
 #include "rsschannellist.h"
 #include "rsschannel.h"
-#include <lang/lang_keys.h>
+
+#include <bettergram/bettergramsettings.h>
 #include <logs.h>
 
 namespace Bettergram {
 
 const int RssChannelList::_defaultFreq = 60;
-const QString RssChannelList::_defaultLastUpdateString = "...";
-
-QString RssChannelList::countLastUpdateString(const QDateTime &dateTime)
-{
-	if (dateTime.isNull()) {
-		return _defaultLastUpdateString;
-	}
-
-	qint64 daysBefore = QDateTime::currentDateTime().daysTo(dateTime);
-	const QString timeString = dateTime.toString("hh:mm:ss");
-
-	if (daysBefore == 0) {
-		return lng_player_message_today(lt_time, timeString);
-	} else if (daysBefore == -1) {
-		return lng_player_message_yesterday(lt_time, timeString);
-	} else {
-		return lng_player_message_date(lt_date,
-									   langDayOfMonthFull(dateTime.date()),
-									   lt_time,
-									   timeString);
-	}
-}
 
 RssChannelList::RssChannelList(QObject *parent) :
 	QObject(parent),
 	_freq(_defaultFreq),
-	_lastUpdateString(_defaultLastUpdateString)
+	_lastUpdateString(BettergramSettings::defaultLastUpdateString())
 {
 }
 
@@ -68,7 +47,7 @@ void RssChannelList::setLastUpdate(const QDateTime &lastUpdate)
 	if (_lastUpdate != lastUpdate) {
 		_lastUpdate = lastUpdate;
 
-		_lastUpdateString = countLastUpdateString(_lastUpdate);
+		_lastUpdateString = BettergramSettings::generateLastUpdateString(_lastUpdate);
 		emit lastUpdateChanged();
 	}
 }

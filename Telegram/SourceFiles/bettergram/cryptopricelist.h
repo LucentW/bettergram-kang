@@ -36,6 +36,9 @@ public:
 
 	int freq() const;
 
+	QDateTime lastUpdate() const;
+	QString lastUpdateString() const;
+
 	const_iterator begin() const;
 	const_iterator end() const;
 
@@ -69,6 +72,9 @@ private:
 	/// Frequency of updates in seconds
 	int _freq;
 
+	QDateTime _lastUpdate;
+	QString _lastUpdateString;
+
 	SortOrder _sortOrder = SortOrder::Origin;
 
 	static bool containsName(const QList<CryptoPrice> &priceList, const QString &name);
@@ -79,6 +85,7 @@ private:
 	static bool sortBy24h(const CryptoPrice *price1, const CryptoPrice *price2);
 
 	void setFreq(int freq);
+	void setLastUpdate(const QDateTime &lastUpdate);
 
 	CryptoPrice *findByName(const QString &name);
 	void sort();

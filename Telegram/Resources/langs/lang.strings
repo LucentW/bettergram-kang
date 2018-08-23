@@ -968,7 +968,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 // Now we do not use lng_prices_upgrade_now
 "lng_prices_upgrade_now" = "Upgrade Now";
 "lng_prices_footer" = "Visit the Site";
-"lng_prices_last_update" = "Last update: %1";
+"lng_prices_last_update" = "%1";
 "lng_prices_site_name" = "LIVE COIN WATCH";
 "lng_prices_market_cap" = "Market Cap: $%1";
 "lng_prices_header_coin" = "Coin";

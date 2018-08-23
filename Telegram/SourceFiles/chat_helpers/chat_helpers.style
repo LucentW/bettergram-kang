@@ -176,6 +176,17 @@ pricesPanColumnPriceWidth: 85px;
 pricesPanColumn24hWidth: 70px;
 pricesPanHover: windowBgOver; // background of selected row in prices panel
 
+// Last update label at the RssWidget
+pricesPanLastUpdateLabel: FlatLabel(defaultFlatLabel) {
+		align: align(left);
+		textFg: windowSubTextFg;
+		style: TextStyle(defaultTextStyle) {
+		}
+		palette: TextPalette(defaultTextPalette) {
+			linkFg: windowSubTextFg;
+		}
+}
+
 // Site name icon at the PricesListWidget.
 pricesPanSiteNameIcon: IconButton {
         width: 249px;
