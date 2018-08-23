@@ -1,7 +1,7 @@
 #include "rsschannellist.h"
 #include "rsschannel.h"
 
-#include <bettergram/bettergramsettings.h>
+#include <bettergram/bettergramservice.h>
 #include <logs.h>
 
 namespace Bettergram {
@@ -11,7 +11,7 @@ const int RssChannelList::_defaultFreq = 60;
 RssChannelList::RssChannelList(QObject *parent) :
 	QObject(parent),
 	_freq(_defaultFreq),
-	_lastUpdateString(BettergramSettings::defaultLastUpdateString())
+	_lastUpdateString(BettergramService::defaultLastUpdateString())
 {
 }
 
@@ -47,7 +47,7 @@ void RssChannelList::setLastUpdate(const QDateTime &lastUpdate)
 	if (_lastUpdate != lastUpdate) {
 		_lastUpdate = lastUpdate;
 
-		_lastUpdateString = BettergramSettings::generateLastUpdateString(_lastUpdate);
+		_lastUpdateString = BettergramService::generateLastUpdateString(_lastUpdate);
 		emit lastUpdateChanged();
 	}
 }

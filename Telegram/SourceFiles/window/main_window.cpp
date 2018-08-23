@@ -25,7 +25,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "bettergram/aditem.h"
 #include "ui/text/text.h"
 #include "core/click_handler_types.h"
-#include "bettergram/bettergramsettings.h"
+#include "bettergram/bettergramservice.h"
 #include "styles/style_window.h"
 #include "styles/style_boxes.h"
 
@@ -82,9 +82,9 @@ MainWindow::MainWindow()
 	_isActiveTimer.setCallback([this] { updateIsActive(0); });
 	_inactivePressTimer.setCallback([this] { setInactivePress(false); });
 
-	Bettergram::BettergramSettings *settings = Bettergram::BettergramSettings::instance();
+	Bettergram::BettergramService *settings = Bettergram::BettergramService::instance();
 
-	settings->connect(settings, &Bettergram::BettergramSettings::isPaidChanged,
+	settings->connect(settings, &Bettergram::BettergramService::isPaidChanged,
 					  this, &MainWindow::onIsPaidChanged);
 
 	Bettergram::AdItem *adItem = settings->currentAd();
@@ -212,7 +212,7 @@ bool MainWindow::computeIsActive() const {
 
 void MainWindow::onIsPaidChanged()
 {
-	Bettergram::BettergramSettings *settings = Bettergram::BettergramSettings::instance();
+	Bettergram::BettergramService *settings = Bettergram::BettergramService::instance();
 
 	if (settings->isPaid()) {
 		_adLabel->hide();
@@ -225,7 +225,7 @@ void MainWindow::onIsPaidChanged()
 
 void MainWindow::updateAdLabel()
 {
-	Bettergram::AdItem *adItem = Bettergram::BettergramSettings::instance()->currentAd();
+	Bettergram::AdItem *adItem = Bettergram::BettergramService::instance()->currentAd();
 
 	QString text;
 	QUrl url;

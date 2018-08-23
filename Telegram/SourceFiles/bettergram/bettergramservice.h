@@ -13,9 +13,9 @@ class RssChannel;
 class AdItem;
 
 /**
- * @brief The BettergramSettings class contains Bettergram specific settings
+ * @brief The BettergramService class contains Bettergram specific classes and settings
  */
-class BettergramSettings : public QObject {
+class BettergramService : public QObject {
 	Q_OBJECT
 
 public:
@@ -26,8 +26,8 @@ public:
 		Yearly
 	};
 
-	static BettergramSettings *init();
-	static BettergramSettings *instance();
+	static BettergramService *init();
+	static BettergramService *instance();
 
 	static const QString &defaultLastUpdateString();
 	static QString generateLastUpdateString(const QDateTime &dateTime);
@@ -60,7 +60,7 @@ signals:
 protected:
 
 private:
-	static BettergramSettings *_instance;
+	static BettergramService *_instance;
 	static const QString _defaultLastUpdateString;
 
 	QNetworkAccessManager _networkManager;
@@ -77,7 +77,7 @@ private:
 	base::Observable<void> _isPaidObservable;
 	base::Observable<void> _billingPlanObservable;
 
-	explicit BettergramSettings(QObject *parent = nullptr);
+	explicit BettergramService(QObject *parent = nullptr);
 
 	void setIsPaid(bool isPaid);
 	void setBillingPlan(BillingPlan billingPlan);

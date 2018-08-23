@@ -19,7 +19,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "base/qthelp_regex.h"
 #include "core/update_checker.h"
 #include "core/crash_report_window.h"
-#include "bettergram/bettergramsettings.h"
+#include "bettergram/bettergramservice.h"
 
 namespace {
 
@@ -124,7 +124,7 @@ Application::Application(
 		_localSocket.connectToServer(_localServerName);
 	}
 
-	Bettergram::BettergramSettings::init();
+	Bettergram::BettergramService::init();
 }
 
 Application::~Application() = default;

@@ -42,7 +42,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "window/window_lock_widgets.h"
 #include "window/window_main_menu.h"
 #include "window/window_controller.h"
-#include "bettergram/bettergramsettings.h"
+#include "bettergram/bettergramservice.h"
 
 namespace {
 
@@ -942,7 +942,7 @@ void MainWindow::sendPaths() {
 
 void MainWindow::updateIsActiveHook() {
 	if (_main) _main->updateOnline();
-	Bettergram::BettergramSettings::instance()->setIsWindowActive(isActive());
+	Bettergram::BettergramService::instance()->setIsWindowActive(isActive());
 }
 
 MainWindow::~MainWindow() {
