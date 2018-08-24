@@ -574,7 +574,7 @@ void RssChannel::add(const QSharedPointer<RssItem> &item)
 
 void RssChannel::downloadIcon()
 {
-	if (_iconLink.isEmpty()) {
+	if (!_iconLink.isValid()) {
 		setIcon(QPixmap());
 		return;
 	}
