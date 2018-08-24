@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/bettergram">
+      <file alias="default-resources.json">../bettergram/default-resources.json</file>
+    </qresource>
+</RCC>

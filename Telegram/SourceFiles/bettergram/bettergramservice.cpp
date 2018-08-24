@@ -3,6 +3,7 @@
 #include "cryptoprice.h"
 #include "rsschannellist.h"
 #include "rsschannel.h"
+#include "resourcegrouplist.h"
 #include "aditem.h"
 
 #include <lang/lang_keys.h>
@@ -62,6 +63,7 @@ Bettergram::BettergramService::BettergramService(QObject *parent) :
 	QObject(parent),
 	_cryptoPriceList(new CryptoPriceList(this)),
 	_rssChannelList(new RssChannelList(this)),
+	_resourceGroupList(new ResourceGroupList(this)),
 	_currentAd(new AdItem(this))
 {
 	getIsPaid();
@@ -77,6 +79,9 @@ Bettergram::BettergramService::BettergramService(QObject *parent) :
 	}
 
 	getRssChannelList();
+
+	_resourceGroupList->parseFile(":/bettergram/default-resources.json");
+	getResourceGroupList();
 }
 
 bool BettergramService::isPaid() const
@@ -117,6 +122,11 @@ CryptoPriceList *BettergramService::cryptoPriceList() const
 RssChannelList *BettergramService::rssChannelList() const
 {
 	return _rssChannelList;
+}
+
+ResourceGroupList *BettergramService::resourceGroupList() const
+{
+	return _resourceGroupList;
 }
 
 AdItem *BettergramService::currentAd() const
@@ -215,6 +225,25 @@ void BettergramService::getRssFeeds(const QSharedPointer<RssChannel> &channel)
 			LOG(("%1").arg(error.errorString()));
 		}
 	});
+}
+
+void BettergramService::getResourceGroupList()
+{
+	//TODO: bettergram: We should get resources from server when it will be ready on server side
+#if 0
+	QUrl url("https://api.bettergram.io/v1/resources");
+
+	QNetworkRequest request;
+	request.setUrl(url);
+
+	QNetworkReply *reply = _networkManager.get(request);
+
+	connect(reply, &QNetworkReply::finished,
+			this, &BettergramService::onGetResourceGroupListFinished);
+
+	connect(reply, &QNetworkReply::sslErrors,
+			this, &BettergramService::onGetResourceGroupListSslFailed);
+#endif
 }
 
 void BettergramService::parseCryptoPriceList(const QByteArray &byteArray)
@@ -323,6 +352,28 @@ void BettergramService::onGetCryptoPriceListFinished()
 }
 
 void BettergramService::onGetCryptoPriceListSslFailed(QList<QSslError> errors)
+{
+	for(const QSslError &error : errors) {
+		LOG(("%1").arg(error.errorString()));
+	}
+}
+
+void BettergramService::onGetResourceGroupListFinished()
+{
+	QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+
+	if(reply->error() == QNetworkReply::NoError) {
+		_resourceGroupList->parse(reply->readAll());
+	} else {
+		LOG(("Can not get resource group list. %1 (%2)")
+			.arg(reply->errorString())
+			.arg(reply->error()));
+	}
+
+	reply->deleteLater();
+}
+
+void BettergramService::onGetResourceGroupListSslFailed(QList<QSslError> errors)
 {
 	for(const QSslError &error : errors) {
 		LOG(("%1").arg(error.errorString()));

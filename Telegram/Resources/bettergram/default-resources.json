@@ -1,0 +1,89 @@
+{
+  "groups": [
+    {
+      "title": "Our favorite exchanges",
+      "items": [
+        {
+          "name": "Binance",
+          "description": "The undisputed leader for crypto trading",
+          "url": "https://www.binance.com",
+          "iconUrl": "https://assets.coingecko.com/coins/images/825/small/binance-coin-logo.png"
+        },
+        {
+          "name": "Bitmax",
+          "description": "Up 100x leverage for margin trading",
+          "url": "https://bitmax.ch",
+          "iconUrl": "https://qolczpnfu7-flywheel.netdna-ssl.com/wp-content/uploads/2014/02/bitoin.png"
+        }
+      ]
+    },
+    {
+      "title": "Sites",
+      "items": [
+        {
+          "name": "Bettergram",
+          "description": "Work smarter with Bettergram",
+          "url": "https://bettergram.io/",
+          "iconUrl": "https://avatars1.githubusercontent.com/u/38667236?s=460&v=4"
+        }
+      ]
+    },
+    {
+      "title": "Our Apps",
+      "items": [
+        {
+          "name": "Bettergram for macOS",
+          "description": "The crypto chat app",
+          "url": "https://bettergram.io/",
+          "iconUrl": "https://avatars1.githubusercontent.com/u/38667236?s=460&v=4"
+        },
+        {
+          "name": "Bettergram for Windows",
+          "description": "The crypto chat app",
+          "url": "https://bettergram.io/",
+          "iconUrl": "https://avatars1.githubusercontent.com/u/38667236?s=460&v=4"
+        },
+        {
+          "name": "Bettergram for Linux",
+          "description": "The crypto chat app",
+          "url": "https://bettergram.io/",
+          "iconUrl": "https://avatars1.githubusercontent.com/u/38667236?s=460&v=4"
+        },
+        {
+          "name": "Bettergram for iOS",
+          "description": "The crypto chat app",
+          "url": "https://bettergram.io/",
+          "iconUrl": "https://avatars1.githubusercontent.com/u/38667236?s=460&v=4"
+        },
+        {
+          "name": "Bettergram for Android",
+          "description": "The crypto chat app",
+          "url": "https://bettergram.io/",
+          "iconUrl": "https://avatars1.githubusercontent.com/u/38667236?s=460&v=4"
+        }
+      ]
+    },
+    {
+      "title": "Telegram groups",
+      "items": [
+        {
+          "name": "",
+          "description": "",
+          "url": "",
+          "iconUrl": ""
+        }
+      ]
+    },
+    {
+      "title": "Telegram channels",
+      "items": [
+        {
+          "name": "",
+          "description": "",
+          "url": "",
+          "iconUrl": ""
+        }
+      ]
+    }
+  ]
+}
