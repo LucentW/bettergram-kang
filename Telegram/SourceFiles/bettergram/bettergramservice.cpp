@@ -164,8 +164,8 @@ base::Observable<void> &BettergramService::billingPlanObservable()
 
 void BettergramService::getIsPaid()
 {
-	//TODO: bettergram: ask server and get know if the instance is paid or not and the current billing plan
-	//TODO: bettergram: if the application is not paid then call getNextAd();
+	//TODO: bettergram: ask server and get know if the instance is paid or not and the current billing plan.
+	//					If the application is not paid then call getNextAd();
 }
 
 void BettergramService::getCryptoPriceList()
