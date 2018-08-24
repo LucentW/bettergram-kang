@@ -82,7 +82,6 @@ private:
 	bool _isRead = false;
 
 	static QString removeHtmlTags(QString text);
-	static QString countPublishDateString(const QDateTime &dateTime);
 
 	void setIsRead(bool isRead);
 };
