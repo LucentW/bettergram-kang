@@ -11,6 +11,8 @@
       '<(res_loc)/qrc/telegram_emoji.qrc',
       '<(res_loc)/qrc/telegram_emoji_large.qrc',
       '<(res_loc)/qrc/telegram_sounds.qrc',
+      '<(res_loc)/qrc/telegram_sounds.qrc',
+      '<(res_loc)/qrc/bettergram.qrc',
     ],
   },
   'conditions': [

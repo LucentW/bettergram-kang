@@ -262,6 +262,25 @@ newsPanIsShowReadLabel: FlatLabel(defaultFlatLabel) {
 		}
 }
 
+resourcesPanPadding: pricesPanPadding;
+resourcesPanHeader: pricesPanHeader;
+resourcesPanRowHeight: 70px;
+resourcesPanRowVerticalPadding: 8px;
+resourcesPanGroupRowHeight: 64;
+resourcesPanImageSize: 32px;
+resourcesPanHover: pricesPanHover; // background of selected row in resources panel
+
+// Last update label at the ResourcesWidget
+resourcesPanLastUpdateLabel: FlatLabel(defaultFlatLabel) {
+		align: align(left);
+		textFg: windowSubTextFg;
+		style: TextStyle(defaultTextStyle) {
+		}
+		palette: TextPalette(defaultTextPalette) {
+			linkFg: windowSubTextFg;
+		}
+}
+
 // Ascending icon at the table column header.
 tableColumnSortAscending: IconButton {
         width: 13px;

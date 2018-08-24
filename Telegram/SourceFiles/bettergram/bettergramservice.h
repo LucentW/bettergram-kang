@@ -10,6 +10,7 @@ namespace Bettergram {
 class CryptoPriceList;
 class RssChannelList;
 class RssChannel;
+class ResourceGroupList;
 class AdItem;
 
 /**
@@ -37,6 +38,7 @@ public:
 
 	CryptoPriceList *cryptoPriceList() const;
 	RssChannelList *rssChannelList() const;
+	ResourceGroupList *resourceGroupList() const;
 	AdItem *currentAd() const;
 
 	bool isWindowActive() const;
@@ -50,6 +52,9 @@ public:
 
 	/// Download and parse all RSS feeds
 	void getRssChannelList();
+
+	/// Download and parse resource group list
+	void getResourceGroupList();
 
 public slots:
 
@@ -70,6 +75,7 @@ private:
 
 	CryptoPriceList *_cryptoPriceList = nullptr;
 	RssChannelList *_rssChannelList = nullptr;
+	ResourceGroupList *_resourceGroupList = nullptr;
 	AdItem *_currentAd = nullptr;
 	bool _isWindowActive = true;
 	std::function<void()> _isWindowActiveHandler = nullptr;
@@ -97,6 +103,9 @@ private slots:
 
 	void onGetNextAdFinished();
 	void onGetNextAdSslFailed(QList<QSslError> errors);
+
+	void onGetResourceGroupListFinished();
+	void onGetResourceGroupListSslFailed(QList<QSslError> errors);
 };
 
 } // namespace Bettergram
