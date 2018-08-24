@@ -35,7 +35,6 @@ public:
 
 	void parseFile(const QString &filePath);
 	void parse(const QByteArray &byteArray);
-	void parse(const QJsonObject &json);
 
 public slots:
 
@@ -59,7 +58,11 @@ private:
 	QDateTime _lastUpdate;
 	QString _lastUpdateString;
 
+	QByteArray _lastSourceHash;
+
 	void setLastUpdate(const QDateTime &lastUpdate);
+
+	void parse(const QJsonObject &json);
 };
 
 } // namespace Bettergram
