@@ -324,8 +324,6 @@ void RssChannel::startFetching()
 
 void RssChannel::fetchingSucceed(const QByteArray &source)
 {
-	qDebug() << QString("fetching succeed for %1").arg(_feedLink.toString());
-
 	// Update source only if it has been changed
 	if (countSourceHash(source) != _lastSourceHash) {
 		_source = source;
@@ -337,7 +335,7 @@ void RssChannel::fetchingSucceed(const QByteArray &source)
 
 void RssChannel::fetchingFailed()
 {
-	qDebug() << QString("fetching failed for %1").arg(_feedLink.toString());
+	LOG(("Fetching failed for %1").arg(_feedLink.toString()));
 	_source.clear();
 	setIsFetching(false);
 	setIsFailed(true);
@@ -358,8 +356,6 @@ void RssChannel::removeOldItems()
 
 bool RssChannel::parse()
 {
-	qDebug() << QString("parsing for %1").arg(_feedLink.toString());
-
 	if (_source.isEmpty()) {
 		return false;
 	}
