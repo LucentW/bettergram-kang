@@ -130,6 +130,8 @@
 <(src_loc)/chat_helpers/prices_list_widget.h
 <(src_loc)/chat_helpers/rss_widget.cpp
 <(src_loc)/chat_helpers/rss_widget.h
+<(src_loc)/chat_helpers/resources_widget.cpp
+<(src_loc)/chat_helpers/resources_widget.h
 <(src_loc)/chat_helpers/list_row.cpp
 <(src_loc)/chat_helpers/list_row.h
 <(src_loc)/chat_helpers/list_row_array.cpp

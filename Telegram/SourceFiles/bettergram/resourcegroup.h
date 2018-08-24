@@ -26,12 +26,16 @@ public:
 	const QSharedPointer<ResourceItem> &at(int index) const;
 
 	int count() const;
+	bool isEmpty() const;
 
-	void parse(const QString &title, const QJsonArray &json);
+	const QList<QSharedPointer<ResourceItem>> &items() const;
+
+	void parse(const QJsonObject &json);
 
 public slots:
 
 signals:
+	void iconChanged();
 
 protected:
 

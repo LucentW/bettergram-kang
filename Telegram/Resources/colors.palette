@@ -562,6 +562,11 @@ newsPanNewsHeaderFg: windowFg; // news panel news header text
 newsPanNewsBodyFg: windowSubTextFg; // news panel news body text
 newsPanNewsReadFg: windowSubTextFg; // news panel already read news text
 
+resourcesPanBg: pricesPanBg; // resources panel background
+resourcesPanGroupFg: windowSubTextFg; // resources panel group title text
+resourcesPanItemTitleFg: windowFg; // resources panel item title text
+resourcesPanItemDescriptionFg: windowSubTextFg; // resources panel item description text
+
 tableHeaderBg: emojiPanCategories; // table header background
 tableHeaderFg: windowSubTextFg; // table header foreground
 tableColumnSortInactiveFg: #00000010 | dialogsMenuIconFg;

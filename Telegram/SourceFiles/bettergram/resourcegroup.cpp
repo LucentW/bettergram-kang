@@ -44,25 +44,35 @@ int ResourceGroup::count() const
 	return _list.count();
 }
 
-void ResourceGroup::parse(const QString &title, const QJsonArray &json)
+bool ResourceGroup::isEmpty() const
+{
+	return _list.isEmpty();
+}
+
+const QList<QSharedPointer<ResourceItem> > &ResourceGroup::items() const
+{
+	return _list;
+}
+
+void ResourceGroup::parse(const QJsonObject &json)
 {
 	if (json.isEmpty()) {
 		return;
 	}
 
-	_title = title;
+	_title = json.value("title").toString();
 
-	for (const QJsonValue &value : json) {
+	for (const QJsonValue &value : json.value("items").toArray()) {
 		if (!value.isObject()) {
 			LOG(("Unable to get json object for resource item"));
 			continue;
 		}
 
-		QJsonObject jsonObject = value.toObject();
-
 		QSharedPointer<ResourceItem> item(new ResourceItem(this));
 
-		item->parse(jsonObject);
+		connect(item.data(), &ResourceItem::iconChanged, this, &ResourceGroup::iconChanged);
+
+		item->parse(value.toObject());
 		_list.push_back(item);
 	}
 }
