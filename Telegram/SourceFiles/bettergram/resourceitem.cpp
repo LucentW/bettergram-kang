@@ -103,6 +103,10 @@ void ResourceItem::parse(const QJsonObject &json)
 
 void ResourceItem::downloadIcon()
 {
+	if (!_iconLink.isValid()) {
+		return;
+	}
+
 	QNetworkAccessManager *networkManager = new QNetworkAccessManager();
 
 	QNetworkRequest request;
