@@ -56,7 +56,7 @@ void ResourcesWidget::Footer::processPanelHideFinished()
 
 void ResourcesWidget::Footer::onFooterClicked()
 {
-	QDesktopServices::openUrl(QUrl("https://bettergram.io"));
+	BettergramService::openUrl(QUrl("https://bettergram.io"));
 }
 
 ResourcesWidget::ResourcesWidget(QWidget* parent, not_null<Window::Controller*> controller)
@@ -221,7 +221,7 @@ void ResourcesWidget::mouseReleaseEvent(QMouseEvent *e)
 			QUrl link = row.item()->link();
 
 			if (!link.isEmpty()) {
-				QDesktopServices::openUrl(link);
+				BettergramService::openUrl(link);
 			}
 		}
 	}

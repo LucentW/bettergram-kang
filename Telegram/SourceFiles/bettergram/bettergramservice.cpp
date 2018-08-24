@@ -6,6 +6,7 @@
 #include "resourcegrouplist.h"
 #include "aditem.h"
 
+#include <messenger.h>
 #include <lang/lang_keys.h>
 
 #include <QTimer>
@@ -58,6 +59,17 @@ QString BettergramService::generateLastUpdateString(const QDateTime &dateTime, b
 									   langDayOfMonthFull(dateTime.date()),
 									   lt_time,
 									   timeString);
+	}
+}
+
+void BettergramService::openUrl(const QUrl &url)
+{
+	QString urlString = url.toString();
+
+	if (urlString.startsWith(QLatin1String("tg://"), Qt::CaseInsensitive)) {
+		Messenger::Instance().openLocalUrl(urlString);
+	} else {
+		QDesktopServices::openUrl(url);
 	}
 }
 

@@ -56,7 +56,7 @@ void RssWidget::Footer::processPanelHideFinished()
 
 void RssWidget::Footer::onFooterClicked()
 {
-	QDesktopServices::openUrl(QUrl("https://bettergram.io"));
+	BettergramService::openUrl(QUrl("https://bettergram.io"));
 }
 
 const style::color &RssWidget::getNewsHeaderColor(const QSharedPointer<RssItem> &item)
@@ -304,7 +304,7 @@ void RssWidget::mouseReleaseEvent(QMouseEvent *e)
 		}
 
 		if (!link.isEmpty()) {
-			QDesktopServices::openUrl(link);
+			BettergramService::openUrl(link);
 		}
 	}
 }
