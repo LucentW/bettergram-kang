@@ -33,6 +33,8 @@ public:
 	static const QString &defaultLastUpdateString();
 	static QString generateLastUpdateString(const QDateTime &dateTime, bool isShowSeconds);
 
+	static void openUrl(const QUrl &url);
+
 	bool isPaid() const;
 	BillingPlan billingPlan() const;
 
