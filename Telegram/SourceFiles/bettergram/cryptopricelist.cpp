@@ -88,7 +88,7 @@ void CryptoPriceList::setLastUpdate(const QDateTime &lastUpdate)
 	if (_lastUpdate != lastUpdate) {
 		_lastUpdate = lastUpdate;
 
-		_lastUpdateString = BettergramService::generateLastUpdateString(_lastUpdate);
+		_lastUpdateString = BettergramService::generateLastUpdateString(_lastUpdate, true);
 	}
 }
 

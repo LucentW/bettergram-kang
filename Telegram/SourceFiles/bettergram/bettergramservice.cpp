@@ -38,14 +38,16 @@ const QString &BettergramService::defaultLastUpdateString()
 	return _defaultLastUpdateString;
 }
 
-QString BettergramService::generateLastUpdateString(const QDateTime &dateTime)
+QString BettergramService::generateLastUpdateString(const QDateTime &dateTime, bool isShowSeconds)
 {
 	if (dateTime.isNull()) {
 		return _defaultLastUpdateString;
 	}
 
 	qint64 daysBefore = QDateTime::currentDateTime().daysTo(dateTime);
-	const QString timeString = dateTime.toString("hh:mm:ss");
+
+	const QString timeFormat = isShowSeconds ? "hh:mm:ss" : "hh:mm";
+	const QString timeString = dateTime.toString(timeFormat);
 
 	if (daysBefore == 0) {
 		return lng_player_message_today(lt_time, timeString);

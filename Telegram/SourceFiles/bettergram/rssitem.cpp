@@ -1,6 +1,6 @@
 #include "rssitem.h"
 #include "rsschannel.h"
-#include <lang/lang_keys.h>
+#include "bettergramservice.h"
 
 #include <QXmlStreamReader>
 
@@ -179,7 +179,8 @@ void RssItem::parse(QXmlStreamReader &xml)
 			_commentsLink = xml.readElementText();
 		} else if (xml.name() == QLatin1String("pubDate")) {
 			_publishDate = QDateTime::fromString(xml.readElementText(), Qt::RFC2822Date);
-			_publishDateString = countPublishDateString(_publishDate.toLocalTime());
+			_publishDateString =
+					BettergramService::generateLastUpdateString(_publishDate.toLocalTime(), false);
 		} else {
 			xml.skipCurrentElement();
 		}
@@ -220,27 +221,6 @@ QString RssItem::removeHtmlTags(QString text)
 	QTextDocument textDocument;
 	textDocument.setHtml(text);
 	return textDocument.toPlainText();
-}
-
-QString RssItem::countPublishDateString(const QDateTime &dateTime)
-{
-	if (dateTime.isNull()) {
-		return QString();
-	}
-
-	qint64 daysBefore = QDateTime::currentDateTime().daysTo(dateTime);
-	const QString timeString = dateTime.toString("hh:mm");
-
-	if (daysBefore == 0) {
-		return lng_player_message_today(lt_time, timeString);
-	} else if (daysBefore == -1) {
-		return lng_player_message_yesterday(lt_time, timeString);
-	} else {
-		return lng_player_message_date(lt_date,
-									   langDayOfMonthFull(dateTime.date()),
-									   lt_time,
-									   timeString);
-	}
 }
 
 } // namespace Bettergrams
