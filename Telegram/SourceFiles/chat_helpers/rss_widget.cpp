@@ -90,6 +90,7 @@ RssWidget::RssWidget(QWidget* parent, not_null<Window::Controller*> controller)
 	updateLastUpdateLabel();
 	updateSortModeLabel();
 	updateIsShowReadLabel();
+	updateRows();
 
 	RssChannelList *rssChannelList = BettergramService::instance()->rssChannelList();
 
@@ -227,7 +228,7 @@ void RssWidget::setSelectedRow(int selectedRow)
 
 int RssWidget::getListAreaTop() const
 {
-	return _sortModeLabel->y() + _sortModeLabel->height() + st::pricesPanPadding;
+	return _sortModeLabel->y() + _sortModeLabel->height() + st::newsPanPadding;
 }
 
 void RssWidget::countSelectedRow(const QPoint &point)
@@ -274,6 +275,10 @@ void RssWidget::mousePressEvent(QMouseEvent *e)
 
 void RssWidget::mouseReleaseEvent(QMouseEvent *e)
 {
+	if (e->button() != Qt::LeftButton) {
+		return;
+	}
+
 	QPointF point = e->localPos();
 
 	countSelectedRow(QPoint(static_cast<int>(qRound(point.x())),

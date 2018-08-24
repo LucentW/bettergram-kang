@@ -95,8 +95,8 @@ void ResourceItem::parse(const QJsonObject &json)
 	_title = json.value("title").toString();
 	_description = json.value("description").toString();
 
-	_link = json.value("link").toString();
-	_iconLink = json.value("iconLink").toString();
+	_link = json.value("url").toString();
+	_iconLink = json.value("iconUrl").toString();
 
 	downloadIcon();
 }
@@ -104,6 +104,7 @@ void ResourceItem::parse(const QJsonObject &json)
 void ResourceItem::downloadIcon()
 {
 	if (!_iconLink.isValid()) {
+		LOG(("Icon link '%1' is invalid").arg(_iconLink.toString()));
 		return;
 	}
 

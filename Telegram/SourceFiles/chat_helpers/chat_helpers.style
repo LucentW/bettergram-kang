@@ -176,7 +176,7 @@ pricesPanColumnPriceWidth: 85px;
 pricesPanColumn24hWidth: 70px;
 pricesPanHover: windowBgOver; // background of selected row in prices panel
 
-// Last update label at the RssWidget
+// Last update label at the PricesWidget
 pricesPanLastUpdateLabel: FlatLabel(defaultFlatLabel) {
 		align: align(left);
 		textFg: windowSubTextFg;
@@ -264,9 +264,9 @@ newsPanIsShowReadLabel: FlatLabel(defaultFlatLabel) {
 
 resourcesPanPadding: pricesPanPadding;
 resourcesPanHeader: pricesPanHeader;
-resourcesPanRowHeight: 70px;
+resourcesPanRowHeight: 48px;
 resourcesPanRowVerticalPadding: 8px;
-resourcesPanGroupRowHeight: 64;
+resourcesPanGroupRowHeight: 36;
 resourcesPanImageSize: 32px;
 resourcesPanHover: pricesPanHover; // background of selected row in resources panel
 

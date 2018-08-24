@@ -10,6 +10,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "prices_list_widget.h"
 #include "rss_widget.h"
+#include "resources_widget.h"
 #include "styles/style_chat_helpers.h"
 #include "ui/widgets/buttons.h"
 #include "ui/widgets/labels.h"
@@ -54,7 +55,7 @@ BettergramTabbedSelector::BettergramTabbedSelector(QWidget *parent, not_null<Win
 			Tab{ BettergramSelectorTab::Prices, object_ptr<PricesListWidget>(this, controller) },
 			Tab{ BettergramSelectorTab::News, object_ptr<RssWidget>(this, controller) },
 			//Tab{ BettergramSelectorTab::Icos, object_ptr<PricesListWidget>(this, controller) },
-			Tab{ BettergramSelectorTab::Resources, object_ptr<PricesListWidget>(this, controller) },
+			Tab{ BettergramSelectorTab::Resources, object_ptr<ResourcesWidget>(this, controller) },
 		} }
 		, _currentTabType(Auth().settings().bettergramSelectorTab()) {
 	resize(st::emojiPanWidth, st::emojiPanMaxHeight);

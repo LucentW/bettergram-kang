@@ -285,6 +285,10 @@ void PricesListWidget::mousePressEvent(QMouseEvent *e)
 
 void PricesListWidget::mouseReleaseEvent(QMouseEvent *e)
 {
+	if (e->button() != Qt::LeftButton) {
+		return;
+	}
+
 	QPointF point = e->localPos();
 
 	countSelectedRow(QPoint(static_cast<int>(qRound(point.x())),

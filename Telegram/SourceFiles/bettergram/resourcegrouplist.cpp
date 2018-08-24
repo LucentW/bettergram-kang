@@ -8,7 +8,7 @@
 
 namespace Bettergram {
 
-const int ResourceGroupList::_defaultFreq = 60;
+const int ResourceGroupList::_defaultFreq = 5 * 60;
 
 ResourceGroupList::ResourceGroupList(QObject *parent) :
 	QObject(parent),
@@ -137,19 +137,19 @@ void ResourceGroupList::parse(const QJsonObject &json)
 
 	_list.clear();
 
-	for (QJsonObject::const_iterator it = json.begin(); it != json.end(); ++it) {
-		QJsonValue value = it.value();
+	QJsonArray groupsJson = json.value("groups").toArray();
 
-		if (!value.isArray()) {
-			LOG(("Unable to get json array for resource group"));
+	for (const QJsonValue value : groupsJson) {
+		if (!value.isObject()) {
+			LOG(("Unable to get json object for resource group"));
 			continue;
 		}
 
-		QJsonArray jsonArray = value.toArray();
-
 		QSharedPointer<ResourceGroup> group(new ResourceGroup(this));
 
-		group->parse(it.key(), jsonArray);
+		connect(group.data(), &ResourceGroup::iconChanged, this, &ResourceGroupList::iconChanged);
+
+		group->parse(value.toObject());
 		_list.push_back(group);
 	}
 
