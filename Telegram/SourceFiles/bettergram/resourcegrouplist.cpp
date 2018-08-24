@@ -98,6 +98,14 @@ void ResourceGroupList::parseFile(const QString &filePath)
 
 void ResourceGroupList::parse(const QByteArray &byteArray)
 {
+	// Update only if it has been changed
+	QByteArray hash = QCryptographicHash::hash(byteArray, QCryptographicHash::Sha256);
+
+	if (hash == _lastSourceHash) {
+		setLastUpdate(QDateTime::currentDateTime());
+		return;
+	}
+
 	QJsonParseError parseError;
 	QJsonDocument doc = QJsonDocument::fromJson(byteArray, &parseError);
 
@@ -118,6 +126,7 @@ void ResourceGroupList::parse(const QByteArray &byteArray)
 	}
 
 	parse(json);
+	_lastSourceHash = hash;
 }
 
 void ResourceGroupList::parse(const QJsonObject &json)
