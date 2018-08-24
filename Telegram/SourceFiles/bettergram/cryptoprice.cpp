@@ -105,6 +105,10 @@ void CryptoPrice::setIconUrl(const QUrl &iconUrl)
 
 void CryptoPrice::downloadIcon()
 {
+	if (!_iconUrl.isValid()) {
+		return;
+	}
+
 	QNetworkAccessManager *networkManager = new QNetworkAccessManager();
 
 	QNetworkRequest request;
