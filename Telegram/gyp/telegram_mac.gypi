@@ -255,7 +255,7 @@
     },
     'mac_sandbox': 1,
     'mac_sandbox_development_team': '<!(cat ../../../TelegramPrivate/mac_development_team)',
-    'product_name': 'Bettergram - Crypto Chat App',
+    'product_name': 'Bettergram',
     'sources': [
       '../Telegram/Telegram Desktop.entitlements',
     ],
@@ -266,12 +266,12 @@
     'postbuilds': [{
       'postbuild_name': 'Clear Frameworks path',
       'action': [
-        'rm', '-rf', '${BUILT_PRODUCTS_DIR}/Bettergram - Crypto Chat App.app/Contents/Frameworks'
+        'rm', '-rf', '${BUILT_PRODUCTS_DIR}/Bettergram.app/Contents/Frameworks'
       ],
     }, {
       'postbuild_name': 'Force Frameworks path',
       'action': [
-        'mkdir', '-p', '${BUILT_PRODUCTS_DIR}/Bettergram - Crypto Chat App.app/Contents/Frameworks/'
+        'mkdir', '-p', '${BUILT_PRODUCTS_DIR}/Bettergram.app/Contents/Frameworks/'
       ],
     }]
   }]],
