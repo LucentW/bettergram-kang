@@ -1,5 +1,7 @@
 #pragma once
 
+#include "remoteimage.h"
+
 #include <QObject>
 
 class QXmlStreamReader;
@@ -122,10 +124,9 @@ private:
 	QString _skipDays;
 
 	QUrl _feedLink;
-	QUrl _iconLink;
 	QUrl _link;
 
-	QPixmap _icon;
+	RemoteImage _icon;
 
 	QByteArray _source;
 	QByteArray _lastSourceHash;
@@ -139,9 +140,6 @@ private:
 	void setIsFetching(bool isFetching);
 	void setIsFailed(bool isFailed);
 
-	void setIcon(const QByteArray &byteArray);
-	void setIcon(const QPixmap &icon);
-
 	QByteArray countSourceHash(const QByteArray &source) const;
 
 	void removeOldItems();
@@ -154,8 +152,6 @@ private:
 	QSharedPointer<RssItem> find(const QSharedPointer<RssItem> &item);
 	void merge(const QSharedPointer<RssItem> &item);
 	void add(const QSharedPointer<RssItem> &item);
-
-	void downloadIcon();
 };
 
 } // namespace Bettergram
