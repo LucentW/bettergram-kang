@@ -1,5 +1,7 @@
 #pragma once
 
+#include "remoteimage.h"
+
 #include <QObject>
 
 namespace Bettergram {
@@ -40,15 +42,8 @@ private:
 	QString _description;
 
 	QUrl _link;
-	QUrl _iconLink;
 
-	QPixmap _icon;
-
-	void setIcon(const QByteArray &byteArray);
-	void setIcon(const QPixmap &icon);
-
-	void downloadIcon();
-	void downloadIconLater();
+	RemoteImage _icon;
 };
 
 } // namespace Bettergram
