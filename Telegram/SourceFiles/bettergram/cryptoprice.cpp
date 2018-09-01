@@ -1,4 +1,5 @@
 #include "cryptoprice.h"
+#include "remoteimage.h"
 
 #include "styles/style_chat_helpers.h"
 
