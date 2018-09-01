@@ -8,10 +8,6 @@
 #include <QCryptographicHash>
 #include <QXmlStreamReader>
 
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkRequest>
-#include <QtNetwork/QNetworkReply>
-
 namespace Bettergram {
 
 void RssChannel::sort(QList<QSharedPointer<RssItem>> &items)
