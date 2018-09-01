@@ -12,7 +12,7 @@ CryptoPrice::CryptoPrice(const QUrl &url,
 						 QObject *parent) :
 	QObject(parent),
 	_url(url),
-	_icon(new RemoteImage(iconUrl, st::pricesPanTableImageSize, st::pricesPanTableImageSize, this)),
+	_icon(new RemoteImage(iconUrl, st::pricesPanTableImageSize, st::pricesPanTableImageSize)),
 	_name(name),
 	_shortName(shortName)
 {
@@ -30,7 +30,7 @@ CryptoPrice::CryptoPrice(const QUrl &url,
 						 QObject *parent) :
 	QObject(parent),
 	_url(url),
-	_icon(new RemoteImage(iconUrl, st::pricesPanTableImageSize, st::pricesPanTableImageSize, this)),
+	_icon(new RemoteImage(iconUrl, st::pricesPanTableImageSize, st::pricesPanTableImageSize)),
 	_name(name),
 	_shortName(shortName),
 	_currentPrice(currentPrice),
