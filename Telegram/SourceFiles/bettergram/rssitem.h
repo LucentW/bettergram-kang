@@ -1,5 +1,7 @@
 #pragma once
 
+#include "remoteimage.h"
+
 #include <QObject>
 
 class QXmlStreamReader;
@@ -36,7 +38,7 @@ public:
 	const QUrl &commentsLink() const;
 	const QDateTime &publishDate() const;
 	const QString publishDateString() const;
-	const QPixmap &icon() const;
+	const QPixmap &image() const;
 
 	bool isValid() const;
 	bool isOld(const QDateTime &now = QDateTime::currentDateTime()) const;
@@ -59,6 +61,7 @@ public slots:
 
 signals:
 	void isReadChanged();
+	void imageChanged();
 
 protected:
 
@@ -75,9 +78,15 @@ private:
 	QStringList _categoryList;
 
 	QUrl _link;
+
 	QUrl _commentsLink;
 	QDateTime _publishDate;
 	QString _publishDateString;
+
+	/// We try to get _imageLink from <enclosure url="link-to-image" type="image/..."/>,
+	/// or from <description>Text <img src="link-to-image"></description>,
+	/// or from <title>Text <img src="link-to-image"></title> tags
+	RemoteImage _image;
 
 	bool _isRead = false;
 
