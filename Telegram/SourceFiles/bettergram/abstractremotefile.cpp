@@ -1,5 +1,6 @@
 #include "abstractremotefile.h"
 
+#include <QTimer>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
@@ -18,7 +19,7 @@ AbstractRemoteFile::AbstractRemoteFile(const QUrl &link, QObject *parent) :
 	download();
 }
 
-QUrl AbstractRemoteFile::link() const
+const QUrl &AbstractRemoteFile::link() const
 {
 	return _link;
 }
@@ -55,6 +56,8 @@ void AbstractRemoteFile::download()
 				.arg(_link.toString())
 				.arg(reply->errorString())
 				.arg(reply->error()));
+
+			downloadLater();
 		}
 	});
 
@@ -68,6 +71,13 @@ void AbstractRemoteFile::download()
 			LOG(("%1").arg(error.errorString()));
 		}
 	});
+}
+
+void AbstractRemoteFile::downloadLater()
+{
+	//TODO: bettergram: increase the timeout after each call of this method
+	//TODO: bettergram: shuffle timeout in a range
+	QTimer::singleShot(5000, this, [this](){ download(); });
 }
 
 } // namespace Bettergrams

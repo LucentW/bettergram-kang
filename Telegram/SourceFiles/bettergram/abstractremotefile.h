@@ -14,7 +14,7 @@ public:
 	explicit AbstractRemoteFile(QObject *parent = nullptr);
 	explicit AbstractRemoteFile(const QUrl &link, QObject *parent = nullptr);
 
-	QUrl link() const;
+	const QUrl &link() const;
 	void setLink(const QUrl &link);
 
 public slots:
@@ -30,6 +30,8 @@ protected:
 
 private:
 	QUrl _link;
+
+	void downloadLater();
 };
 
 } // namespace Bettergram

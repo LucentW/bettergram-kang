@@ -12,9 +12,15 @@ class RemoteImage : public AbstractRemoteFile {
 
 public:
 	explicit RemoteImage(QObject *parent = nullptr);
+
 	explicit RemoteImage(const QUrl &link, QObject *parent = nullptr);
+
 	explicit RemoteImage(const QUrl &link,
 						 int scaledWidth,
+						 int scaledHeight,
+						 QObject *parent = nullptr);
+
+	explicit RemoteImage(int scaledWidth,
 						 int scaledHeight,
 						 QObject *parent = nullptr);
 
@@ -26,7 +32,7 @@ public:
 
 	void setScaledSize(int scaledWidth, int scaledHeight);
 
-	QPixmap image() const;
+	const QPixmap &image() const;
 
 public slots:
 
