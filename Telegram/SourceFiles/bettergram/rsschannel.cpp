@@ -25,14 +25,18 @@ bool RssChannel::compare(const QSharedPointer<RssItem> &a, const QSharedPointer<
 }
 
 RssChannel::RssChannel(QObject *parent) :
-	QObject(parent)
+	QObject(parent),
+	_icon(st::newsPanImageSize, st::newsPanImageSize)
 {
+	connect(&_icon, &RemoteImage::imageChanged, this, &RssChannel::iconChanged);
 }
 
 RssChannel::RssChannel(const QUrl &feedLink, QObject *parent) :
 	QObject(parent),
-	_feedLink(feedLink)
+	_feedLink(feedLink),
+	_icon(st::newsPanImageSize, st::newsPanImageSize)
 {
+	connect(&_icon, &RemoteImage::imageChanged, this, &RssChannel::iconChanged);
 }
 
 const QString &RssChannel::title() const
@@ -156,18 +160,12 @@ void RssChannel::setFeedLink(const QUrl &feedLink)
 
 const QUrl &RssChannel::iconLink() const
 {
-	return _iconLink;
+	return _icon.link();
 }
 
 void RssChannel::setIconLink(const QUrl &iconLink)
 {
-	if (_iconLink != iconLink) {
-		_iconLink = iconLink;
-
-		downloadIcon();
-	} else if (_icon.isNull()) {
-		downloadIcon();
-	}
+	_icon.setLink(iconLink);
 }
 
 const QUrl &RssChannel::link() const
@@ -182,7 +180,7 @@ void RssChannel::setLink(const QUrl &link)
 
 const QPixmap &RssChannel::icon() const
 {
-	return _icon;
+	return _icon.image();
 }
 
 bool RssChannel::isFetching() const
@@ -203,40 +201,6 @@ bool RssChannel::isFailed() const
 void RssChannel::setIsFailed(bool isFailed)
 {
 	_isFailed = isFailed;
-}
-
-void RssChannel::setIcon(const QByteArray &byteArray)
-{
-	if (byteArray.isEmpty()) {
-		LOG(("Can not get icon for RSS channel %1. Response is empty.")
-			.arg(_link.toString()));
-		return;
-	}
-
-	QPixmap icon;
-
-	if (!icon.loadFromData(byteArray)) {
-		LOG(("Can not get icon for RSS channel %1. Can not convert response to image.")
-			.arg(_link.toString()));
-		return;
-	}
-
-	setIcon(icon);
-}
-
-void RssChannel::setIcon(const QPixmap &icon)
-{
-	_icon = icon;
-
-	if (!_icon.isNull()
-			&& (_icon.width() != st::newsPanImageSize || _icon.height() != st::newsPanImageSize)) {
-		_icon = _icon.scaled(st::newsPanImageSize,
-							 st::newsPanImageSize,
-							 Qt::KeepAspectRatio,
-							 Qt::SmoothTransformation);
-	}
-
-	emit iconChanged();
 }
 
 QByteArray RssChannel::countSourceHash(const QByteArray &source) const
@@ -570,43 +534,6 @@ void RssChannel::add(const QSharedPointer<RssItem> &item)
 	connect(item.data(), &RssItem::isReadChanged, this, &RssChannel::isReadChanged);
 
 	_list.push_back(item);
-}
-
-void RssChannel::downloadIcon()
-{
-	if (!_iconLink.isValid()) {
-		setIcon(QPixmap());
-		return;
-	}
-
-	QNetworkAccessManager *networkManager = new QNetworkAccessManager();
-
-	QNetworkRequest request;
-	request.setUrl(_iconLink);
-
-	QNetworkReply *reply = networkManager->get(request);
-
-	connect(reply, &QNetworkReply::finished, this, [this, reply]() {
-		if(reply->error() == QNetworkReply::NoError) {
-			setIcon(reply->readAll());
-		} else {
-			LOG(("Can not get icon for RSS channel %1. %2 (%3)")
-						  .arg(_link.toString())
-						  .arg(reply->errorString())
-						  .arg(reply->error()));
-		}
-	});
-
-	connect(reply, &QNetworkReply::finished, [networkManager, reply]() {
-		reply->deleteLater();
-		networkManager->deleteLater();
-	});
-
-	connect(reply, &QNetworkReply::sslErrors, this, [](QList<QSslError> errors) {
-		for(const QSslError &error : errors) {
-			LOG(("%1").arg(error.errorString()));
-		}
-	});
 }
 
 } // namespace Bettergrams
