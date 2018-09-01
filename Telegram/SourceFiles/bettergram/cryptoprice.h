@@ -1,10 +1,10 @@
 #pragma once
 
-#include "remoteimage.h"
-
 #include <QObject>
 
 namespace Bettergram {
+
+class RemoteImage;
 
 /**
  * @brief The CryptoPrice class contains current price of one cryptocurrency.
