@@ -2,11 +2,6 @@
 
 #include "styles/style_chat_helpers.h"
 
-#include <QTimer>
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkRequest>
-#include <QtNetwork/QNetworkReply>
-
 namespace Bettergram {
 
 CryptoPrice::CryptoPrice(const QUrl &url,
@@ -16,10 +11,11 @@ CryptoPrice::CryptoPrice(const QUrl &url,
 						 QObject *parent) :
 	QObject(parent),
 	_url(url),
-	_iconUrl(iconUrl),
+	_icon(new RemoteImage(iconUrl, st::pricesPanTableImageSize, st::pricesPanTableImageSize, this)),
 	_name(name),
 	_shortName(shortName)
 {
+	connect(_icon.data(), &RemoteImage::imageChanged, this, &CryptoPrice::iconChanged);
 }
 
 CryptoPrice::CryptoPrice(const QUrl &url,
@@ -33,7 +29,7 @@ CryptoPrice::CryptoPrice(const QUrl &url,
 						 QObject *parent) :
 	QObject(parent),
 	_url(url),
-	_iconUrl(iconUrl),
+	_icon(new RemoteImage(iconUrl, st::pricesPanTableImageSize, st::pricesPanTableImageSize, this)),
 	_name(name),
 	_shortName(shortName),
 	_currentPrice(currentPrice),
@@ -42,12 +38,12 @@ CryptoPrice::CryptoPrice(const QUrl &url,
 	_isChangeFor24HoursGrown(_changeFor24Hours >= 0.0),
 	_originSortIndex(originSortIndex)
 {
+	connect(_icon.data(), &RemoteImage::imageChanged, this, &CryptoPrice::iconChanged);
 }
 
 CryptoPrice::CryptoPrice(const CryptoPrice &price, QObject *parent) :
 	QObject(parent),
 	_url(price._url),
-	_iconUrl(price._iconUrl),
 	_icon(price._icon),
 	_name(price._name),
 	_shortName(price._shortName),
@@ -57,12 +53,12 @@ CryptoPrice::CryptoPrice(const CryptoPrice &price, QObject *parent) :
 	_isChangeFor24HoursGrown(price._isChangeFor24HoursGrown),
 	_originSortIndex(price._originSortIndex)
 {
+	connect(_icon.data(), &RemoteImage::imageChanged, this, &CryptoPrice::iconChanged);
 }
 
 CryptoPrice &CryptoPrice::operator=(const CryptoPrice &price)
 {
 	setUrl(price._url);
-	setIconUrl(price._iconUrl);
 	setIcon(price._icon);
 	setName(price._name);
 	setShortName(price._shortName);
@@ -84,96 +80,19 @@ void CryptoPrice::setUrl(const QUrl &url)
 	_url = url;
 }
 
+void CryptoPrice::setIcon(const QSharedPointer<RemoteImage> &icon)
+{
+	_icon = icon;
+}
+
 const QUrl &CryptoPrice::iconUrl() const
 {
-	return _iconUrl;
+	return _icon->link();
 }
 
 const QPixmap &CryptoPrice::icon() const
 {
-	return _icon;
-}
-
-void CryptoPrice::setIconUrl(const QUrl &iconUrl)
-{
-	if (_iconUrl != iconUrl) {
-		_iconUrl = iconUrl;
-
-		downloadIcon();
-	}
-}
-
-void CryptoPrice::downloadIcon()
-{
-	if (!_iconUrl.isValid()) {
-		return;
-	}
-
-	QNetworkAccessManager *networkManager = new QNetworkAccessManager();
-
-	QNetworkRequest request;
-	request.setUrl(_iconUrl);
-
-	QNetworkReply *reply = networkManager->get(request);
-
-	connect(reply, &QNetworkReply::finished, this, [this, reply]() {
-		if(reply->error() == QNetworkReply::NoError) {
-			setIcon(reply->readAll());
-		} else {
-			LOG(("Can not get icon for crypto currency. %1 (%2)")
-						  .arg(reply->errorString())
-						  .arg(reply->error()));
-
-			downloadIconLater();
-		}
-	});
-
-	connect(reply, &QNetworkReply::finished, [networkManager, reply]() {
-		reply->deleteLater();
-		networkManager->deleteLater();
-	});
-
-	connect(reply, &QNetworkReply::sslErrors, this, [](QList<QSslError> errors) {
-		for(const QSslError &error : errors) {
-			LOG(("%1").arg(error.errorString()));
-		}
-	});
-}
-
-void CryptoPrice::downloadIconLater()
-{
-	QTimer::singleShot(5000, this, [this](){ downloadIcon(); });
-}
-
-void CryptoPrice::setIcon(const QByteArray &byteArray)
-{
-	if (byteArray.isEmpty()) {
-		LOG(("Can not get icon for crypto currency. Response is empty."));
-		return;
-	}
-
-	QPixmap icon;
-
-	if (!icon.loadFromData(byteArray)) {
-		LOG(("Can not get icon for crypto currency. Can not convert response to image."));
-		return;
-	}
-
-	setIcon(icon);
-}
-
-void CryptoPrice::setIcon(const QPixmap &icon)
-{
-	_icon = icon;
-
-	if (_icon.width() != st::pricesPanTableImageSize || _icon.height() != st::pricesPanTableImageSize) {
-		_icon = _icon.scaled(st::pricesPanTableImageSize,
-							 st::pricesPanTableImageSize,
-							 Qt::KeepAspectRatio,
-							 Qt::SmoothTransformation);
-	}
-
-	emit iconChanged();
+	return _icon->image();
 }
 
 const QString &CryptoPrice::name() const

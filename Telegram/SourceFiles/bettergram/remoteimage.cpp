@@ -19,6 +19,13 @@ RemoteImage::RemoteImage(const QUrl &link, int scaledWidth, int scaledHeight, QO
 {
 }
 
+RemoteImage::RemoteImage(int scaledWidth, int scaledHeight, QObject *parent) :
+	AbstractRemoteFile(parent),
+	_scaledWidth(scaledWidth),
+	_scaledHeight(scaledHeight)
+{
+}
+
 int RemoteImage::scaledWidth() const
 {
 	return _scaledWidth;
@@ -66,7 +73,7 @@ void RemoteImage::setScaledSize(int scaledWidth, int scaledHeight)
 	}
 }
 
-QPixmap RemoteImage::image() const
+const QPixmap &RemoteImage::image() const
 {
 	return _image;
 }

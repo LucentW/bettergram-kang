@@ -159,10 +159,6 @@ void CryptoPriceList::updateData(double marketCap, int freq, const QList<CryptoP
 		} else {
 			existedPrice = new CryptoPrice(price, this);
 
-			if (existedPrice->icon().isNull()) {
-				existedPrice->downloadIcon();
-			}
-
 			connect(existedPrice, &CryptoPrice::iconChanged, this, &CryptoPriceList::updated);
 
 			_list.push_back(existedPrice);
