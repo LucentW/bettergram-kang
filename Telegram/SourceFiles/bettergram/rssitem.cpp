@@ -2,6 +2,8 @@
 #include "rsschannel.h"
 #include "bettergramservice.h"
 
+#include <styles/style_chat_helpers.h>
+
 #include <QXmlStreamReader>
 
 namespace Bettergram {
@@ -10,11 +12,14 @@ const qint64 RssItem::_maxLastHoursInMs = 24 * 60 * 60 * 1000;
 
 RssItem::RssItem(RssChannel *channel) :
 	QObject(channel),
-	_channel(channel)
+	_channel(channel),
+	_image(st::newsPanImageSize, st::newsPanImageSize)
 {
 	if (!_channel) {
 		throw std::invalid_argument("RSS Channel is null");
 	}
+
+	connect(&_image, &RemoteImage::imageChanged, this, &RssItem::imageChanged);
 }
 
 RssItem::RssItem(const QString &guid,
@@ -35,11 +40,14 @@ RssItem::RssItem(const QString &guid,
 	_categoryList(categoryList),
 	_link(link),
 	_commentsLink(commentsLink),
-	_publishDate(publishDate)
+	_publishDate(publishDate),
+	_image(st::newsPanImageSize, st::newsPanImageSize)
 {
 	if (!_channel) {
 		throw std::invalid_argument("RSS Channel is null");
 	}
+
+	connect(&_image, &RemoteImage::imageChanged, this, &RssItem::imageChanged);
 }
 
 const QString &RssItem::guid() const
@@ -87,8 +95,12 @@ const QString RssItem::publishDateString() const
 	return _publishDateString;
 }
 
-const QPixmap &RssItem::icon() const
+const QPixmap &RssItem::image() const
 {
+	if (!_image.image().isNull()) {
+		return _image.image();
+	}
+
 	if (!_channel) {
 		throw std::invalid_argument("RSS Channel is null");
 	}
@@ -154,6 +166,7 @@ void RssItem::update(const QSharedPointer<RssItem> &item)
 	_commentsLink = item->_commentsLink;
 	_publishDate = item->_publishDate;
 	_publishDateString = item->_publishDateString;
+	_image.setLink(item->_image.link());
 
 	// We do not change _isRead field in this method
 }
@@ -181,6 +194,12 @@ void RssItem::parse(QXmlStreamReader &xml)
 			_publishDate = QDateTime::fromString(xml.readElementText(), Qt::RFC2822Date);
 			_publishDateString =
 					BettergramService::generateLastUpdateString(_publishDate.toLocalTime(), false);
+		} else if (xml.name() == QLatin1String("enclosure")) {
+			QUrl url = QUrl(xml.attributes().value("url").toString());
+
+			if (url.isValid()) {
+				_image.setLink(url);
+			}
 		} else {
 			xml.skipCurrentElement();
 		}
@@ -198,6 +217,7 @@ void RssItem::load(QSettings &settings)
 	_link = settings.value("link").toUrl();
 	_commentsLink = settings.value("commentsLink").toUrl();
 	_publishDate = settings.value("publishDate").toDateTime();
+	_image.setLink(settings.value("imageLink").toString());
 
 	setIsRead(settings.value("isRead").toBool());
 }
@@ -213,6 +233,8 @@ void RssItem::save(QSettings &settings)
 	settings.setValue("link", link());
 	settings.setValue("commentsLink", commentsLink());
 	settings.setValue("publishDate", publishDate());
+	settings.setValue("imageLink", _image.link());
+
 	settings.setValue("isRead", isRead());
 }
 

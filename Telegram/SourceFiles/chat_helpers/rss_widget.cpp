@@ -487,13 +487,13 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 							 Qt::AlignLeft | Qt::AlignBottom,
 							 row.userData().item()->publishDateString());
 
-			if (!row.userData().item()->icon().isNull()) {
+			if (!row.userData().item()->image().isNull()) {
 				QRect targetRect(iconLeft,
 								 rowRect.top() + (rowRect.height() - st::newsPanImageSize) / 2,
 								 st::newsPanImageSize,
 								 st::newsPanImageSize);
 
-				painter.drawPixmap(targetRect, row.userData().item()->icon());
+				painter.drawPixmap(targetRect, row.userData().item()->image());
 			}
 		} else if (row.userData().isChannel()) {
 			painter.setFont(st::semiboldFont);

@@ -528,6 +528,7 @@ void RssChannel::add(const QSharedPointer<RssItem> &item)
 	}
 
 	connect(item.data(), &RssItem::isReadChanged, this, &RssChannel::isReadChanged);
+	connect(item.data(), &RssItem::imageChanged, this, &RssChannel::iconChanged);
 
 	_list.push_back(item);
 }
