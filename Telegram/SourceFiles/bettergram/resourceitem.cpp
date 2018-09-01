@@ -10,8 +10,10 @@
 namespace Bettergram {
 
 ResourceItem::ResourceItem(QObject *parent) :
-	QObject(parent)
+	QObject(parent),
+	_icon(st::resourcesPanImageSize, st::resourcesPanImageSize)
 {
+	connect(&_icon, &RemoteImage::imageChanged, this, &ResourceItem::iconChanged);
 }
 
 ResourceItem::ResourceItem(const QString &title,
@@ -23,8 +25,9 @@ ResourceItem::ResourceItem(const QString &title,
 	_title(title),
 	_description(description),
 	_link(link),
-	_iconLink(iconLink)
+	_icon(iconLink, st::resourcesPanImageSize, st::resourcesPanImageSize)
 {
+	connect(&_icon, &RemoteImage::imageChanged, this, &ResourceItem::iconChanged);
 }
 
 const QString &ResourceItem::title() const
@@ -44,46 +47,12 @@ const QUrl &ResourceItem::link() const
 
 const QUrl &ResourceItem::iconLink() const
 {
-	return _iconLink;
+	return _icon.link();
 }
 
 const QPixmap &ResourceItem::icon() const
 {
-	return _icon;
-}
-
-void ResourceItem::setIcon(const QByteArray &byteArray)
-{
-	if (byteArray.isEmpty()) {
-		LOG(("Can not get icon for resource item %1. Response is empty.")
-			.arg(_link.toString()));
-		return;
-	}
-
-	QPixmap icon;
-
-	if (!icon.loadFromData(byteArray)) {
-		LOG(("Can not get icon for resource item %1. Can not convert response to image.")
-			.arg(_link.toString()));
-		return;
-	}
-
-	setIcon(icon);
-}
-
-void ResourceItem::setIcon(const QPixmap &icon)
-{
-	_icon = icon;
-
-	if (!_icon.isNull()
-			&& (_icon.width() != st::resourcesPanImageSize || _icon.height() != st::resourcesPanImageSize)) {
-		_icon = _icon.scaled(st::resourcesPanImageSize,
-							 st::resourcesPanImageSize,
-							 Qt::KeepAspectRatio,
-							 Qt::SmoothTransformation);
-	}
-
-	emit iconChanged();
+	return _icon.image();
 }
 
 void ResourceItem::parse(const QJsonObject &json)
@@ -96,54 +65,7 @@ void ResourceItem::parse(const QJsonObject &json)
 	_description = json.value("description").toString();
 
 	_link = json.value("url").toString();
-	_iconLink = json.value("iconUrl").toString();
-
-	downloadIcon();
-}
-
-void ResourceItem::downloadIcon()
-{
-	if (!_iconLink.isValid()) {
-		LOG(("Icon link '%1' is invalid").arg(_iconLink.toString()));
-		return;
-	}
-
-	QNetworkAccessManager *networkManager = new QNetworkAccessManager();
-
-	QNetworkRequest request;
-	request.setUrl(_iconLink);
-
-	QNetworkReply *reply = networkManager->get(request);
-
-	connect(reply, &QNetworkReply::finished, this, [this, reply]() {
-		if(reply->error() == QNetworkReply::NoError) {
-			setIcon(reply->readAll());
-		} else {
-			LOG(("Can not get icon for resource item %1 (%2). %3 (%4)")
-				.arg(_link.toString())
-				.arg(_iconLink.toString())
-				.arg(reply->errorString())
-				.arg(reply->error()));
-
-			downloadIconLater();
-		}
-	});
-
-	connect(reply, &QNetworkReply::finished, [networkManager, reply]() {
-		reply->deleteLater();
-		networkManager->deleteLater();
-	});
-
-	connect(reply, &QNetworkReply::sslErrors, this, [](QList<QSslError> errors) {
-		for(const QSslError &error : errors) {
-			LOG(("%1").arg(error.errorString()));
-		}
-	});
-}
-
-void ResourceItem::downloadIconLater()
-{
-	QTimer::singleShot(5000, this, [this](){ downloadIcon(); });
+	_icon.setLink(json.value("iconUrl").toString());
 }
 
 } // namespace Bettergrams
