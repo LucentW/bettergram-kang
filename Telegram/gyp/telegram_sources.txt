@@ -838,6 +838,10 @@
 <(src_loc)/bettergram/resourcegroup.h
 <(src_loc)/bettergram/resourcegrouplist.cpp
 <(src_loc)/bettergram/resourcegrouplist.h
+<(src_loc)/bettergram/abstractremotefile.cpp
+<(src_loc)/bettergram/abstractremotefile.h
+<(src_loc)/bettergram/remoteimage.cpp
+<(src_loc)/bettergram/remoteimage.h
 <(emoji_suggestions_loc)/emoji_suggestions.cpp
 <(emoji_suggestions_loc)/emoji_suggestions.h
 
