@@ -2,11 +2,6 @@
 
 #include <styles/style_chat_helpers.h>
 
-#include <QTimer>
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkRequest>
-#include <QtNetwork/QNetworkReply>
-
 namespace Bettergram {
 
 ResourceItem::ResourceItem(QObject *parent) :
