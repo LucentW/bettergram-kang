@@ -226,7 +226,7 @@ newsPanRowHeight: 70px;
 newsPanRowVerticalPadding: 8px;
 newsPanChannelRowHeight: 64;
 newsPanDateHeight: 16px;
-newsPanImageSize: 32px;
+newsPanImageSize: 54px;
 newsPanHover: pricesPanHover; // background of selected row in news panel
 
 // Last update label at the RssWidget
