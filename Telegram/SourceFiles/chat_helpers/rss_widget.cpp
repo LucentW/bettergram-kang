@@ -487,13 +487,15 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 							 Qt::AlignLeft | Qt::AlignBottom,
 							 row.userData().item()->publishDateString());
 
-			if (!row.userData().item()->image().isNull()) {
-				QRect targetRect(iconLeft,
-								 rowRect.top() + (rowRect.height() - st::newsPanImageSize) / 2,
-								 st::newsPanImageSize,
-								 st::newsPanImageSize);
+			const QPixmap &image = row.userData().item()->image();
 
-				painter.drawPixmap(targetRect, row.userData().item()->image());
+			if (!image.isNull()) {
+				QRect targetRect(iconLeft,
+								 rowRect.top() + (rowRect.height() - image.height()) / 2,
+								 image.width(),
+								 image.height());
+
+				painter.drawPixmap(targetRect, image);
 			}
 		} else if (row.userData().isChannel()) {
 			painter.setFont(st::semiboldFont);
@@ -503,13 +505,15 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 							 Qt::AlignLeft | Qt::AlignVCenter | Qt::TextWordWrap,
 							 row.userData().channel()->title());
 
-			if (!row.userData().channel()->icon().isNull()) {
-				QRect targetRect(iconLeft,
-								 row.top() + (row.height() - st::newsPanImageSize) / 2,
-								 st::newsPanImageSize,
-								 st::newsPanImageSize);
+			const QPixmap &image = row.userData().channel()->icon();
 
-				painter.drawPixmap(targetRect, row.userData().channel()->icon());
+			if (!image.isNull()) {
+				QRect targetRect(iconLeft,
+								 row.top() + (row.height() - image.height()) / 2,
+								 image.width(),
+								 image.height());
+
+				painter.drawPixmap(targetRect, image);
 			}
 		} else {
 			LOG(("Unable to recognize row content"));
