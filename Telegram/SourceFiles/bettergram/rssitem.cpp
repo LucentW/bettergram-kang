@@ -131,6 +131,48 @@ void RssItem::setIsRead(bool isRead)
 	}
 }
 
+void RssItem::tryToGetImageLink(const QString &text)
+{
+	if (_image.link().isValid()) {
+		return;
+	}
+
+	int imgTagIndex = text.indexOf("<img");
+
+	if (imgTagIndex == -1) {
+		return;
+	}
+
+	int srcAttributeStartIndex = text.indexOf("src=\"", imgTagIndex + 5);
+
+	if (srcAttributeStartIndex == -1) {
+		return;
+	}
+
+	int srcAttributeEndIndex = text.indexOf("\"", srcAttributeStartIndex + 6);
+
+	if (srcAttributeEndIndex == -1) {
+		return;
+	}
+
+	srcAttributeStartIndex += 5;
+
+	QString urlString = text.mid(srcAttributeStartIndex,
+								 srcAttributeEndIndex - srcAttributeStartIndex);
+
+	qDebug() << "URL STRING:" << urlString;
+
+	if (urlString.isEmpty()) {
+		return;
+	}
+
+	QUrl url(urlString);
+
+	if (url.isValid()) {
+		_image.setLink(url);
+	}
+}
+
 void RssItem::markAsRead()
 {
 	setIsRead(true);
@@ -177,6 +219,11 @@ void RssItem::parse(QXmlStreamReader &xml)
 
 	while (xml.readNextStartElement()) {
 		if (!xml.prefix().isEmpty()) {
+			if (xml.qualifiedName() == QLatin1String("content:encoded")) {
+				tryToGetImageLink(xml.readElementText());
+				continue;
+			}
+
 			xml.skipCurrentElement();
 			continue;
 		}
@@ -186,9 +233,17 @@ void RssItem::parse(QXmlStreamReader &xml)
 		if (xmlName == QLatin1String("guid")) {
 			_guid = xml.readElementText();
 		} else if (xmlName == QLatin1String("title")) {
-			_title = removeHtmlTags(xml.readElementText());
+			const QString elementText = xml.readElementText();
+
+			tryToGetImageLink(elementText);
+
+			_title = removeHtmlTags(elementText);
 		} else if (xmlName == QLatin1String("description")) {
-			_description = removeHtmlTags(xml.readElementText());
+			const QString elementText = xml.readElementText();
+
+			tryToGetImageLink(elementText);
+
+			_description = removeHtmlTags(elementText);
 		} else if (xmlName == QLatin1String("author")) {
 			_author = xml.readElementText();
 		} else if (xmlName == QLatin1String("category")) {
@@ -247,7 +302,7 @@ void RssItem::save(QSettings &settings)
 	settings.setValue("isRead", isRead());
 }
 
-QString RssItem::removeHtmlTags(QString text)
+QString RssItem::removeHtmlTags(const QString &text)
 {
 	QTextDocument textDocument;
 	textDocument.setHtml(text);

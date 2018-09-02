@@ -90,9 +90,10 @@ private:
 
 	bool _isRead = false;
 
-	static QString removeHtmlTags(QString text);
+	static QString removeHtmlTags(const QString &text);
 
 	void setIsRead(bool isRead);
+	void tryToGetImageLink(const QString &text);
 };
 
 } // namespace Bettergram
