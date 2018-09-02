@@ -198,7 +198,9 @@ void RssItem::parse(QXmlStreamReader &xml)
 			QUrl url = QUrl(xml.attributes().value("url").toString());
 
 			if (url.isValid()) {
-				_image.setLink(url);
+				if (xml.attributes().value("type").contains("image")) {
+					_image.setLink(url);
+				}
 			}
 		} else {
 			xml.skipCurrentElement();
