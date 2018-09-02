@@ -176,25 +176,32 @@ void RssItem::parse(QXmlStreamReader &xml)
 	_categoryList.clear();
 
 	while (xml.readNextStartElement()) {
-		if (xml.name() == QLatin1String("guid")) {
+		if (!xml.prefix().isEmpty()) {
+			xml.skipCurrentElement();
+			continue;
+		}
+
+		QStringRef xmlName = xml.name();
+
+		if (xmlName == QLatin1String("guid")) {
 			_guid = xml.readElementText();
-		} else if (xml.name() == QLatin1String("title")) {
+		} else if (xmlName == QLatin1String("title")) {
 			_title = removeHtmlTags(xml.readElementText());
-		} else if (xml.name() == QLatin1String("description")) {
+		} else if (xmlName == QLatin1String("description")) {
 			_description = removeHtmlTags(xml.readElementText());
-		} else if (xml.name() == QLatin1String("author")) {
+		} else if (xmlName == QLatin1String("author")) {
 			_author = xml.readElementText();
-		} else if (xml.name() == QLatin1String("category")) {
+		} else if (xmlName == QLatin1String("category")) {
 			_categoryList.push_back(xml.readElementText());
-		} else if (xml.name() == QLatin1String("link")) {
+		} else if (xmlName == QLatin1String("link")) {
 			_link = xml.readElementText();
-		} else if (xml.name() == QLatin1String("comments")) {
+		} else if (xmlName == QLatin1String("comments")) {
 			_commentsLink = xml.readElementText();
-		} else if (xml.name() == QLatin1String("pubDate")) {
+		} else if (xmlName == QLatin1String("pubDate")) {
 			_publishDate = QDateTime::fromString(xml.readElementText(), Qt::RFC2822Date);
 			_publishDateString =
 					BettergramService::generateLastUpdateString(_publishDate.toLocalTime(), false);
-		} else if (xml.name() == QLatin1String("enclosure")) {
+		} else if (xmlName == QLatin1String("enclosure")) {
 			QUrl url = QUrl(xml.attributes().value("url").toString());
 
 			if (url.isValid()) {
