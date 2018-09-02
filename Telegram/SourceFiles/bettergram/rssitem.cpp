@@ -160,8 +160,6 @@ void RssItem::tryToGetImageLink(const QString &text)
 	QString urlString = text.mid(srcAttributeStartIndex,
 								 srcAttributeEndIndex - srcAttributeStartIndex);
 
-	qDebug() << "URL STRING:" << urlString;
-
 	if (urlString.isEmpty()) {
 		return;
 	}
