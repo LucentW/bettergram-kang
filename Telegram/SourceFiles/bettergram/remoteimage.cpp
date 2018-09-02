@@ -107,7 +107,7 @@ void RemoteImage::setImage(const QPixmap &image)
 		if (_scaledWidth && _scaledHeight) {
 			_image = image.scaled(_scaledWidth,
 								  _scaledHeight,
-								  Qt::KeepAspectRatio,
+								  Qt::KeepAspectRatioByExpanding,
 								  Qt::SmoothTransformation);
 		} else if (_scaledWidth) {
 			_image = image.scaledToWidth(_scaledWidth, Qt::SmoothTransformation);

@@ -415,7 +415,7 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 	const int iconLeft = st::newsPanPadding;
 	const int iconSize = st::newsPanImageSize;
 
-	const int textLeft = iconLeft + iconSize + st::newsPanPadding;
+	const int textLeft = iconLeft + iconSize + st::newsPanPadding / 2;
 	const int textRight = width();
 	const int textWidth = textRight - textLeft;
 
@@ -491,11 +491,16 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 
 			if (!image.isNull()) {
 				QRect targetRect(iconLeft,
-								 rowRect.top() + (rowRect.height() - image.height()) / 2,
-								 image.width(),
-								 image.height());
+								 row.top() + (row.height() - st::newsPanImageSize) / 2,
+								 st::newsPanImageSize,
+								 st::newsPanImageSize);
 
-				painter.drawPixmap(targetRect, image);
+				QRect sourceRect(image.width() > st::newsPanImageSize ? (image.width() - st::newsPanImageSize) / 2 : 0,
+								 image.height() > st::newsPanImageSize ? (image.height() - st::newsPanImageSize) / 2 : 0,
+								 st::newsPanImageSize,
+								 st::newsPanImageSize);
+
+				painter.drawPixmap(targetRect, image, sourceRect);
 			}
 		} else if (row.userData().isChannel()) {
 			painter.setFont(st::semiboldFont);
@@ -509,11 +514,16 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 
 			if (!image.isNull()) {
 				QRect targetRect(iconLeft,
-								 row.top() + (row.height() - image.height()) / 2,
-								 image.width(),
-								 image.height());
+								 row.top() + (row.height() - st::newsPanImageSize) / 2,
+								 st::newsPanImageSize,
+								 st::newsPanImageSize);
 
-				painter.drawPixmap(targetRect, image);
+				QRect sourceRect(image.width() > st::newsPanImageSize ? (image.width() - st::newsPanImageSize) / 2 : 0,
+								 image.height() > st::newsPanImageSize ? (image.height() - st::newsPanImageSize) / 2 : 0,
+								 st::newsPanImageSize,
+								 st::newsPanImageSize);
+
+				painter.drawPixmap(targetRect, image, sourceRect);
 			}
 		} else {
 			LOG(("Unable to recognize row content"));
