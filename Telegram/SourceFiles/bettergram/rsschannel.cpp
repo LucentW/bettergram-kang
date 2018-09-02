@@ -327,6 +327,11 @@ bool RssChannel::parse()
 	xml.addData(_source);
 
 	while (xml.readNextStartElement()) {
+		if (!xml.prefix().isEmpty()) {
+			xml.skipCurrentElement();
+			continue;
+		}
+
 		if (xml.name() == QLatin1String("rss")) {
 			parseRss(xml);
 		} else {
@@ -354,6 +359,11 @@ bool RssChannel::parse()
 void RssChannel::parseRss(QXmlStreamReader &xml)
 {
 	while (xml.readNextStartElement()) {
+		if (!xml.prefix().isEmpty()) {
+			xml.skipCurrentElement();
+			continue;
+		}
+
 		if (xml.name() == QLatin1String("channel")) {
 			parseChannel(xml);
 		} else {
@@ -365,34 +375,41 @@ void RssChannel::parseRss(QXmlStreamReader &xml)
 void RssChannel::parseChannel(QXmlStreamReader &xml)
 {
 	while (xml.readNextStartElement()) {
-		if (xml.name() == QLatin1String("item")) {
+		if (!xml.prefix().isEmpty()) {
+			xml.skipCurrentElement();
+			continue;
+		}
+
+		QStringRef xmlName = xml.name();
+
+		if (xmlName == QLatin1String("item")) {
 			parseItem(xml);
-		} else if (xml.name() == QLatin1String("title")) {
+		} else if (xmlName == QLatin1String("title")) {
 			setTitle(xml.readElementText());
-		} else if (xml.name() == QLatin1String("link")) {
-			setLink(xml.readElementText());
-		} else if (xml.name() == QLatin1String("description")) {
+		} else if (xmlName == QLatin1String("link")) {
+			setLink(QUrl(xml.readElementText()));
+		} else if (xmlName == QLatin1String("description")) {
 			setDescription(xml.readElementText());
-		} else if (xml.name() == QLatin1String("image")) {
+		} else if (xmlName == QLatin1String("image")) {
 			parseChannelImage(xml);
-		} else if (xml.name() == QLatin1String("language")) {
+		} else if (xmlName == QLatin1String("language")) {
 			setLanguage(xml.readElementText());
-		} else if (xml.name() == QLatin1String("copyright")) {
+		} else if (xmlName == QLatin1String("copyright")) {
 			setCopyright(xml.readElementText());
-		} else if (xml.name() == QLatin1String("managingEditor")) {
+		} else if (xmlName == QLatin1String("managingEditor")) {
 			setEditorEmail(xml.readElementText());
-		} else if (xml.name() == QLatin1String("webmaster")) {
+		} else if (xmlName == QLatin1String("webmaster")) {
 			setWebMasterEmail(xml.readElementText());
-		} else if (xml.name() == QLatin1String("pubDate")) {
+		} else if (xmlName == QLatin1String("pubDate")) {
 			// Please note that thid property may not exist
 			setPublishDate(QDateTime::fromString(xml.readElementText(), Qt::RFC2822Date));
-		} else if (xml.name() == QLatin1String("lastBuildDate")) {
+		} else if (xmlName == QLatin1String("lastBuildDate")) {
 			setLastBuildDate(QDateTime::fromString(xml.readElementText(), Qt::RFC2822Date));
-		} else if (xml.name() == QLatin1String("skipHours")) {
+		} else if (xmlName == QLatin1String("skipHours")) {
 			setSkipHours(xml.readElementText());
-		} else if (xml.name() == QLatin1String("skipDays")) {
+		} else if (xmlName == QLatin1String("skipDays")) {
 			setSkipDays(xml.readElementText());
-		} else if (xml.name() == QLatin1String("category")) {
+		} else if (xmlName == QLatin1String("category")) {
 			_categoryList.push_back(xml.readElementText());
 		} else {
 			xml.skipCurrentElement();
@@ -403,6 +420,11 @@ void RssChannel::parseChannel(QXmlStreamReader &xml)
 void RssChannel::parseChannelImage(QXmlStreamReader &xml)
 {
 	while (xml.readNextStartElement()) {
+		if (!xml.prefix().isEmpty()) {
+			xml.skipCurrentElement();
+			continue;
+		}
+
 		if (xml.name() == QLatin1String("url")) {
 			setIconLink(xml.readElementText());
 		} else {
