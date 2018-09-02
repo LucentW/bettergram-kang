@@ -101,8 +101,8 @@ void RemoteImage::dataDownloaded(const QByteArray &data)
 void RemoteImage::setImage(const QPixmap &image)
 {
 	if (!image.isNull() &&
-			((_scaledWidth && image.width() != _scaledWidth)
-			 || (_scaledHeight && image.height() != _scaledHeight))) {
+			((_scaledWidth && image.width() > _scaledWidth)
+			 || (_scaledHeight && image.height() > _scaledHeight))) {
 
 		if (_scaledWidth && _scaledHeight) {
 			_image = image.scaled(_scaledWidth,
