@@ -53,6 +53,7 @@ public:
 	void update(const QSharedPointer<RssItem> &item);
 
 	void parse(QXmlStreamReader &xml);
+	void parseAtom(QXmlStreamReader &xml);
 
 	void load(QSettings &settings);
 	void save(QSettings &settings);
@@ -94,6 +95,8 @@ private:
 
 	void setIsRead(bool isRead);
 	void tryToGetImageLink(const QString &text);
+
+	void parseAtomMediaGroup(QXmlStreamReader &xml);
 };
 
 } // namespace Bettergram
