@@ -217,7 +217,8 @@ void RssItem::parse(QXmlStreamReader &xml)
 
 	while (xml.readNextStartElement()) {
 		if (!xml.prefix().isEmpty()) {
-			if (xml.qualifiedName() == QLatin1String("content:encoded")) {
+			if (xml.name() == QLatin1String("encoded")
+					&& xml.namespaceUri() == "http://purl.org/rss/1.0/modules/content/") {
 				tryToGetImageLink(xml.readElementText());
 				continue;
 			}
@@ -262,6 +263,75 @@ void RssItem::parse(QXmlStreamReader &xml)
 					_image.setLink(url);
 				}
 			}
+			xml.skipCurrentElement();
+		} else {
+			xml.skipCurrentElement();
+		}
+	}
+}
+
+void RssItem::parseAtom(QXmlStreamReader &xml)
+{
+	_categoryList.clear();
+
+	while (xml.readNextStartElement()) {
+		QStringRef xmlName = xml.name();
+		QStringRef xmlNamespace = xml.namespaceUri();
+
+		if (xmlNamespace.isEmpty() || xmlNamespace == "http://www.w3.org/2005/Atom") {
+			if (xmlName == QLatin1String("id")) {
+				_guid = xml.readElementText();
+			} else if (xmlName == QLatin1String("title")) {
+				_title = removeHtmlTags(xml.readElementText());
+			} else if (xmlName == QLatin1String("category")) {
+				_categoryList.push_back(xml.attributes().value("term").toString());
+				xml.skipCurrentElement();
+			} else if (xmlName == QLatin1String("link")) {
+				_link = QUrl(xml.attributes().value("href").toString());
+				xml.skipCurrentElement();
+			} else if (xmlName == QLatin1String("category")) {
+				_categoryList.push_back(xml.attributes().value("term").toString());
+			} else if (xmlName == QLatin1String("published")) {
+				if (_publishDate.isValid()) {
+					xml.skipCurrentElement();
+				} else {
+					_publishDate = QDateTime::fromString(xml.readElementText(), Qt::ISODate);
+					_publishDateString =
+							BettergramService::generateLastUpdateString(_publishDate.toLocalTime(), false);
+				}
+			} else if (xmlName == QLatin1String("updated")) {
+				_publishDate = QDateTime::fromString(xml.readElementText(), Qt::ISODate);
+				_publishDateString =
+						BettergramService::generateLastUpdateString(_publishDate.toLocalTime(), false);
+			} else {
+				xml.skipCurrentElement();
+			}
+		} else if (xmlNamespace  == "http://search.yahoo.com/mrss/") {
+			if (xmlName == QLatin1String("group")) {
+				parseAtomMediaGroup(xml);
+			}
+		} else {
+			xml.skipCurrentElement();
+		}
+	}
+}
+
+void RssItem::parseAtomMediaGroup(QXmlStreamReader &xml)
+{
+	while (xml.readNextStartElement()) {
+		QStringRef xmlName = xml.name();
+		QStringRef xmlNamespace = xml.namespaceUri();
+
+		if (xmlNamespace != "http://search.yahoo.com/mrss/") {
+			xml.skipCurrentElement();
+			continue;
+		}
+
+		if (xmlName == QLatin1String("description")) {
+			_description = xml.readElementText();
+		} else if (xmlName == QLatin1String("thumbnail")) {
+			_image.setLink(QUrl(xml.attributes().value("url").toString()));
+			xml.skipCurrentElement();
 		} else {
 			xml.skipCurrentElement();
 		}

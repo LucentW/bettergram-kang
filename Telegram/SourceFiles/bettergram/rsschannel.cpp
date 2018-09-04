@@ -332,8 +332,12 @@ bool RssChannel::parse()
 			continue;
 		}
 
-		if (xml.name() == QLatin1String("rss")) {
+		QStringRef xmlName = xml.name();
+
+		if (xmlName == QLatin1String("rss")) {
 			parseRss(xml);
+		} else if (xmlName == QLatin1String("feed")) {
+			parseAtomFeed(xml);
 		} else {
 			xml.skipCurrentElement();
 		}
@@ -372,6 +376,40 @@ void RssChannel::parseRss(QXmlStreamReader &xml)
 	}
 }
 
+void RssChannel::parseAtomFeed(QXmlStreamReader &xml)
+{
+	while (xml.readNextStartElement()) {
+		if (!xml.prefix().isEmpty()) {
+			xml.skipCurrentElement();
+			continue;
+		}
+
+		QStringRef xmlName = xml.name();
+
+		if (xmlName == QLatin1String("entry")) {
+			parseAtomEntry(xml);
+		} else if (xmlName == QLatin1String("title")) {
+			setTitle(xml.readElementText());
+		} else if (xmlName == QLatin1String("link")) {
+			setLink(QUrl(xml.attributes().value("href").toString()));
+			xml.skipCurrentElement();
+		} else if (xmlName == QLatin1String("subtitle")) {
+			setDescription(xml.readElementText());
+		} else if (xmlName == QLatin1String("icon")) {
+			setIconLink(QUrl(xml.readElementText()));
+		} else if (xmlName == QLatin1String("rights")) {
+			setCopyright(xml.readElementText());
+		} else if (xmlName == QLatin1String("updated")) {
+			setLastBuildDate(QDateTime::fromString(xml.readElementText(), Qt::ISODate));
+		} else if (xmlName == QLatin1String("category")) {
+			_categoryList.push_back(xml.attributes().value("term").toString());
+			xml.skipCurrentElement();
+		} else {
+			xml.skipCurrentElement();
+		}
+	}
+}
+
 void RssChannel::parseChannel(QXmlStreamReader &xml)
 {
 	while (xml.readNextStartElement()) {
@@ -401,7 +439,7 @@ void RssChannel::parseChannel(QXmlStreamReader &xml)
 		} else if (xmlName == QLatin1String("webmaster")) {
 			setWebMasterEmail(xml.readElementText());
 		} else if (xmlName == QLatin1String("pubDate")) {
-			// Please note that thid property may not exist
+			// Please note that this property may not exist
 			setPublishDate(QDateTime::fromString(xml.readElementText(), Qt::RFC2822Date));
 		} else if (xmlName == QLatin1String("lastBuildDate")) {
 			setLastBuildDate(QDateTime::fromString(xml.readElementText(), Qt::RFC2822Date));
@@ -440,6 +478,23 @@ void RssChannel::parseItem(QXmlStreamReader &xml)
 
 	if (xml.hasError()) {
 		LOG(("Unable to parse RSS feed item from %1. %2 (%3)")
+			.arg(_feedLink.toString())
+			.arg(xml.errorString())
+			.arg(xml.error()));
+
+		item->deleteLater();
+	} else {
+		merge(item);
+	}
+}
+
+void RssChannel::parseAtomEntry(QXmlStreamReader &xml)
+{
+	QSharedPointer<RssItem> item(new RssItem(this));
+	item->parseAtom(xml);
+
+	if (xml.hasError()) {
+		LOG(("Unable to parse Atom feed entry from %1. %2 (%3)")
 			.arg(_feedLink.toString())
 			.arg(xml.errorString())
 			.arg(xml.error()));

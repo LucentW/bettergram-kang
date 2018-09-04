@@ -145,9 +145,11 @@ private:
 	void removeOldItems();
 
 	void parseRss(QXmlStreamReader &xml);
+	void parseAtomFeed(QXmlStreamReader &xml);
 	void parseChannel(QXmlStreamReader &xml);
 	void parseChannelImage(QXmlStreamReader &xml);
 	void parseItem(QXmlStreamReader &xml);
+	void parseAtomEntry(QXmlStreamReader &xml);
 
 	QSharedPointer<RssItem> find(const QSharedPointer<RssItem> &item);
 	void merge(const QSharedPointer<RssItem> &item);
