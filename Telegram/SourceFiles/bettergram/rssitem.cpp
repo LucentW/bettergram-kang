@@ -3,8 +3,6 @@
 #include "imagefromsite.h"
 #include "bettergramservice.h"
 
-#include <styles/style_chat_helpers.h>
-
 #include <QXmlStreamReader>
 
 namespace Bettergram {
@@ -14,7 +12,7 @@ const qint64 RssItem::_maxLastHoursInMs = 24 * 60 * 60 * 1000;
 RssItem::RssItem(RssChannel *channel) :
 	QObject(channel),
 	_channel(channel),
-	_image(st::newsPanImageSize, st::newsPanImageSize)
+	_image(_channel->iconWidth(), _channel->iconHeight())
 {
 	if (!_channel) {
 		throw std::invalid_argument("RSS Channel is null");
@@ -42,7 +40,7 @@ RssItem::RssItem(const QString &guid,
 	_link(link),
 	_commentsLink(commentsLink),
 	_publishDate(publishDate),
-	_image(st::newsPanImageSize, st::newsPanImageSize)
+	_image(_channel->iconWidth(), _channel->iconHeight())
 {
 	if (!_channel) {
 		throw std::invalid_argument("RSS Channel is null");
@@ -414,7 +412,11 @@ void RssItem::createImageFromSite()
 		return;
 	}
 
-	_imageFromSite = new ImageFromSite(st::newsPanImageSize, st::newsPanImageSize, this);
+	if (!_channel) {
+		throw std::invalid_argument("RSS Channel is null");
+	}
+
+	_imageFromSite = new ImageFromSite(_channel->iconWidth(), _channel->iconHeight(), this);
 
 	connect(_imageFromSite, &ImageFromSite::imageChanged, this, &RssItem::imageChanged);
 }

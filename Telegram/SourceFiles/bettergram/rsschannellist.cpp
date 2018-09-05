@@ -8,8 +8,10 @@ namespace Bettergram {
 
 const int RssChannelList::_defaultFreq = 60;
 
-RssChannelList::RssChannelList(QObject *parent) :
+RssChannelList::RssChannelList(int imageWidth, int imageHeight, QObject *parent) :
 	QObject(parent),
+	_imageWidth(imageWidth),
+	_imageHeight(imageHeight),
 	_freq(_defaultFreq),
 	_lastUpdateString(BettergramService::defaultLastUpdateString())
 {
@@ -111,7 +113,10 @@ void RssChannelList::add(const QUrl &channelLink)
 		return;
 	}
 
-	QSharedPointer<RssChannel> channel(new RssChannel(channelLink, nullptr));
+	QSharedPointer<RssChannel> channel(new RssChannel(channelLink,
+													  _imageWidth,
+													  _imageHeight,
+													  nullptr));
 	add(channel);
 }
 
@@ -226,7 +231,7 @@ void RssChannelList::load()
 	int size = settings.beginReadArray("channels");
 
 	for (int i = 0; i < size; i++) {
-		QSharedPointer<RssChannel> channel(new RssChannel(this));
+		QSharedPointer<RssChannel> channel(new RssChannel(_imageWidth, _imageHeight, this));
 
 		settings.setArrayIndex(i);
 		channel->load(settings);

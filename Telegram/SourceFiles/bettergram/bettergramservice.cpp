@@ -8,6 +8,7 @@
 
 #include <messenger.h>
 #include <lang/lang_keys.h>
+#include <styles/style_chat_helpers.h>
 
 #include <QTimer>
 #include <QJsonDocument>
@@ -76,7 +77,7 @@ void BettergramService::openUrl(const QUrl &url)
 Bettergram::BettergramService::BettergramService(QObject *parent) :
 	QObject(parent),
 	_cryptoPriceList(new CryptoPriceList(this)),
-	_rssChannelList(new RssChannelList(this)),
+	_rssChannelList(new RssChannelList(st::newsPanImageSize, st::newsPanImageSize, this)),
 	_resourceGroupList(new ResourceGroupList(this)),
 	_currentAd(new AdItem(this))
 {

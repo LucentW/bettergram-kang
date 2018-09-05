@@ -2,7 +2,6 @@
 #include "rssitem.h"
 
 #include <logs.h>
-#include <styles/style_chat_helpers.h>
 
 #include <QDateTime>
 #include <QCryptographicHash>
@@ -20,17 +19,17 @@ bool RssChannel::compare(const QSharedPointer<RssItem> &a, const QSharedPointer<
 	return a->publishDate() > b->publishDate();
 }
 
-RssChannel::RssChannel(QObject *parent) :
+RssChannel::RssChannel(int imageWidth, int imageHeight, QObject *parent) :
 	QObject(parent),
-	_icon(st::newsPanImageSize, st::newsPanImageSize)
+	_icon(imageWidth, imageHeight)
 {
 	connect(&_icon, &RemoteImage::imageChanged, this, &RssChannel::iconChanged);
 }
 
-RssChannel::RssChannel(const QUrl &feedLink, QObject *parent) :
+RssChannel::RssChannel(const QUrl &feedLink, int imageWidth, int imageHeight, QObject *parent) :
 	QObject(parent),
 	_feedLink(feedLink),
-	_icon(st::newsPanImageSize, st::newsPanImageSize)
+	_icon(imageWidth, imageHeight)
 {
 	connect(&_icon, &RemoteImage::imageChanged, this, &RssChannel::iconChanged);
 }
@@ -172,6 +171,16 @@ const QUrl &RssChannel::link() const
 void RssChannel::setLink(const QUrl &link)
 {
 	_link = link;
+}
+
+int RssChannel::iconWidth() const
+{
+	return _icon.scaledWidth();
+}
+
+int RssChannel::iconHeight() const
+{
+	return _icon.scaledHeight();
 }
 
 const QPixmap &RssChannel::icon() const
