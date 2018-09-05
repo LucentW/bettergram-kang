@@ -34,6 +34,8 @@ public:
 
 	const QPixmap &image() const;
 
+	bool isNull() const;
+
 public slots:
 
 signals:
