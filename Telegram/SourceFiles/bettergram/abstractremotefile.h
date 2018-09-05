@@ -26,6 +26,8 @@ protected:
 	virtual void dataDownloaded(const QByteArray &data) = 0;
 	virtual void resetData() = 0;
 
+	virtual bool checkLink(const QUrl &link);
+
 	void download();
 
 private:

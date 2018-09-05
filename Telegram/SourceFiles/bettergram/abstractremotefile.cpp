@@ -27,6 +27,10 @@ const QUrl &AbstractRemoteFile::link() const
 void AbstractRemoteFile::setLink(const QUrl &link)
 {
 	if (_link != link) {
+		if (!checkLink(link)) {
+			return;
+		}
+
 		_link = link;
 
 		download();
@@ -79,6 +83,13 @@ void AbstractRemoteFile::downloadLater()
 
 	//TODO: bettergram: increase the timeout after each call of this method
 	QTimer::singleShot(2000 + (qrand() % 3000), this, [this](){ download(); });
+}
+
+bool AbstractRemoteFile::checkLink(const QUrl &link)
+{
+	Q_UNUSED(link);
+
+	return true;
 }
 
 } // namespace Bettergrams
