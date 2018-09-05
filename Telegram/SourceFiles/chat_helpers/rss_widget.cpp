@@ -514,7 +514,7 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 
 			if (!image.isNull()) {
 				QRect targetRect(iconLeft,
-								 row.top() + (image.height() >= st::newsPanImageSize ? st::newsPanImageSize : image.height()) / 2,
+								 row.top() + (row.height() - (image.height() >= st::newsPanImageSize ? st::newsPanImageSize : image.height())) / 2,
 								 st::newsPanImageSize,
 								 st::newsPanImageSize);
 
