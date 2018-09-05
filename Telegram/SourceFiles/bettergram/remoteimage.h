@@ -45,6 +45,8 @@ protected:
 	void dataDownloaded(const QByteArray &data) override;
 	void resetData() override;
 
+	bool checkLink(const QUrl &link) override;
+
 private:
 	/// If _scaledWidth or _scaledHeight is not 0 then we scale fetched image
 	int _scaledWidth = 0;

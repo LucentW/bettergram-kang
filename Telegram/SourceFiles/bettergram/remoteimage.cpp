@@ -135,4 +135,12 @@ void RemoteImage::resetData()
 	}
 }
 
+bool RemoteImage::checkLink(const QUrl &link)
+{
+	// Do not download images with too large file names
+	// because it seems they are auto generated not user visible images
+
+	return link.toString().size() < 300;
+}
+
 } // namespace Bettergrams
