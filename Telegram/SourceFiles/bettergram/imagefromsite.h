@@ -43,6 +43,10 @@ signals:
 protected:
 
 private:
+	/// We use these values to break searching images if we have already found big enough image
+	static const int DEFAULT_WIDTH;
+	static const int DEFAULT_HEIGHT;
+
 	RemoteTempData _siteContent;
 	RemoteImage _image;
 
@@ -53,6 +57,14 @@ private:
 	QStringRef parseStringAttribute(const QStringRef &source,
 									const QString &startAttribute,
 									const QString &endAttribute);
+
+	QStringRef getLargestImageInImageTags(const QString &source,
+										  double &maxWidth,
+										  double &maxHeight);
+
+	QString getLargestImageInFileNames(const QString &source,
+									   double &maxWidth,
+									   double &maxHeight);
 
 private slots:
 	void onSiteContentDownloaded(QByteArray data);

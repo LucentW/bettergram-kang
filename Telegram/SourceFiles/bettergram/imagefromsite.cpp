@@ -1,8 +1,12 @@
 #include "imagefromsite.h"
 
 #include <QUrl>
+#include <QRegExp>
 
 namespace Bettergram {
+
+const int ImageFromSite::DEFAULT_WIDTH = 600;
+const int ImageFromSite::DEFAULT_HEIGHT = 380;
 
 ImageFromSite::ImageFromSite(QObject *parent) :
 	QObject(parent)
@@ -135,11 +139,11 @@ QStringRef ImageFromSite::parseStringAttribute(const QStringRef &source,
 	return QStringRef();
 }
 
-void Bettergram::ImageFromSite::onSiteContentDownloaded(QByteArray data)
+QStringRef ImageFromSite::getLargestImageInImageTags(const QString &source,
+													 double &maxWidth,
+													 double &maxHeight)
 {
-	// Here we should find all images with sizes and find the largest one
-
-	const QString source = QString::fromUtf8(data);
+	QStringRef imageLink;
 
 	const QString startImageTag = QStringLiteral("<img");
 	const QString endImageTag = QStringLiteral(">");
@@ -152,11 +156,6 @@ void Bettergram::ImageFromSite::onSiteContentDownloaded(QByteArray data)
 
 	const QString startHeightAttribute = QStringLiteral("height=\"");
 	const QString endHeightAttribute = QStringLiteral("\"");
-
-	QStringRef imageLink;
-
-	double maxWidth = 0.0;
-	double maxHeight = 0.0;
 
 	int startIndex = 0;
 
@@ -213,12 +212,89 @@ void Bettergram::ImageFromSite::onSiteContentDownloaded(QByteArray data)
 
 		// We do not need to continue parsing the site content
 		// if we have already got a big enough image
-		if (currentHeight >= 500.0 && currentHeight >= 300.0) {
+		if (currentWidth >= DEFAULT_WIDTH && currentHeight >= DEFAULT_HEIGHT) {
 			break;
 		}
 	}
 
-	QUrl imageUrl = QUrl(imageLink.toString());
+	return imageLink;
+}
+
+QString ImageFromSite::getLargestImageInFileNames(const QString &source,
+												  double &maxWidth,
+												  double &maxHeight)
+{
+	QRegExp regExp("(http://|https://)([\\w]|[0-9]|_|-|/|\\.)+(-|_)(\\d+)(x)(\\d+)(.jpg|.png|.jpeg)");
+	int position = 0;
+
+	int tempMaxWidth = 0;
+	int tempMaxHeight = 0;
+
+	QString imageLink;
+
+	while((position = regExp.indexIn(source, position)) != -1) {
+		int currentWidth = regExp.cap(4).toInt();
+		int currentHeight = regExp.cap(6).toInt();
+
+		if (currentHeight > tempMaxHeight) {
+			tempMaxHeight = currentHeight;
+			tempMaxWidth = currentWidth;
+
+			imageLink = regExp.cap(0);
+		} else if (currentHeight == tempMaxHeight && currentWidth > tempMaxWidth) {
+			tempMaxHeight = currentHeight;
+			tempMaxWidth = currentWidth;
+
+			imageLink = regExp.cap(0);
+		} else if (tempMaxWidth == 0.0 && tempMaxHeight == 0.0) {
+			imageLink = regExp.cap(0);
+		}
+
+		position += regExp.matchedLength();
+
+		// We do not need to continue parsing the site content
+		// if we have already got a big enough image
+		if (currentWidth >= DEFAULT_WIDTH && currentHeight >= DEFAULT_HEIGHT) {
+			break;
+		}
+	}
+
+	maxWidth = tempMaxWidth;
+	maxHeight = tempMaxHeight;
+
+	return imageLink;
+}
+
+void Bettergram::ImageFromSite::onSiteContentDownloaded(QByteArray data)
+{
+	// Here we should find all images with sizes and find the largest one
+
+	const QString source = QString::fromUtf8(data);
+
+	double maxWidthInImageTags = 0.0;
+	double maxHeightInImageTags = 0.0;
+
+	QStringRef imageLinkInImageTags = getLargestImageInImageTags(source,
+																 maxWidthInImageTags,
+																 maxHeightInImageTags);
+
+	double maxWidthInFileNames = 0.0;
+	double maxHeightInFileNames = 0.0;
+
+	QString imageLinkInFileName = getLargestImageInFileNames(source,
+															 maxWidthInFileNames,
+															 maxHeightInFileNames);
+
+	QUrl imageUrl;
+
+	if (maxHeightInFileNames > maxHeightInImageTags) {
+		imageUrl = imageLinkInFileName;
+	} else if (maxHeightInFileNames == maxHeightInImageTags
+			   && maxWidthInFileNames > maxWidthInImageTags) {
+		imageUrl = imageLinkInFileName;
+	} else {
+		imageUrl = imageLinkInImageTags.toString();
+	}
 
 	if (imageUrl.isValid()) {
 		_image.setLink(imageUrl);
