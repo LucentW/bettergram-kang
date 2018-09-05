@@ -1,5 +1,6 @@
 #include "rssitem.h"
 #include "rsschannel.h"
+#include "imagefromsite.h"
 #include "bettergramservice.h"
 
 #include <styles/style_chat_helpers.h>
@@ -97,8 +98,12 @@ const QString RssItem::publishDateString() const
 
 const QPixmap &RssItem::image() const
 {
-	if (!_image.image().isNull()) {
+	if (!_image.isNull()) {
 		return _image.image();
+	}
+
+	if (_imageFromSite && !_imageFromSite->isNull()) {
+		return _imageFromSite->image();
 	}
 
 	if (!_channel) {
@@ -208,6 +213,16 @@ void RssItem::update(const QSharedPointer<RssItem> &item)
 	_publishDateString = item->_publishDateString;
 	_image.setLink(item->_image.link());
 
+	if (_imageFromSite && item->_imageFromSite) {
+		_imageFromSite->setLink(item->_imageFromSite->link());
+		_imageFromSite->setImageLink(item->_imageFromSite->imageLink());
+	} else if (!_imageFromSite && item->_imageFromSite) {
+		createImageFromSite();
+
+		_imageFromSite->setLink(item->_imageFromSite->link());
+		_imageFromSite->setImageLink(item->_imageFromSite->imageLink());
+	}
+
 	// We do not change _isRead field in this method
 }
 
@@ -268,6 +283,11 @@ void RssItem::parse(QXmlStreamReader &xml)
 			xml.skipCurrentElement();
 		}
 	}
+
+	if (!_image.link().isValid()) {
+		createImageFromSite();
+		_imageFromSite->setLink(_link);
+	}
 }
 
 void RssItem::parseAtom(QXmlStreamReader &xml)
@@ -314,6 +334,11 @@ void RssItem::parseAtom(QXmlStreamReader &xml)
 			xml.skipCurrentElement();
 		}
 	}
+
+	if (!_image.link().isValid()) {
+		createImageFromSite();
+		_imageFromSite->setLink(_link);
+	}
 }
 
 void RssItem::parseAtomMediaGroup(QXmlStreamReader &xml)
@@ -351,6 +376,12 @@ void RssItem::load(QSettings &settings)
 	_publishDate = settings.value("publishDate").toDateTime();
 	_image.setLink(settings.value("imageLink").toString());
 
+	if (!_image.link().isValid() && _link.isValid()) {
+		createImageFromSite();
+
+		_imageFromSite->setLink(_link);
+	}
+
 	setIsRead(settings.value("isRead").toBool());
 }
 
@@ -375,6 +406,17 @@ QString RssItem::removeHtmlTags(const QString &text)
 	QTextDocument textDocument;
 	textDocument.setHtml(text);
 	return textDocument.toPlainText();
+}
+
+void RssItem::createImageFromSite()
+{
+	if (_imageFromSite) {
+		return;
+	}
+
+	_imageFromSite = new ImageFromSite(st::newsPanImageSize, st::newsPanImageSize, this);
+
+	connect(_imageFromSite, &ImageFromSite::imageChanged, this, &RssItem::imageChanged);
 }
 
 } // namespace Bettergrams

@@ -9,6 +9,7 @@ class QXmlStreamReader;
 namespace Bettergram {
 
 class RssChannel;
+class ImageFromSite;
 
 /**
  * @brief The RssItem class contains information from a RSS item.
@@ -86,8 +87,10 @@ private:
 
 	/// We try to get _imageLink from <enclosure url="link-to-image" type="image/..."/>,
 	/// or from <description>Text <img src="link-to-image"></description>,
-	/// or from <title>Text <img src="link-to-image"></title> tags
+	/// or from <title>Text <img src="link-to-image"></title> tags,
+	/// or try to get the largest image from the site content
 	RemoteImage _image;
+	ImageFromSite *_imageFromSite = nullptr;
 
 	bool _isRead = false;
 
@@ -97,6 +100,8 @@ private:
 	void tryToGetImageLink(const QString &text);
 
 	void parseAtomMediaGroup(QXmlStreamReader &xml);
+
+	void createImageFromSite();
 };
 
 } // namespace Bettergram

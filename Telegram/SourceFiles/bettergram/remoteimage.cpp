@@ -78,6 +78,11 @@ const QPixmap &RemoteImage::image() const
 	return _image;
 }
 
+bool RemoteImage::isNull() const
+{
+	return _image.isNull();
+}
+
 void RemoteImage::dataDownloaded(const QByteArray &data)
 {
 	if (data.isEmpty()) {
