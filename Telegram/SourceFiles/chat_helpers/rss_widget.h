@@ -42,6 +42,11 @@ protected:
 	RssWidget(QWidget* parent,
 			  not_null<Window::Controller*> controller,
 			  Bettergram::RssChannelList *rssChannelList,
+			  const QString &showOnlyUnreadTitle,
+			  const QString &showAllTitle,
+			  const QString &markAsReadTitle,
+			  const QString &markAllSiteNewsAsReadTitle,
+			  const QString &markAllNewsAsReadTitle,
 			  const style::color &rowReadFg,
 			  const style::color &rowBodyFg,
 			  const style::color &rowHeaderFg,
@@ -113,6 +118,13 @@ private:
 	};
 
 	Bettergram::RssChannelList *const _rssChannelList;
+
+	const QString _showOnlyUnreadTitle;
+	const QString _showAllTitle;
+
+	const QString _markAsReadTitle;
+	const QString _markAllSiteNewsAsReadTitle;
+	const QString _markAllNewsAsReadTitle;
 
 	const style::color _rowReadFg;
 	const style::color _rowBodyFg;

@@ -63,6 +63,11 @@ RssWidget::RssWidget(QWidget* parent, not_null<Window::Controller*> controller)
 	: RssWidget(parent,
 				controller,
 				BettergramService::instance()->rssChannelList(),
+				lang(lng_news_show_only_unread_news),
+				lang(lng_news_show_all_news),
+				lang(lng_menu_news_mark_as_read),
+				lang(lng_menu_news_mark_all_site_news_as_read),
+				lang(lng_menu_news_mark_all_news_as_read),
 				st::newsPanNewsReadFg,
 				st::newsPanNewsBodyFg,
 				st::newsPanNewsHeaderFg,
@@ -84,6 +89,11 @@ RssWidget::RssWidget(QWidget* parent, not_null<Window::Controller*> controller)
 RssWidget::RssWidget(QWidget* parent,
 					 not_null<Window::Controller*> controller,
 					 RssChannelList *rssChannelList,
+					 const QString &showOnlyUnreadTitle,
+					 const QString &showAllTitle,
+					 const QString &markAsReadTitle,
+					 const QString &markAllSiteNewsAsReadTitle,
+					 const QString &markAllNewsAsReadTitle,
 					 const style::color &rowReadFg,
 					 const style::color &rowBodyFg,
 					 const style::color &rowHeaderFg,
@@ -101,6 +111,11 @@ RssWidget::RssWidget(QWidget* parent,
 					 bool isShowDescriptions)
 	: Inner(parent, controller),
 	  _rssChannelList(rssChannelList),
+	  _showOnlyUnreadTitle(showOnlyUnreadTitle),
+	  _showAllTitle(showAllTitle),
+	  _markAsReadTitle(markAsReadTitle),
+	  _markAllSiteNewsAsReadTitle(markAllSiteNewsAsReadTitle),
+	  _markAllNewsAsReadTitle(markAllNewsAsReadTitle),
 	  _rowReadFg(rowReadFg),
 	  _rowBodyFg(rowBodyFg),
 	  _rowHeaderFg(rowHeaderFg),
@@ -424,7 +439,7 @@ void RssWidget::contextMenuEvent(QContextMenuEvent *e)
 	});
 
 	if (row.userData().isItem()) {
-		_menu->addAction(lang(lng_menu_news_mark_as_read), [row] {
+		_menu->addAction(_markAsReadTitle, [row] {
 			if (row.userData().isItem()) {
 				row.userData().item()->markAsRead();
 			} else {
@@ -433,7 +448,7 @@ void RssWidget::contextMenuEvent(QContextMenuEvent *e)
 		});
 	}
 
-	_menu->addAction(lang(lng_menu_news_mark_all_site_news_as_read), [row] {
+	_menu->addAction(_markAllSiteNewsAsReadTitle, [row] {
 		if (row.userData().isItem()) {
 			row.userData().item()->markAllNewsAtSiteAsRead();
 		} else if (row.userData().isChannel()) {
@@ -443,7 +458,7 @@ void RssWidget::contextMenuEvent(QContextMenuEvent *e)
 		}
 	});
 
-	_menu->addAction(lang(lng_menu_news_mark_all_news_as_read), [this] {
+	_menu->addAction(_markAllNewsAsReadTitle, [this] {
 		_rssChannelList->markAsRead();
 	});
 
@@ -621,9 +636,9 @@ void RssWidget::updateSortModeLabel()
 void RssWidget::updateIsShowReadLabel()
 {
 	if (_isShowRead) {
-		_isShowReadLabel->setRichText(textcmdLink(1, lang(lng_news_show_only_unread_news)));
+		_isShowReadLabel->setRichText(textcmdLink(1, _showOnlyUnreadTitle));
 	} else {
-		_isShowReadLabel->setRichText(textcmdLink(1, lang(lng_news_show_all_news)));
+		_isShowReadLabel->setRichText(textcmdLink(1, _showAllTitle));
 	}
 
 	_isShowReadLabel->setLink(1, getIsShowReadClickHandler());
