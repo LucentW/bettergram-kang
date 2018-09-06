@@ -242,7 +242,7 @@ newsPanLastUpdateLabel: FlatLabel(defaultFlatLabel) {
 
 // Sort model label at the RssWidget
 newsPanSortModeLabel: FlatLabel(defaultFlatLabel) {
-        align: align(left);
+		align: align(left);
 		textFg: windowSubTextFg;
 		style: TextStyle(defaultTextStyle) {
 		}
@@ -261,6 +261,15 @@ newsPanIsShowReadLabel: FlatLabel(defaultFlatLabel) {
 			linkFg: windowSubTextFg;
 		}
 }
+
+videosPanPadding: pricesPanPadding;
+videosPanHeader: pricesPanHeader;
+videosPanRowHeight: 70px;
+videosPanRowVerticalPadding: 8px;
+videosPanChannelRowHeight: 64;
+videosPanDateHeight: 16px;
+videosPanImageSize: 54px;
+videosPanHover: pricesPanHover; // background of selected row in videos panel
 
 resourcesPanPadding: pricesPanPadding;
 resourcesPanHeader: pricesPanHeader;
