@@ -26,6 +26,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_menu_news_mark_as_read" = "Mark as Read";
 "lng_menu_news_mark_all_site_news_as_read" = "Mark All Site News as Read";
 "lng_menu_news_mark_all_news_as_read" = "Mark All News as Read";
+"lng_menu_videos_mark_as_watched" = "Mark as Watched";
+"lng_menu_videos_mark_all_site_videos_as_watched" = "Mark All Site Videos as Watched";
+"lng_menu_videos_mark_all_videos_as_watched" = "Mark All Videos as Watched";
 "lng_menu_resources_copy_link" = "Copy Link Address";
 "lng_menu_resources_copy_title" = "Copy Title";
 
@@ -983,6 +986,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_news_sort_by_time" = "Sort by time";
 "lng_news_show_all_news" = "Show all news";
 "lng_news_show_only_unread_news" = "Show only unread news";
+
+"lng_videos_show_all_videos" = "Show all videos";
+"lng_videos_show_only_unread_videos" = "Show only unread videos";
 
 "lng_resources_footer" = "Visit the Site";
 "lng_resources_last_update" = "%1";
