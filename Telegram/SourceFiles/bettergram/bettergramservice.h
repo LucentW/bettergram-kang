@@ -40,6 +40,7 @@ public:
 
 	CryptoPriceList *cryptoPriceList() const;
 	RssChannelList *rssChannelList() const;
+	RssChannelList *videoChannelList() const;
 	ResourceGroupList *resourceGroupList() const;
 	AdItem *currentAd() const;
 
@@ -54,6 +55,9 @@ public:
 
 	/// Download and parse all RSS feeds
 	void getRssChannelList();
+
+	/// Download and parse all Video feeds
+	void getVideoChannelList();
 
 	/// Download and parse resource group list
 	void getResourceGroupList();
@@ -77,6 +81,7 @@ private:
 
 	CryptoPriceList *_cryptoPriceList = nullptr;
 	RssChannelList *_rssChannelList = nullptr;
+	RssChannelList *_videoChannelList = nullptr;
 	ResourceGroupList *_resourceGroupList = nullptr;
 	AdItem *_currentAd = nullptr;
 	bool _isWindowActive = true;
@@ -97,7 +102,7 @@ private:
 	void parseCryptoPriceList(const QByteArray &byteArray);
 	bool parseNextAd(const QByteArray &byteArray);
 
-	void getRssFeeds(const QSharedPointer<RssChannel> &channel);
+	void getRssFeeds(RssChannelList *rssChannelList, const QSharedPointer<RssChannel> &channel);
 
 private slots:
 	void onGetCryptoPriceListFinished();
