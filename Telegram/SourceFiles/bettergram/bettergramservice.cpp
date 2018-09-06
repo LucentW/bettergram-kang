@@ -228,7 +228,8 @@ void BettergramService::getVideoChannelList()
 	}
 }
 
-void BettergramService::getRssFeeds(RssChannelList *rssChannelList, const QSharedPointer<RssChannel> &channel)
+void BettergramService::getRssFeeds(RssChannelList *rssChannelList,
+									const QSharedPointer<RssChannel> &channel)
 {
 	channel->startFetching();
 
@@ -237,7 +238,7 @@ void BettergramService::getRssFeeds(RssChannelList *rssChannelList, const QShare
 
 	QNetworkReply *reply = _networkManager.get(request);
 
-	connect(reply, &QNetworkReply::finished, this, [this, reply, channel] {
+	connect(reply, &QNetworkReply::finished, this, [rssChannelList, reply, channel] {
 		if(reply->error() == QNetworkReply::NoError) {
 			channel->fetchingSucceed(reply->readAll());
 		} else {
