@@ -55,7 +55,8 @@ protected:
 			  int rowVerticalPadding,
 			  int rowHeight,
 			  int channelRowHeight,
-			  int dateTimeHeight);
+			  int dateTimeHeight,
+			  bool isShowDescriptions);
 
 	TabbedSelector::InnerFooter *getFooter() const override;
 	int countDesiredHeight(int newWidth) override;
@@ -128,6 +129,8 @@ private:
 	const int _rowHeight;
 	const int _channelRowHeight;
 	const int _dateTimeHeight;
+
+	const bool _isShowDescriptions;
 
 	ListRowArray<Row> _rows;
 

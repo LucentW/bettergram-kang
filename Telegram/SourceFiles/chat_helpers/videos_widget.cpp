@@ -25,7 +25,8 @@ VideosWidget::VideosWidget(QWidget* parent, not_null<Window::Controller*> contro
 				st::videosPanRowVerticalPadding,
 				st::videosPanRowHeight,
 				st::videosPanChannelRowHeight,
-				st::videosPanDateHeight)
+				st::videosPanDateHeight,
+				true)
 {
 }
 

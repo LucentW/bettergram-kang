@@ -76,7 +76,8 @@ RssWidget::RssWidget(QWidget* parent, not_null<Window::Controller*> controller)
 				st::newsPanRowVerticalPadding,
 				st::newsPanRowHeight,
 				st::newsPanChannelRowHeight,
-				st::newsPanDateHeight)
+				st::newsPanDateHeight,
+				false)
 {
 }
 
@@ -96,7 +97,8 @@ RssWidget::RssWidget(QWidget* parent,
 					 int rowVerticalPadding,
 					 int rowHeight,
 					 int channelRowHeight,
-					 int dateTimeHeight)
+					 int dateTimeHeight,
+					 bool isShowDescriptions)
 	: Inner(parent, controller),
 	  _rssChannelList(rssChannelList),
 	  _rowReadFg(rowReadFg),
@@ -112,7 +114,8 @@ RssWidget::RssWidget(QWidget* parent,
 	  _rowVerticalPadding(rowVerticalPadding),
 	  _rowHeight(rowHeight),
 	  _channelRowHeight(channelRowHeight),
-	  _dateTimeHeight(dateTimeHeight)
+	  _dateTimeHeight(dateTimeHeight),
+	  _isShowDescriptions(isShowDescriptions)
 {
 	_lastUpdateLabel = new Ui::FlatLabel(this, st::newsPanLastUpdateLabel);
 	_sortModeLabel = new Ui::FlatLabel(this, st::newsPanSortModeLabel);
@@ -500,34 +503,33 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 
 			QRect boundingRect = painter.boundingRect(rowRect, titleFlags, title);
 
-			// We decided do not show description text, only title
-#if 1
-			boundingRect.setHeight(rowRect.height());
-			TextHelper::drawElidedText(painter, rowRect, title);
+			if (_isShowDescriptions) {
+				if (boundingRect.height() >= rowRect.height()) {
+					boundingRect.setHeight(rowRect.height());
+					TextHelper::drawElidedText(painter, rowRect, title);
 
-			painter.setFont(st::normalFont);
-			painter.setPen(getNewsBodyColor(row.userData().item()));
-#else
-			if (boundingRect.height() >= rowRect.height()) {
+					painter.setFont(st::normalFont);
+					painter.setPen(getNewsBodyColor(row.userData().item()));
+				} else {
+					painter.drawText(boundingRect, titleFlags, title, &boundingRect);
+
+					painter.setFont(st::normalFont);
+					painter.setPen(getNewsBodyColor(row.userData().item()));
+
+					QRect descriptionRect(textLeft, boundingRect.bottom(),
+										  textWidth, rowRect.bottom() - boundingRect.bottom());
+
+					TextHelper::drawElidedText(painter,
+											   descriptionRect,
+											   row.userData().item()->description());
+				}
+			} else {
 				boundingRect.setHeight(rowRect.height());
 				TextHelper::drawElidedText(painter, rowRect, title);
 
 				painter.setFont(st::normalFont);
 				painter.setPen(getNewsBodyColor(row.userData().item()));
-			} else {
-				painter.drawText(boundingRect, titleFlags, title, &boundingRect);
-
-				painter.setFont(st::normalFont);
-				painter.setPen(getNewsBodyColor(row.userData().item()));
-
-				QRect descriptionRect(textLeft, boundingRect.bottom(),
-									  textWidth, rowRect.bottom() - boundingRect.bottom());
-
-				TextHelper::drawElidedText(painter,
-										   descriptionRect,
-										   row.userData().item()->description());
 			}
-#endif
 
 			painter.drawText(textLeft,
 							 row.bottom() - _dateTimeHeight - _rowVerticalPadding,
