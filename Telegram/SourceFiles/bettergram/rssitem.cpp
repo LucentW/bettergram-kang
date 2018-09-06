@@ -1,8 +1,7 @@
 #include "rssitem.h"
 #include "rsschannel.h"
+#include "imagefromsite.h"
 #include "bettergramservice.h"
-
-#include <styles/style_chat_helpers.h>
 
 #include <QXmlStreamReader>
 
@@ -13,7 +12,7 @@ const qint64 RssItem::_maxLastHoursInMs = 24 * 60 * 60 * 1000;
 RssItem::RssItem(RssChannel *channel) :
 	QObject(channel),
 	_channel(channel),
-	_image(st::newsPanImageSize, st::newsPanImageSize)
+	_image(_channel->iconWidth(), _channel->iconHeight())
 {
 	if (!_channel) {
 		throw std::invalid_argument("RSS Channel is null");
@@ -41,7 +40,7 @@ RssItem::RssItem(const QString &guid,
 	_link(link),
 	_commentsLink(commentsLink),
 	_publishDate(publishDate),
-	_image(st::newsPanImageSize, st::newsPanImageSize)
+	_image(_channel->iconWidth(), _channel->iconHeight())
 {
 	if (!_channel) {
 		throw std::invalid_argument("RSS Channel is null");
@@ -97,8 +96,12 @@ const QString RssItem::publishDateString() const
 
 const QPixmap &RssItem::image() const
 {
-	if (!_image.image().isNull()) {
+	if (!_image.isNull()) {
 		return _image.image();
+	}
+
+	if (_imageFromSite && !_imageFromSite->isNull()) {
+		return _imageFromSite->image();
 	}
 
 	if (!_channel) {
@@ -208,6 +211,14 @@ void RssItem::update(const QSharedPointer<RssItem> &item)
 	_publishDateString = item->_publishDateString;
 	_image.setLink(item->_image.link());
 
+	if (_imageFromSite && item->_imageFromSite) {
+		_imageFromSite->setLink(item->_imageFromSite->link());
+	} else if (!_imageFromSite && item->_imageFromSite) {
+		createImageFromSite();
+
+		_imageFromSite->setLink(item->_imageFromSite->link());
+	}
+
 	// We do not change _isRead field in this method
 }
 
@@ -217,7 +228,8 @@ void RssItem::parse(QXmlStreamReader &xml)
 
 	while (xml.readNextStartElement()) {
 		if (!xml.prefix().isEmpty()) {
-			if (xml.qualifiedName() == QLatin1String("content:encoded")) {
+			if (xml.name() == QLatin1String("encoded")
+					&& xml.namespaceUri() == "http://purl.org/rss/1.0/modules/content/") {
 				tryToGetImageLink(xml.readElementText());
 				continue;
 			}
@@ -262,6 +274,85 @@ void RssItem::parse(QXmlStreamReader &xml)
 					_image.setLink(url);
 				}
 			}
+			xml.skipCurrentElement();
+		} else {
+			xml.skipCurrentElement();
+		}
+	}
+
+	if (!_image.link().isValid()) {
+		createImageFromSite();
+		_imageFromSite->setLink(_link);
+	}
+}
+
+void RssItem::parseAtom(QXmlStreamReader &xml)
+{
+	_categoryList.clear();
+
+	while (xml.readNextStartElement()) {
+		QStringRef xmlName = xml.name();
+		QStringRef xmlNamespace = xml.namespaceUri();
+
+		if (xmlNamespace.isEmpty() || xmlNamespace == "http://www.w3.org/2005/Atom") {
+			if (xmlName == QLatin1String("id")) {
+				_guid = xml.readElementText();
+			} else if (xmlName == QLatin1String("title")) {
+				_title = removeHtmlTags(xml.readElementText());
+			} else if (xmlName == QLatin1String("category")) {
+				_categoryList.push_back(xml.attributes().value("term").toString());
+				xml.skipCurrentElement();
+			} else if (xmlName == QLatin1String("link")) {
+				_link = QUrl(xml.attributes().value("href").toString());
+				xml.skipCurrentElement();
+			} else if (xmlName == QLatin1String("category")) {
+				_categoryList.push_back(xml.attributes().value("term").toString());
+			} else if (xmlName == QLatin1String("published")) {
+				if (_publishDate.isValid()) {
+					xml.skipCurrentElement();
+				} else {
+					_publishDate = QDateTime::fromString(xml.readElementText(), Qt::ISODate);
+					_publishDateString =
+							BettergramService::generateLastUpdateString(_publishDate.toLocalTime(), false);
+				}
+			} else if (xmlName == QLatin1String("updated")) {
+				_publishDate = QDateTime::fromString(xml.readElementText(), Qt::ISODate);
+				_publishDateString =
+						BettergramService::generateLastUpdateString(_publishDate.toLocalTime(), false);
+			} else {
+				xml.skipCurrentElement();
+			}
+		} else if (xmlNamespace  == "http://search.yahoo.com/mrss/") {
+			if (xmlName == QLatin1String("group")) {
+				parseAtomMediaGroup(xml);
+			}
+		} else {
+			xml.skipCurrentElement();
+		}
+	}
+
+	if (!_image.link().isValid()) {
+		createImageFromSite();
+		_imageFromSite->setLink(_link);
+	}
+}
+
+void RssItem::parseAtomMediaGroup(QXmlStreamReader &xml)
+{
+	while (xml.readNextStartElement()) {
+		QStringRef xmlName = xml.name();
+		QStringRef xmlNamespace = xml.namespaceUri();
+
+		if (xmlNamespace != "http://search.yahoo.com/mrss/") {
+			xml.skipCurrentElement();
+			continue;
+		}
+
+		if (xmlName == QLatin1String("description")) {
+			_description = xml.readElementText();
+		} else if (xmlName == QLatin1String("thumbnail")) {
+			_image.setLink(QUrl(xml.attributes().value("url").toString()));
+			xml.skipCurrentElement();
 		} else {
 			xml.skipCurrentElement();
 		}
@@ -280,6 +371,12 @@ void RssItem::load(QSettings &settings)
 	_commentsLink = settings.value("commentsLink").toUrl();
 	_publishDate = settings.value("publishDate").toDateTime();
 	_image.setLink(settings.value("imageLink").toString());
+
+	if (!_image.link().isValid() && _link.isValid()) {
+		createImageFromSite();
+
+		_imageFromSite->setLink(_link);
+	}
 
 	setIsRead(settings.value("isRead").toBool());
 }
@@ -305,6 +402,21 @@ QString RssItem::removeHtmlTags(const QString &text)
 	QTextDocument textDocument;
 	textDocument.setHtml(text);
 	return textDocument.toPlainText();
+}
+
+void RssItem::createImageFromSite()
+{
+	if (_imageFromSite) {
+		return;
+	}
+
+	if (!_channel) {
+		throw std::invalid_argument("RSS Channel is null");
+	}
+
+	_imageFromSite = new ImageFromSite(_channel->iconWidth(), _channel->iconHeight(), this);
+
+	connect(_imageFromSite, &ImageFromSite::imageChanged, this, &RssItem::imageChanged);
 }
 
 } // namespace Bettergrams

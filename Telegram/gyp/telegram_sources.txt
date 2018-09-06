@@ -130,6 +130,8 @@
 <(src_loc)/chat_helpers/prices_list_widget.h
 <(src_loc)/chat_helpers/rss_widget.cpp
 <(src_loc)/chat_helpers/rss_widget.h
+<(src_loc)/chat_helpers/videos_widget.cpp
+<(src_loc)/chat_helpers/videos_widget.h
 <(src_loc)/chat_helpers/resources_widget.cpp
 <(src_loc)/chat_helpers/resources_widget.h
 <(src_loc)/chat_helpers/list_row.cpp
@@ -842,6 +844,10 @@
 <(src_loc)/bettergram/abstractremotefile.h
 <(src_loc)/bettergram/remoteimage.cpp
 <(src_loc)/bettergram/remoteimage.h
+<(src_loc)/bettergram/remotetempdata.cpp
+<(src_loc)/bettergram/remotetempdata.h
+<(src_loc)/bettergram/imagefromsite.cpp
+<(src_loc)/bettergram/imagefromsite.h
 <(emoji_suggestions_loc)/emoji_suggestions.cpp
 <(emoji_suggestions_loc)/emoji_suggestions.h
 

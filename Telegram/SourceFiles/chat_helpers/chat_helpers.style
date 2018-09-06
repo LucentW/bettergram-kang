@@ -226,7 +226,8 @@ newsPanRowHeight: 70px;
 newsPanRowVerticalPadding: 8px;
 newsPanChannelRowHeight: 64;
 newsPanDateHeight: 16px;
-newsPanImageSize: 54px;
+newsPanImageWidth: 54px;
+newsPanImageHeight: 54px;
 newsPanHover: pricesPanHover; // background of selected row in news panel
 
 // Last update label at the RssWidget
@@ -242,7 +243,7 @@ newsPanLastUpdateLabel: FlatLabel(defaultFlatLabel) {
 
 // Sort model label at the RssWidget
 newsPanSortModeLabel: FlatLabel(defaultFlatLabel) {
-        align: align(left);
+		align: align(left);
 		textFg: windowSubTextFg;
 		style: TextStyle(defaultTextStyle) {
 		}
@@ -261,6 +262,16 @@ newsPanIsShowReadLabel: FlatLabel(defaultFlatLabel) {
 			linkFg: windowSubTextFg;
 		}
 }
+
+videosPanPadding: pricesPanPadding;
+videosPanHeader: pricesPanHeader;
+videosPanRowHeight: 106px;
+videosPanRowVerticalPadding: 8px;
+videosPanChannelRowHeight: 64;
+videosPanDateHeight: 16px;
+videosPanImageWidth: 160px;
+videosPanImageHeight: 90px;
+videosPanHover: pricesPanHover; // background of selected row in videos panel
 
 resourcesPanPadding: pricesPanPadding;
 resourcesPanHeader: pricesPanHeader;

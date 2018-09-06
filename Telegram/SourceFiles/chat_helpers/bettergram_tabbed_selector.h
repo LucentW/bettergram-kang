@@ -20,6 +20,7 @@ namespace ChatHelpers {
 enum class BettergramSelectorTab {
 	Prices,
 	News,
+	Videos,
 	//Icos,
 	Resources
 };
@@ -77,7 +78,7 @@ signals:
 private:
 	class Tab {
 	public:
-		static constexpr auto kCount = 3;
+		static constexpr auto kCount = 4;
 
 		Tab(BettergramSelectorTab type, object_ptr<TabbedSelector::Inner> widget);
 

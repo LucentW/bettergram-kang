@@ -16,7 +16,10 @@ class RssChannelList : public QObject {
 public:
 	typedef QList<QSharedPointer<RssChannel>>::const_iterator const_iterator;
 
-	explicit RssChannelList(QObject *parent = nullptr);
+	explicit RssChannelList(const QString &name,
+							int imageWidth,
+							int imageHeight,
+							QObject *parent = nullptr);
 
 	int freq() const;
 	void setFreq(int freq);
@@ -48,6 +51,8 @@ public:
 public slots:
 
 signals:
+	void update();
+
 	void freqChanged();
 	void lastUpdateChanged();
 	void iconChanged();
@@ -61,6 +66,12 @@ private:
 	static const int _defaultFreq;
 
 	QList<QSharedPointer<RssChannel>> _list;
+
+	/// It is used for storing and loading data
+	const QString _name;
+
+	int _imageWidth = 0;
+	int _imageHeight = 0;
 
 	/// Frequency of updates in seconds
 	int _freq;

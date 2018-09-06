@@ -34,6 +34,8 @@ public:
 
 	const QPixmap &image() const;
 
+	bool isNull() const;
+
 public slots:
 
 signals:
@@ -42,6 +44,8 @@ signals:
 protected:
 	void dataDownloaded(const QByteArray &data) override;
 	void resetData() override;
+
+	bool checkLink(const QUrl &link) override;
 
 private:
 	/// If _scaledWidth or _scaledHeight is not 0 then we scale fetched image

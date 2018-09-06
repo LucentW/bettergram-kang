@@ -78,6 +78,11 @@ const QPixmap &RemoteImage::image() const
 	return _image;
 }
 
+bool RemoteImage::isNull() const
+{
+	return _image.isNull();
+}
+
 void RemoteImage::dataDownloaded(const QByteArray &data)
 {
 	if (data.isEmpty()) {
@@ -128,6 +133,14 @@ void RemoteImage::resetData()
 
 		emit imageChanged();
 	}
+}
+
+bool RemoteImage::checkLink(const QUrl &link)
+{
+	// Do not download images with too large file names
+	// because it seems they are auto generated not user visible images
+
+	return link.toString().size() < 300;
 }
 
 } // namespace Bettergrams

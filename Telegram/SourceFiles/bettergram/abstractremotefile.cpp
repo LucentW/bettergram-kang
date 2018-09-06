@@ -27,6 +27,10 @@ const QUrl &AbstractRemoteFile::link() const
 void AbstractRemoteFile::setLink(const QUrl &link)
 {
 	if (_link != link) {
+		if (!checkLink(link)) {
+			return;
+		}
+
 		_link = link;
 
 		download();
@@ -75,9 +79,17 @@ void AbstractRemoteFile::download()
 
 void AbstractRemoteFile::downloadLater()
 {
+	qsrand(static_cast<uint>(QDateTime::currentMSecsSinceEpoch() / (5 * 1000 * 1000)));
+
 	//TODO: bettergram: increase the timeout after each call of this method
-	//TODO: bettergram: shuffle timeout in a range
-	QTimer::singleShot(5000, this, [this](){ download(); });
+	QTimer::singleShot(2000 + (qrand() % 3000), this, [this](){ download(); });
+}
+
+bool AbstractRemoteFile::checkLink(const QUrl &link)
+{
+	Q_UNUSED(link);
+
+	return true;
 }
 
 } // namespace Bettergrams

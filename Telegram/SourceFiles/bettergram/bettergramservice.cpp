@@ -8,6 +8,7 @@
 
 #include <messenger.h>
 #include <lang/lang_keys.h>
+#include <styles/style_chat_helpers.h>
 
 #include <QTimer>
 #include <QJsonDocument>
@@ -76,7 +77,8 @@ void BettergramService::openUrl(const QUrl &url)
 Bettergram::BettergramService::BettergramService(QObject *parent) :
 	QObject(parent),
 	_cryptoPriceList(new CryptoPriceList(this)),
-	_rssChannelList(new RssChannelList(this)),
+	_rssChannelList(new RssChannelList("news", st::newsPanImageWidth, st::newsPanImageHeight, this)),
+	_videoChannelList(new RssChannelList("videos", st::videosPanImageWidth, st::videosPanImageHeight, this)),
 	_resourceGroupList(new ResourceGroupList(this)),
 	_currentAd(new AdItem(this))
 {
@@ -92,7 +94,20 @@ Bettergram::BettergramService::BettergramService(QObject *parent) :
 		_rssChannelList->add(QUrl("https://www.ccn.com/feed/"));
 	}
 
+	_videoChannelList->load();
+
+	if (_videoChannelList->isEmpty()) {
+		_videoChannelList->add(QUrl("https://www.youtube.com/feeds/videos.xml?channel_id=UCyC_4jvPzLiSkJkLIkA7B8g"));
+	}
+
+	connect(_rssChannelList, &RssChannelList::update,
+			this, &BettergramService::onUpdateRssChannelList);
+
+	connect(_videoChannelList, &RssChannelList::update,
+			this, &BettergramService::onUpdateVideoChannelList);
+
 	getRssChannelList();
+	getVideoChannelList();
 
 	_resourceGroupList->parseFile(":/bettergram/default-resources.json");
 	getResourceGroupList();
@@ -136,6 +151,11 @@ CryptoPriceList *BettergramService::cryptoPriceList() const
 RssChannelList *BettergramService::rssChannelList() const
 {
 	return _rssChannelList;
+}
+
+RssChannelList *BettergramService::videoChannelList() const
+{
+	return _videoChannelList;
 }
 
 ResourceGroupList *BettergramService::resourceGroupList() const
@@ -200,12 +220,22 @@ void BettergramService::getRssChannelList()
 {
 	for (const QSharedPointer<RssChannel> &channel : *_rssChannelList) {
 		if (channel->isMayFetchNewData()) {
-			getRssFeeds(channel);
+			getRssFeeds(_rssChannelList, channel);
 		}
 	}
 }
 
-void BettergramService::getRssFeeds(const QSharedPointer<RssChannel> &channel)
+void BettergramService::getVideoChannelList()
+{
+	for (const QSharedPointer<RssChannel> &channel : *_videoChannelList) {
+		if (channel->isMayFetchNewData()) {
+			getRssFeeds(_videoChannelList, channel);
+		}
+	}
+}
+
+void BettergramService::getRssFeeds(RssChannelList *rssChannelList,
+									const QSharedPointer<RssChannel> &channel)
 {
 	channel->startFetching();
 
@@ -214,7 +244,7 @@ void BettergramService::getRssFeeds(const QSharedPointer<RssChannel> &channel)
 
 	QNetworkReply *reply = _networkManager.get(request);
 
-	connect(reply, &QNetworkReply::finished, this, [this, reply, channel] {
+	connect(reply, &QNetworkReply::finished, this, [rssChannelList, reply, channel] {
 		if(reply->error() == QNetworkReply::NoError) {
 			channel->fetchingSucceed(reply->readAll());
 		} else {
@@ -226,7 +256,7 @@ void BettergramService::getRssFeeds(const QSharedPointer<RssChannel> &channel)
 			channel->fetchingFailed();
 		}
 
-		_rssChannelList->parse();
+		rssChannelList->parse();
 
 		reply->deleteLater();
 	});
@@ -537,6 +567,16 @@ void BettergramService::onGetNextAdSslFailed(QList<QSslError> errors)
 	for(const QSslError &error : errors) {
 		LOG(("%1").arg(error.errorString()));
 	}
+}
+
+void BettergramService::onUpdateRssChannelList()
+{
+	getRssChannelList();
+}
+
+void BettergramService::onUpdateVideoChannelList()
+{
+	getVideoChannelList();
 }
 
 } // namespace Bettergrams

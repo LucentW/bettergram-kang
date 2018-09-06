@@ -10,6 +10,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include "prices_list_widget.h"
 #include "rss_widget.h"
+#include "videos_widget.h"
 #include "resources_widget.h"
 #include "styles/style_chat_helpers.h"
 #include "ui/widgets/buttons.h"
@@ -54,6 +55,7 @@ BettergramTabbedSelector::BettergramTabbedSelector(QWidget *parent, not_null<Win
 	, _tabs{ {
 			Tab{ BettergramSelectorTab::Prices, object_ptr<PricesListWidget>(this, controller) },
 			Tab{ BettergramSelectorTab::News, object_ptr<RssWidget>(this, controller) },
+			Tab{ BettergramSelectorTab::Videos, object_ptr<VideosWidget>(this, controller) },
 			//Tab{ BettergramSelectorTab::Icos, object_ptr<PricesListWidget>(this, controller) },
 			Tab{ BettergramSelectorTab::Resources, object_ptr<ResourcesWidget>(this, controller) },
 		} }
@@ -323,6 +325,7 @@ void BettergramTabbedSelector::createTabsSlider() {
 	auto sections = QStringList();
 	sections.push_back(lang(lng_switch_prices).toUpper());
 	sections.push_back(lang(lng_switch_news).toUpper());
+	sections.push_back(lang(lng_switch_videos).toUpper());
 	//sections.push_back(lang(lng_switch_icos).toUpper());
 	sections.push_back(lang(lng_switch_resources).toUpper());
 	_tabsSlider->setSections(sections);

@@ -59,32 +59,87 @@ void RssWidget::Footer::onFooterClicked()
 	BettergramService::openUrl(QUrl("https://bettergram.io"));
 }
 
-const style::color &RssWidget::getNewsHeaderColor(const QSharedPointer<RssItem> &item)
-{
-	if (item->isRead()) {
-		return st::newsPanNewsReadFg;
-	} else {
-		return st::newsPanNewsHeaderFg;
-	}
-}
-
-const style::color &RssWidget::getNewsBodyColor(const QSharedPointer<RssItem> &item)
-{
-	if (item->isRead()) {
-		return st::newsPanNewsReadFg;
-	} else {
-		return st::newsPanNewsBodyFg;
-	}
-}
-
 RssWidget::RssWidget(QWidget* parent, not_null<Window::Controller*> controller)
-	: Inner(parent, controller)
+	: RssWidget(parent,
+				controller,
+				BettergramService::instance()->rssChannelList(),
+				lang(lng_news_show_only_unread_news),
+				lang(lng_news_show_all_news),
+				lang(lng_menu_news_mark_as_read),
+				lang(lng_menu_news_mark_all_site_news_as_read),
+				lang(lng_menu_news_mark_all_news_as_read),
+				st::newsPanNewsReadFg,
+				st::newsPanNewsBodyFg,
+				st::newsPanNewsHeaderFg,
+				st::newsPanSiteNameFg,
+				st::newsPanBg,
+				st::newsPanHover,
+				st::newsPanPadding,
+				st::newsPanHeader,
+				st::newsPanImageWidth,
+				st::newsPanImageHeight,
+				st::newsPanRowVerticalPadding,
+				st::newsPanRowHeight,
+				st::newsPanChannelRowHeight,
+				st::newsPanDateHeight,
+				false,
+				true)
+{
+}
+
+RssWidget::RssWidget(QWidget* parent,
+					 not_null<Window::Controller*> controller,
+					 RssChannelList *rssChannelList,
+					 const QString &showOnlyUnreadTitle,
+					 const QString &showAllTitle,
+					 const QString &markAsReadTitle,
+					 const QString &markAllSiteNewsAsReadTitle,
+					 const QString &markAllNewsAsReadTitle,
+					 const style::color &rowReadFg,
+					 const style::color &rowBodyFg,
+					 const style::color &rowHeaderFg,
+					 const style::color &siteNameFg,
+					 const style::color &bg,
+					 const style::color &hover,
+					 int padding,
+					 int headerPadding,
+					 int imageWidth,
+					 int imageHeight,
+					 int rowVerticalPadding,
+					 int rowHeight,
+					 int channelRowHeight,
+					 int dateTimeHeight,
+					 bool isShowDescriptions,
+					 bool isShowChannelIcons)
+	: Inner(parent, controller),
+	  _rssChannelList(rssChannelList),
+	  _showOnlyUnreadTitle(showOnlyUnreadTitle),
+	  _showAllTitle(showAllTitle),
+	  _markAsReadTitle(markAsReadTitle),
+	  _markAllSiteNewsAsReadTitle(markAllSiteNewsAsReadTitle),
+	  _markAllNewsAsReadTitle(markAllNewsAsReadTitle),
+	  _rowReadFg(rowReadFg),
+	  _rowBodyFg(rowBodyFg),
+	  _rowHeaderFg(rowHeaderFg),
+	  _siteNameFg(siteNameFg),
+	  _bg(bg),
+	  _hover(hover),
+	  _padding(padding),
+	  _headerPadding(headerPadding),
+	  _imageWidth(imageWidth),
+	  _imageHeight(imageHeight),
+	  _rowVerticalPadding(rowVerticalPadding),
+	  _rowHeight(rowHeight),
+	  _channelRowHeight(channelRowHeight),
+	  _dateTimeHeight(dateTimeHeight),
+	  _isShowDescriptions(isShowDescriptions),
+	  _isShowChannelIcons(isShowChannelIcons)
 {
 	_lastUpdateLabel = new Ui::FlatLabel(this, st::newsPanLastUpdateLabel);
 	_sortModeLabel = new Ui::FlatLabel(this, st::newsPanSortModeLabel);
 	_isShowReadLabel = new Ui::FlatLabel(this, st::newsPanIsShowReadLabel);
 
-	BettergramService::instance()->getRssChannelList();
+	_rssChannelList->update();
 
 	updateControlsGeometry();
 	updateLastUpdateLabel();
@@ -92,18 +147,34 @@ RssWidget::RssWidget(QWidget* parent, not_null<Window::Controller*> controller)
 	updateIsShowReadLabel();
 	updateRows();
 
-	RssChannelList *rssChannelList = BettergramService::instance()->rssChannelList();
-
-	connect(rssChannelList, &RssChannelList::lastUpdateChanged,
+	connect(_rssChannelList, &RssChannelList::lastUpdateChanged,
 			this, &RssWidget::onLastUpdateChanged);
 
-	connect(rssChannelList, &RssChannelList::iconChanged,
+	connect(_rssChannelList, &RssChannelList::iconChanged,
 			this, &RssWidget::onIconChanged);
 
-	connect(rssChannelList, &RssChannelList::updated,
+	connect(_rssChannelList, &RssChannelList::updated,
 			this, &RssWidget::onRssUpdated);
 
 	setMouseTracking(true);
+}
+
+const style::color &RssWidget::getNewsHeaderColor(const QSharedPointer<RssItem> &item) const
+{
+	if (item->isRead()) {
+		return _rowReadFg;
+	} else {
+		return _rowHeaderFg;
+	}
+}
+
+const style::color &RssWidget::getNewsBodyColor(const QSharedPointer<RssItem> &item) const
+{
+	if (item->isRead()) {
+		return _rowReadFg;
+	} else {
+		return _rowBodyFg;
+	}
 }
 
 ClickHandlerPtr RssWidget::getSortModeClickHandler()
@@ -147,7 +218,7 @@ void RssWidget::setIsShowRead(bool isShowRead)
 		_isShowRead = isShowRead;
 
 		updateIsShowReadLabel();
-		_isShowReadLabel->moveToRight(st::newsPanPadding, _sortModeLabel->y());
+		_isShowReadLabel->moveToRight(_padding, _sortModeLabel->y());
 
 		updateRows();
 		resizeToWidth(width());
@@ -176,7 +247,7 @@ void RssWidget::afterShown()
 {
 	startRssTimer();
 
-	BettergramService::instance()->getRssChannelList();
+	_rssChannelList->update();
 }
 
 void RssWidget::beforeHiding()
@@ -187,18 +258,18 @@ void RssWidget::beforeHiding()
 void RssWidget::timerEvent(QTimerEvent *event)
 {
 	if (event->timerId() == _timerId) {
-		BettergramService::instance()->getRssChannelList();
+		_rssChannelList->update();
 	}
 }
 
 void RssWidget::startRssTimer()
 {
 	if (!_timerId) {
-		_timerId = startTimer(BettergramService::instance()->rssChannelList()->freq() * 1000);
+		_timerId = startTimer(_rssChannelList->freq() * 1000);
 
 		if (!_timerId) {
 			LOG(("Can not start timer for %1 ms")
-				.arg(BettergramService::instance()->rssChannelList()->freq()));
+				.arg(_rssChannelList->freq()));
 		}
 	}
 }
@@ -228,7 +299,7 @@ void RssWidget::setSelectedRow(int selectedRow)
 
 int RssWidget::getListAreaTop() const
 {
-	return _sortModeLabel->y() + _sortModeLabel->height() + st::newsPanPadding;
+	return _sortModeLabel->y() + _sortModeLabel->height() + _padding;
 }
 
 void RssWidget::countSelectedRow(const QPoint &point)
@@ -371,7 +442,7 @@ void RssWidget::contextMenuEvent(QContextMenuEvent *e)
 	});
 
 	if (row.userData().isItem()) {
-		_menu->addAction(lang(lng_menu_news_mark_as_read), [row] {
+		_menu->addAction(_markAsReadTitle, [row] {
 			if (row.userData().isItem()) {
 				row.userData().item()->markAsRead();
 			} else {
@@ -380,7 +451,7 @@ void RssWidget::contextMenuEvent(QContextMenuEvent *e)
 		});
 	}
 
-	_menu->addAction(lang(lng_menu_news_mark_all_site_news_as_read), [row] {
+	_menu->addAction(_markAllSiteNewsAsReadTitle, [row] {
 		if (row.userData().isItem()) {
 			row.userData().item()->markAllNewsAtSiteAsRead();
 		} else if (row.userData().isChannel()) {
@@ -390,8 +461,8 @@ void RssWidget::contextMenuEvent(QContextMenuEvent *e)
 		}
 	});
 
-	_menu->addAction(lang(lng_menu_news_mark_all_news_as_read), [] {
-		BettergramService::instance()->rssChannelList()->markAsRead();
+	_menu->addAction(_markAllNewsAsReadTitle, [this] {
+		_rssChannelList->markAsRead();
 	});
 
 	connect(_menu.get(), &QObject::destroyed, [this] {
@@ -410,14 +481,15 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 		painter.setClipRect(r);
 	}
 
-	painter.fillRect(r, st::newsPanBg);
+	painter.fillRect(r, _bg);
 
-	const int iconLeft = st::newsPanPadding;
-	const int iconSize = st::newsPanImageSize;
+	const int iconLeft = _padding;
 
-	const int textLeft = iconLeft + iconSize + st::newsPanPadding / 2;
+	const int textLeft = iconLeft + _imageWidth + _padding / 2;
 	const int textRight = width();
 	const int textWidth = textRight - textLeft;
+
+	const int channelTextLeft = _isShowChannelIcons ? textLeft : iconLeft;
 
 	// Draw rows
 
@@ -434,14 +506,14 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 
 		if (i == _selectedRow) {
 			QRect rowRectangle(0, row.top(), width(), row.height());
-			App::roundRect(painter, rowRectangle, st::newsPanHover, StickerHoverCorners);
+			App::roundRect(painter, rowRectangle, _hover, StickerHoverCorners);
 		}
 
 		if (row.userData().isItem()) {
 			QRect rowRect(textLeft,
-						  row.top() + st::newsPanRowVerticalPadding,
+						  row.top() + _rowVerticalPadding,
 						  textWidth,
-						  row.height() - st::newsPanDateHeight - 2 * st::newsPanRowVerticalPadding);
+						  row.height() - _dateTimeHeight - 2 * _rowVerticalPadding);
 
 			painter.setFont(st::semiboldFont);
 			painter.setPen(getNewsHeaderColor(row.userData().item()));
@@ -451,39 +523,40 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 
 			QRect boundingRect = painter.boundingRect(rowRect, titleFlags, title);
 
-			// We decided do not show description text, only title
-#if 1
-			boundingRect.setHeight(rowRect.height());
-			TextHelper::drawElidedText(painter, rowRect, title);
+			if (_isShowDescriptions) {
+				if (boundingRect.height() >= rowRect.height()) {
+					TextHelper::drawElidedText(painter, rowRect, title);
 
-			painter.setFont(st::normalFont);
-			painter.setPen(getNewsBodyColor(row.userData().item()));
-#else
-			if (boundingRect.height() >= rowRect.height()) {
-				boundingRect.setHeight(rowRect.height());
+					painter.setFont(st::normalFont);
+					painter.setPen(getNewsBodyColor(row.userData().item()));
+				} else {
+					painter.drawText(boundingRect, titleFlags, title, &boundingRect);
+
+					painter.setFont(st::normalFont);
+					painter.setPen(getNewsBodyColor(row.userData().item()));
+
+					int descriptionHeight = rowRect.bottom() - boundingRect.bottom();
+
+					if (descriptionHeight >= _dateTimeHeight / 2) {
+						QRect descriptionRect(textLeft, boundingRect.bottom(),
+											  textWidth, descriptionHeight);
+
+						TextHelper::drawElidedText(painter,
+												   descriptionRect,
+												   row.userData().item()->description());
+					}
+				}
+			} else {
 				TextHelper::drawElidedText(painter, rowRect, title);
 
 				painter.setFont(st::normalFont);
 				painter.setPen(getNewsBodyColor(row.userData().item()));
-			} else {
-				painter.drawText(boundingRect, titleFlags, title, &boundingRect);
-
-				painter.setFont(st::normalFont);
-				painter.setPen(getNewsBodyColor(row.userData().item()));
-
-				QRect descriptionRect(textLeft, boundingRect.bottom(),
-									  textWidth, rowRect.bottom() - boundingRect.bottom());
-
-				TextHelper::drawElidedText(painter,
-										   descriptionRect,
-										   row.userData().item()->description());
 			}
-#endif
 
 			painter.drawText(textLeft,
-							 row.bottom() - st::newsPanDateHeight - st::newsPanRowVerticalPadding,
+							 row.bottom() - _dateTimeHeight - _rowVerticalPadding,
 							 textWidth,
-							 st::newsPanDateHeight,
+							 _dateTimeHeight,
 							 Qt::AlignLeft | Qt::AlignBottom,
 							 row.userData().item()->publishDateString());
 
@@ -491,22 +564,22 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 
 			if (!image.isNull()) {
 				QRect targetRect(iconLeft,
-								 row.top() + (row.height() - (image.height() >= st::newsPanImageSize ? st::newsPanImageSize : image.height())) / 2,
-								 st::newsPanImageSize,
-								 st::newsPanImageSize);
+								 row.top() + (row.height() - (image.height() >= _imageHeight ? _imageHeight : image.height())) / 2,
+								 _imageWidth,
+								 _imageHeight);
 
-				QRect sourceRect(image.width() > st::newsPanImageSize ? (image.width() - st::newsPanImageSize) / 2 : 0,
-								 image.height() > st::newsPanImageSize ? (image.height() - st::newsPanImageSize) / 2 : 0,
-								 st::newsPanImageSize,
-								 st::newsPanImageSize);
+				QRect sourceRect(image.width() > _imageWidth ? (image.width() - _imageWidth) / 2 : 0,
+								 image.height() > _imageHeight ? (image.height() - _imageHeight) / 2 : 0,
+								 _imageWidth,
+								 _imageHeight);
 
 				painter.drawPixmap(targetRect, image, sourceRect);
 			}
 		} else if (row.userData().isChannel()) {
 			painter.setFont(st::semiboldFont);
-			painter.setPen(st::newsPanSiteNameFg);
+			painter.setPen(_siteNameFg);
 
-			painter.drawText(textLeft, row.top(), textWidth, row.height(),
+			painter.drawText(channelTextLeft, row.top(), textWidth, row.height(),
 							 Qt::AlignLeft | Qt::AlignVCenter | Qt::TextWordWrap,
 							 row.userData().channel()->title());
 
@@ -514,14 +587,14 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 
 			if (!image.isNull()) {
 				QRect targetRect(iconLeft,
-								 row.top() + (image.height() >= st::newsPanImageSize ? st::newsPanImageSize : image.height()) / 2,
-								 st::newsPanImageSize,
-								 st::newsPanImageSize);
+								 row.top() + (row.height() - (image.height() >= _imageHeight ? _imageHeight : image.height())) / 2,
+								 _imageWidth,
+								 _imageHeight);
 
-				QRect sourceRect(image.width() > st::newsPanImageSize ? (image.width() - st::newsPanImageSize) / 2 : 0,
-								 image.height() > st::newsPanImageSize ? (image.height() - st::newsPanImageSize) / 2 : 0,
-								 st::newsPanImageSize,
-								 st::newsPanImageSize);
+				QRect sourceRect(image.width() > _imageWidth ? (image.width() - _imageWidth) / 2 : 0,
+								 image.height() > _imageHeight ? (image.height() - _imageHeight) / 2 : 0,
+								 _imageWidth,
+								 _imageHeight);
 
 				painter.drawPixmap(targetRect, image, sourceRect);
 			}
@@ -543,17 +616,17 @@ void RssWidget::updateControlsGeometry()
 	updateSortModeLabel();
 	updateIsShowReadLabel();
 
-	_lastUpdateLabel->moveToLeft(st::newsPanPadding, st::newsPanHeader);
-	_sortModeLabel->moveToLeft(st::newsPanPadding,
-							   _lastUpdateLabel->y() + _lastUpdateLabel->height() + st::newsPanPadding / 2);
+	_lastUpdateLabel->moveToLeft(_padding, _headerPadding);
+	_sortModeLabel->moveToLeft(_padding,
+							   _lastUpdateLabel->y() + _lastUpdateLabel->height() + _padding / 2);
 
-	_isShowReadLabel->moveToRight(st::newsPanPadding, _sortModeLabel->y());
+	_isShowReadLabel->moveToRight(_padding, _sortModeLabel->y());
 }
 
 void RssWidget::updateLastUpdateLabel()
 {
 	_lastUpdateLabel->setText(lang(lng_news_last_update)
-							  .arg(BettergramService::instance()->rssChannelList()->lastUpdateString()));
+							  .arg(_rssChannelList->lastUpdateString()));
 }
 
 void RssWidget::updateSortModeLabel()
@@ -570,9 +643,9 @@ void RssWidget::updateSortModeLabel()
 void RssWidget::updateIsShowReadLabel()
 {
 	if (_isShowRead) {
-		_isShowReadLabel->setRichText(textcmdLink(1, lang(lng_news_show_only_unread_news)));
+		_isShowReadLabel->setRichText(textcmdLink(1, _showOnlyUnreadTitle));
 	} else {
-		_isShowReadLabel->setRichText(textcmdLink(1, lang(lng_news_show_all_news)));
+		_isShowReadLabel->setRichText(textcmdLink(1, _showAllTitle));
 	}
 
 	_isShowReadLabel->setLink(1, getIsShowReadClickHandler());
@@ -580,28 +653,25 @@ void RssWidget::updateIsShowReadLabel()
 
 void RssWidget::fillRowsInSortByTimeMode()
 {
-	RssChannelList *channelList = BettergramService::instance()->rssChannelList();
 	QList<QSharedPointer<RssItem>> items;
 
 	if (_isShowRead) {
-		items = channelList->getAllItems();
+		items = _rssChannelList->getAllItems();
 	} else {
-		items = channelList->getAllUnreadItems();
+		items = _rssChannelList->getAllUnreadItems();
 	}
 
 	RssChannel::sort(items);
 
 	for (const QSharedPointer<RssItem> &item : items) {
-		_rows.add(Row(item), st::newsPanRowHeight);
+		_rows.add(Row(item), _rowHeight);
 	}
 }
 
 void RssWidget::fillRowsInSortBySiteMode()
 {
-	RssChannelList *channelList = BettergramService::instance()->rssChannelList();
-
-	for (const QSharedPointer<RssChannel> &channel : *channelList) {
-		_rows.add(Row(channel), st::newsPanChannelRowHeight);
+	for (const QSharedPointer<RssChannel> &channel : *_rssChannelList) {
+		_rows.add(Row(channel), _channelRowHeight);
 
 		QList<QSharedPointer<RssItem>> items;
 
@@ -612,7 +682,7 @@ void RssWidget::fillRowsInSortBySiteMode()
 		}
 
 		for (const QSharedPointer<RssItem> &item : items) {
-			_rows.add(Row(item), st::newsPanRowHeight);
+			_rows.add(Row(item), _rowHeight);
 		}
 	}
 }
