@@ -16,6 +16,7 @@ class PopupMenu;
 namespace Bettergram {
 class RssItem;
 class RssChannel;
+class RssChannelList;
 } // namespace Bettergram
 
 namespace ChatHelpers {
@@ -38,6 +39,23 @@ public:
 	void beforeHiding() override;
 
 protected:
+	RssWidget(QWidget* parent,
+			  not_null<Window::Controller*> controller,
+			  Bettergram::RssChannelList *rssChannelList,
+			  const style::color &rowReadFg,
+			  const style::color &rowBodyFg,
+			  const style::color &rowHeaderFg,
+			  const style::color &siteNameFg,
+			  const style::color &bg,
+			  const style::color &hover,
+			  int padding,
+			  int headerPadding,
+			  int imageSize,
+			  int rowVerticalPadding,
+			  int rowHeight,
+			  int channelRowHeight,
+			  int dateTimeHeight);
+
 	TabbedSelector::InnerFooter *getFooter() const override;
 	int countDesiredHeight(int newWidth) override;
 
@@ -92,6 +110,23 @@ private:
 		QSharedPointer<Bettergram::RssChannel> _channel;
 	};
 
+	Bettergram::RssChannelList *const _rssChannelList;
+
+	const style::color _rowReadFg;
+	const style::color _rowBodyFg;
+	const style::color _rowHeaderFg;
+	const style::color _siteNameFg;
+	const style::color _bg;
+	const style::color _hover;
+
+	const int _padding;
+	const int _headerPadding;
+	const int _imageSize;
+	const int _rowVerticalPadding;
+	const int _rowHeight;
+	const int _channelRowHeight;
+	const int _dateTimeHeight;
+
 	ListRowArray<Row> _rows;
 
 	int _timerId = 0;
@@ -106,8 +141,8 @@ private:
 	Footer *_footer = nullptr;
 	base::unique_qptr<Ui::PopupMenu> _menu = nullptr;
 
-	static const style::color &getNewsHeaderColor(const QSharedPointer<Bettergram::RssItem> &item);
-	static const style::color &getNewsBodyColor(const QSharedPointer<Bettergram::RssItem> &item);
+	const style::color &getNewsHeaderColor(const QSharedPointer<Bettergram::RssItem> &item) const;
+	const style::color &getNewsBodyColor(const QSharedPointer<Bettergram::RssItem> &item) const;
 
 	ClickHandlerPtr getSortModeClickHandler();
 	ClickHandlerPtr getIsShowReadClickHandler();

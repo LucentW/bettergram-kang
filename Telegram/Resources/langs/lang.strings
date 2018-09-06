@@ -990,6 +990,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_switch_stickers" = "Stickers";
 "lng_switch_prices" = "Prices";
 "lng_switch_news" = "News";
+"lng_switch_videos" = "Videos";
 "lng_switch_icos" = "ICOS";
 "lng_switch_resources" = "Resources";
 "lng_switch_emoji" = "Emoji";
