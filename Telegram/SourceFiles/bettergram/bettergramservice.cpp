@@ -78,6 +78,7 @@ Bettergram::BettergramService::BettergramService(QObject *parent) :
 	QObject(parent),
 	_cryptoPriceList(new CryptoPriceList(this)),
 	_rssChannelList(new RssChannelList(st::newsPanImageSize, st::newsPanImageSize, this)),
+	_videoChannelList(new RssChannelList(st::newsPanImageSize, st::newsPanImageSize, this)),
 	_resourceGroupList(new ResourceGroupList(this)),
 	_currentAd(new AdItem(this))
 {
@@ -93,7 +94,14 @@ Bettergram::BettergramService::BettergramService(QObject *parent) :
 		_rssChannelList->add(QUrl("https://www.ccn.com/feed/"));
 	}
 
+	_videoChannelList->load();
+
+	if (_videoChannelList->isEmpty()) {
+		_videoChannelList->add(QUrl("https://www.youtube.com/channel/UCyC_4jvPzLiSkJkLIkA7B8g"));
+	}
+
 	getRssChannelList();
+	getVideoChannelList();
 
 	_resourceGroupList->parseFile(":/bettergram/default-resources.json");
 	getResourceGroupList();
@@ -137,6 +145,11 @@ CryptoPriceList *BettergramService::cryptoPriceList() const
 RssChannelList *BettergramService::rssChannelList() const
 {
 	return _rssChannelList;
+}
+
+RssChannelList *BettergramService::videoChannelList() const
+{
+	return _videoChannelList;
 }
 
 ResourceGroupList *BettergramService::resourceGroupList() const
@@ -201,12 +214,21 @@ void BettergramService::getRssChannelList()
 {
 	for (const QSharedPointer<RssChannel> &channel : *_rssChannelList) {
 		if (channel->isMayFetchNewData()) {
-			getRssFeeds(channel);
+			getRssFeeds(_rssChannelList, channel);
 		}
 	}
 }
 
-void BettergramService::getRssFeeds(const QSharedPointer<RssChannel> &channel)
+void BettergramService::getVideoChannelList()
+{
+	for (const QSharedPointer<RssChannel> &channel : *_videoChannelList) {
+		if (channel->isMayFetchNewData()) {
+			getRssFeeds(_videoChannelList, channel);
+		}
+	}
+}
+
+void BettergramService::getRssFeeds(RssChannelList *rssChannelList, const QSharedPointer<RssChannel> &channel)
 {
 	channel->startFetching();
 
@@ -227,7 +249,7 @@ void BettergramService::getRssFeeds(const QSharedPointer<RssChannel> &channel)
 			channel->fetchingFailed();
 		}
 
-		_rssChannelList->parse();
+		rssChannelList->parse();
 
 		reply->deleteLater();
 	});
