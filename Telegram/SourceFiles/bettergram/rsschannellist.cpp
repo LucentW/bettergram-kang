@@ -8,8 +8,12 @@ namespace Bettergram {
 
 const int RssChannelList::_defaultFreq = 60;
 
-RssChannelList::RssChannelList(int imageWidth, int imageHeight, QObject *parent) :
+RssChannelList::RssChannelList(const QString &name,
+							   int imageWidth,
+							   int imageHeight,
+							   QObject *parent) :
 	QObject(parent),
+	_name(name),
 	_imageWidth(imageWidth),
 	_imageHeight(imageHeight),
 	_freq(_defaultFreq),
@@ -202,7 +206,7 @@ void RssChannelList::save()
 
 	QSettings settings;
 
-	settings.beginGroup("news");
+	settings.beginGroup(_name);
 
 	settings.setValue("lastUpdate", _lastUpdate);
 	settings.setValue("frequency", _freq);
@@ -223,7 +227,7 @@ void RssChannelList::load()
 {
 	QSettings settings;
 
-	settings.beginGroup("news");
+	settings.beginGroup(_name);
 
 	setLastUpdate(settings.value("lastUpdate").toDateTime());
 	setFreq(settings.value("frequency", _defaultFreq).toInt());
