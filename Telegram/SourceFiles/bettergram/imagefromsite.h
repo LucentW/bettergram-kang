@@ -50,21 +50,23 @@ private:
 	RemoteTempData _siteContent;
 	RemoteImage _image;
 
-	double parseDoubleAttribute(const QStringRef &source,
-								const QString &startAttribute,
-								const QString &endAttribute);
+	int parseIntAttribute(const QStringRef &source,
+						  const QString &startAttribute,
+						  const QString &endAttribute);
 
 	QStringRef parseStringAttribute(const QStringRef &source,
 									const QString &startAttribute,
 									const QString &endAttribute);
 
 	QStringRef getLargestImageInImageTags(const QString &source,
-										  double &maxWidth,
-										  double &maxHeight);
+										  int &maxWidth,
+										  int &maxHeight,
+										  int &position);
 
 	QString getLargestImageInFileNames(const QString &source,
-									   double &maxWidth,
-									   double &maxHeight);
+									   int &maxWidth,
+									   int &maxHeight,
+									   int &position);
 
 private slots:
 	void onSiteContentDownloaded(QByteArray data);
