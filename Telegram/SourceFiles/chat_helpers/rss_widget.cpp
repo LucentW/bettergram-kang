@@ -525,7 +525,6 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 
 			if (_isShowDescriptions) {
 				if (boundingRect.height() >= rowRect.height()) {
-					boundingRect.setHeight(rowRect.height());
 					TextHelper::drawElidedText(painter, rowRect, title);
 
 					painter.setFont(st::normalFont);
@@ -536,15 +535,18 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 					painter.setFont(st::normalFont);
 					painter.setPen(getNewsBodyColor(row.userData().item()));
 
-					QRect descriptionRect(textLeft, boundingRect.bottom(),
-										  textWidth, rowRect.bottom() - boundingRect.bottom());
+					int descriptionHeight = rowRect.bottom() - boundingRect.bottom();
 
-					TextHelper::drawElidedText(painter,
-											   descriptionRect,
-											   row.userData().item()->description());
+					if (descriptionHeight >= _dateTimeHeight / 2) {
+						QRect descriptionRect(textLeft, boundingRect.bottom(),
+											  textWidth, descriptionHeight);
+
+						TextHelper::drawElidedText(painter,
+												   descriptionRect,
+												   row.userData().item()->description());
+					}
 				}
 			} else {
-				boundingRect.setHeight(rowRect.height());
 				TextHelper::drawElidedText(painter, rowRect, title);
 
 				painter.setFont(st::normalFont);
