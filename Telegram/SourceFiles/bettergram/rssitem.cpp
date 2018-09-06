@@ -213,12 +213,10 @@ void RssItem::update(const QSharedPointer<RssItem> &item)
 
 	if (_imageFromSite && item->_imageFromSite) {
 		_imageFromSite->setLink(item->_imageFromSite->link());
-		_imageFromSite->setImageLink(item->_imageFromSite->imageLink());
 	} else if (!_imageFromSite && item->_imageFromSite) {
 		createImageFromSite();
 
 		_imageFromSite->setLink(item->_imageFromSite->link());
-		_imageFromSite->setImageLink(item->_imageFromSite->imageLink());
 	}
 
 	// We do not change _isRead field in this method
