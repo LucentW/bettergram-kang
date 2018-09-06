@@ -32,7 +32,8 @@ VideosWidget::VideosWidget(QWidget* parent, not_null<Window::Controller*> contro
 				st::videosPanRowHeight,
 				st::videosPanChannelRowHeight,
 				st::videosPanDateHeight,
-				true)
+				true,
+				false)
 {
 }
 
