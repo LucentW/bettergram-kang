@@ -77,8 +77,8 @@ void BettergramService::openUrl(const QUrl &url)
 Bettergram::BettergramService::BettergramService(QObject *parent) :
 	QObject(parent),
 	_cryptoPriceList(new CryptoPriceList(this)),
-	_rssChannelList(new RssChannelList("news", st::newsPanImageSize, st::newsPanImageSize, this)),
-	_videoChannelList(new RssChannelList("videos", st::newsPanImageSize, st::newsPanImageSize, this)),
+	_rssChannelList(new RssChannelList("news", st::newsPanImageWidth, st::newsPanImageHeight, this)),
+	_videoChannelList(new RssChannelList("videos", st::videosPanImageWidth, st::videosPanImageHeight, this)),
 	_resourceGroupList(new ResourceGroupList(this)),
 	_currentAd(new AdItem(this))
 {

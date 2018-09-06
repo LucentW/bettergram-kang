@@ -71,7 +71,8 @@ RssWidget::RssWidget(QWidget* parent, not_null<Window::Controller*> controller)
 				st::newsPanHover,
 				st::newsPanPadding,
 				st::newsPanHeader,
-				st::newsPanImageSize,
+				st::newsPanImageWidth,
+				st::newsPanImageHeight,
 				st::newsPanRowVerticalPadding,
 				st::newsPanRowHeight,
 				st::newsPanChannelRowHeight,
@@ -90,7 +91,8 @@ RssWidget::RssWidget(QWidget* parent,
 					 const style::color &hover,
 					 int padding,
 					 int headerPadding,
-					 int imageSize,
+					 int imageWidth,
+					 int imageHeight,
 					 int rowVerticalPadding,
 					 int rowHeight,
 					 int channelRowHeight,
@@ -105,7 +107,8 @@ RssWidget::RssWidget(QWidget* parent,
 	  _hover(hover),
 	  _padding(padding),
 	  _headerPadding(headerPadding),
-	  _imageSize(imageSize),
+	  _imageWidth(imageWidth),
+	  _imageHeight(imageHeight),
 	  _rowVerticalPadding(rowVerticalPadding),
 	  _rowHeight(rowHeight),
 	  _channelRowHeight(channelRowHeight),
@@ -460,9 +463,8 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 	painter.fillRect(r, _bg);
 
 	const int iconLeft = _padding;
-	const int iconSize = _imageSize;
 
-	const int textLeft = iconLeft + iconSize + _padding / 2;
+	const int textLeft = iconLeft + _imageWidth + _padding / 2;
 	const int textRight = width();
 	const int textWidth = textRight - textLeft;
 
@@ -538,14 +540,14 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 
 			if (!image.isNull()) {
 				QRect targetRect(iconLeft,
-								 row.top() + (row.height() - (image.height() >= _imageSize ? _imageSize : image.height())) / 2,
-								 _imageSize,
-								 _imageSize);
+								 row.top() + (row.height() - (image.height() >= _imageHeight ? _imageHeight : image.height())) / 2,
+								 _imageWidth,
+								 _imageHeight);
 
-				QRect sourceRect(image.width() > _imageSize ? (image.width() - _imageSize) / 2 : 0,
-								 image.height() > _imageSize ? (image.height() - _imageSize) / 2 : 0,
-								 _imageSize,
-								 _imageSize);
+				QRect sourceRect(image.width() > _imageWidth ? (image.width() - _imageWidth) / 2 : 0,
+								 image.height() > _imageHeight ? (image.height() - _imageHeight) / 2 : 0,
+								 _imageWidth,
+								 _imageHeight);
 
 				painter.drawPixmap(targetRect, image, sourceRect);
 			}
@@ -561,14 +563,14 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 
 			if (!image.isNull()) {
 				QRect targetRect(iconLeft,
-								 row.top() + (row.height() - (image.height() >= _imageSize ? _imageSize : image.height())) / 2,
-								 _imageSize,
-								 _imageSize);
+								 row.top() + (row.height() - (image.height() >= _imageHeight ? _imageHeight : image.height())) / 2,
+								 _imageWidth,
+								 _imageHeight);
 
-				QRect sourceRect(image.width() > _imageSize ? (image.width() - _imageSize) / 2 : 0,
-								 image.height() > _imageSize ? (image.height() - _imageSize) / 2 : 0,
-								 _imageSize,
-								 _imageSize);
+				QRect sourceRect(image.width() > _imageWidth ? (image.width() - _imageWidth) / 2 : 0,
+								 image.height() > _imageHeight ? (image.height() - _imageHeight) / 2 : 0,
+								 _imageWidth,
+								 _imageHeight);
 
 				painter.drawPixmap(targetRect, image, sourceRect);
 			}

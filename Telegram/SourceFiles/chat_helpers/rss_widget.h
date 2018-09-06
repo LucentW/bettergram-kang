@@ -50,7 +50,8 @@ protected:
 			  const style::color &hover,
 			  int padding,
 			  int headerPadding,
-			  int imageSize,
+			  int imageWidth,
+			  int imageHeight,
 			  int rowVerticalPadding,
 			  int rowHeight,
 			  int channelRowHeight,
@@ -121,7 +122,8 @@ private:
 
 	const int _padding;
 	const int _headerPadding;
-	const int _imageSize;
+	const int _imageWidth;
+	const int _imageHeight;
 	const int _rowVerticalPadding;
 	const int _rowHeight;
 	const int _channelRowHeight;
