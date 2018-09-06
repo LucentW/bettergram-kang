@@ -226,7 +226,8 @@ newsPanRowHeight: 70px;
 newsPanRowVerticalPadding: 8px;
 newsPanChannelRowHeight: 64;
 newsPanDateHeight: 16px;
-newsPanImageSize: 54px;
+newsPanImageWidth: 54px;
+newsPanImageHeight: 54px;
 newsPanHover: pricesPanHover; // background of selected row in news panel
 
 // Last update label at the RssWidget
@@ -264,11 +265,12 @@ newsPanIsShowReadLabel: FlatLabel(defaultFlatLabel) {
 
 videosPanPadding: pricesPanPadding;
 videosPanHeader: pricesPanHeader;
-videosPanRowHeight: 70px;
+videosPanRowHeight: 106px;
 videosPanRowVerticalPadding: 8px;
 videosPanChannelRowHeight: 64;
 videosPanDateHeight: 16px;
-videosPanImageSize: 54px;
+videosPanImageWidth: 160px;
+videosPanImageHeight: 90px;
 videosPanHover: pricesPanHover; // background of selected row in videos panel
 
 resourcesPanPadding: pricesPanPadding;
