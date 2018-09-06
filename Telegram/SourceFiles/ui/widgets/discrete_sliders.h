@@ -50,6 +50,7 @@ protected:
 	};
 
 	int getCurrentActiveLeft(TimeMs ms);
+	int getCurrentActiveWidth() const;
 
 	int getSectionsCount() const {
 		return _sections.size();

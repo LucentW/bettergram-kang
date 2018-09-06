@@ -82,6 +82,10 @@ int DiscreteSlider::getCurrentActiveLeft(TimeMs ms) {
 	return _a_left.current(ms, left);
 }
 
+int DiscreteSlider::getCurrentActiveWidth() const {
+	return _sections.empty() ? 0 : _sections[_selected].width;
+}
+
 template <typename Lambda>
 void DiscreteSlider::enumerateSections(Lambda callback) {
 	for (auto &section : _sections) {
@@ -277,9 +281,10 @@ void SettingsSlider::paintEvent(QPaintEvent *e) {
 	auto clip = e->rect();
 	auto ms = getms();
 	auto activeLeft = getCurrentActiveLeft(ms);
+	auto activeWidth = getCurrentActiveWidth();
 
 	p.setFont(_st.labelFont);
-	enumerateSections([this, &p, activeLeft, ms, clip](Section &section) {
+	enumerateSections([this, &p, activeLeft, activeWidth, ms, clip](Section &section) {
 		auto active = 1. - snap(qAbs(activeLeft - section.left) / float64(section.width), 0., 1.);
 		if (section.ripple) {
 			auto color = anim::color(_st.rippleBg, _st.rippleBgActive, active);
@@ -295,8 +300,8 @@ void SettingsSlider::paintEvent(QPaintEvent *e) {
 			from += fill;
 			tofill -= fill;
 		}
-		if (activeLeft + section.width > from) {
-			if (auto fill = qMin(tofill, activeLeft + section.width - from)) {
+		if ((activeLeft >= section.left) || (activeLeft + activeWidth > from)) {
+			if (auto fill = qMin(tofill, activeLeft + activeWidth - from)) {
 				p.fillRect(myrtlrect(from, _st.barTop, fill, _st.barStroke), _st.barFgActive);
 				from += fill;
 				tofill -= fill;
