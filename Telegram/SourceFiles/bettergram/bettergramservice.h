@@ -105,6 +105,9 @@ private:
 	void getRssFeeds(RssChannelList *rssChannelList, const QSharedPointer<RssChannel> &channel);
 
 private slots:
+	void onUpdateRssChannelList();
+	void onUpdateVideoChannelList();
+
 	void onGetCryptoPriceListFinished();
 	void onGetCryptoPriceListSslFailed(QList<QSslError> errors);
 

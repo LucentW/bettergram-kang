@@ -97,8 +97,14 @@ Bettergram::BettergramService::BettergramService(QObject *parent) :
 	_videoChannelList->load();
 
 	if (_videoChannelList->isEmpty()) {
-		_videoChannelList->add(QUrl("https://www.youtube.com/channel/UCyC_4jvPzLiSkJkLIkA7B8g"));
+		_videoChannelList->add(QUrl("https://www.youtube.com/feeds/videos.xml?channel_id=UCyC_4jvPzLiSkJkLIkA7B8g"));
 	}
+
+	connect(_rssChannelList, &RssChannelList::update,
+			this, &BettergramService::onUpdateRssChannelList);
+
+	connect(_videoChannelList, &RssChannelList::update,
+			this, &BettergramService::onUpdateVideoChannelList);
 
 	getRssChannelList();
 	getVideoChannelList();
@@ -561,6 +567,16 @@ void BettergramService::onGetNextAdSslFailed(QList<QSslError> errors)
 	for(const QSslError &error : errors) {
 		LOG(("%1").arg(error.errorString()));
 	}
+}
+
+void BettergramService::onUpdateRssChannelList()
+{
+	getRssChannelList();
+}
+
+void BettergramService::onUpdateVideoChannelList()
+{
+	getVideoChannelList();
 }
 
 } // namespace Bettergrams

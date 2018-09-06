@@ -51,6 +51,8 @@ public:
 public slots:
 
 signals:
+	void update();
+
 	void freqChanged();
 	void lastUpdateChanged();
 	void iconChanged();
