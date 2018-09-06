@@ -82,7 +82,8 @@ RssWidget::RssWidget(QWidget* parent, not_null<Window::Controller*> controller)
 				st::newsPanRowHeight,
 				st::newsPanChannelRowHeight,
 				st::newsPanDateHeight,
-				false)
+				false,
+				true)
 {
 }
 
@@ -108,7 +109,8 @@ RssWidget::RssWidget(QWidget* parent,
 					 int rowHeight,
 					 int channelRowHeight,
 					 int dateTimeHeight,
-					 bool isShowDescriptions)
+					 bool isShowDescriptions,
+					 bool isShowChannelIcons)
 	: Inner(parent, controller),
 	  _rssChannelList(rssChannelList),
 	  _showOnlyUnreadTitle(showOnlyUnreadTitle),
@@ -130,7 +132,8 @@ RssWidget::RssWidget(QWidget* parent,
 	  _rowHeight(rowHeight),
 	  _channelRowHeight(channelRowHeight),
 	  _dateTimeHeight(dateTimeHeight),
-	  _isShowDescriptions(isShowDescriptions)
+	  _isShowDescriptions(isShowDescriptions),
+	  _isShowChannelIcons(isShowChannelIcons)
 {
 	_lastUpdateLabel = new Ui::FlatLabel(this, st::newsPanLastUpdateLabel);
 	_sortModeLabel = new Ui::FlatLabel(this, st::newsPanSortModeLabel);
@@ -486,6 +489,8 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 	const int textRight = width();
 	const int textWidth = textRight - textLeft;
 
+	const int channelTextLeft = _isShowChannelIcons ? textLeft : iconLeft;
+
 	// Draw rows
 
 	for (int i = 0; i < _rows.count(); i++) {
@@ -572,7 +577,7 @@ void RssWidget::paintEvent(QPaintEvent *event) {
 			painter.setFont(st::semiboldFont);
 			painter.setPen(_siteNameFg);
 
-			painter.drawText(textLeft, row.top(), textWidth, row.height(),
+			painter.drawText(channelTextLeft, row.top(), textWidth, row.height(),
 							 Qt::AlignLeft | Qt::AlignVCenter | Qt::TextWordWrap,
 							 row.userData().channel()->title());
 
