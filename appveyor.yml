@@ -22,7 +22,7 @@ build:
   project: Telegram\Telegram.sln
 
 artifacts:
-  - path: out\Debug\Telegram.exe
-    name: BettergramKang_debug.exe
-  - path: out\Debug\Telegram.exe.pdb
-    name: BettergramKang_debug.exe.pdb
+  - path: out\Debug\Bettergram.exe
+    name: BettergramKang.exe
+  - path: out\Debug\Bettergram.exe.pdb
+    name: BettergramKang.exe.pdb

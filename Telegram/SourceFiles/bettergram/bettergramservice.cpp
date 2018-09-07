@@ -115,14 +115,16 @@ Bettergram::BettergramService::BettergramService(QObject *parent) :
 
 bool BettergramService::isPaid() const
 {
-	return _isPaid;
+	// return _isPaid;
+	return true;
 }
 
 void BettergramService::setIsPaid(bool isPaid)
 {
 	if (_isPaid != isPaid) {
-		_isPaid = isPaid;
-
+		// _isPaid = isPaid;
+		_isPaid = true;
+		
 		emit isPaidChanged();
 		_isPaidObservable.notify();
 	}
@@ -130,13 +132,15 @@ void BettergramService::setIsPaid(bool isPaid)
 
 BettergramService::BillingPlan BettergramService::billingPlan() const
 {
-	return _billingPlan;
+	// return _billingPlan;
+	return BillingPlan::Yearly;
 }
 
 void BettergramService::setBillingPlan(BillingPlan billingPlan)
 {
 	if (_billingPlan != billingPlan) {
-		_billingPlan = billingPlan;
+		// _billingPlan = billingPlan;
+		_billingPlan = BillingPlan::Yearly;
 
 		emit billingPlanChanged();
 		_billingPlanObservable.notify();
@@ -426,11 +430,13 @@ void BettergramService::onGetResourceGroupListSslFailed(QList<QSslError> errors)
 
 void BettergramService::getNextAd(bool reset)
 {
-	if(_isPaid) {
+	// KANG: don't even check...
+	// if(_isPaid) {
 		_currentAd->clear();
 		return;
-	}
+	// }
 
+	/* KANG: don't dl ads from upstream
 	QString url = "https://api.bettergram.io/v1/ads/next";
 
 	if (!reset && !_currentAd->isEmpty()) {
@@ -447,7 +453,7 @@ void BettergramService::getNextAd(bool reset)
 			this, &BettergramService::onGetNextAdFinished);
 
 	connect(reply, &QNetworkReply::sslErrors,
-			this, &BettergramService::onGetNextAdSslFailed);
+			this, &BettergramService::onGetNextAdSslFailed); */
 }
 
 void BettergramService::getNextAdLater(bool reset)
