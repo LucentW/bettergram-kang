@@ -189,3 +189,13 @@ To make Release version go to ***BuildPath*/tdesktop/out/Release** and run
 
 You can debug your builds from Qt Creator, just open **CMakeLists.txt** from ***BuildPath*/tdesktop/out/Debug** and launch with debug.
 
+Or you can work with [Visual Studio Code](https://code.visualstudio.com/). See at the instructions:
+
+1. [C++ Development using Visual Studio Code, CMake and LLDB](https://medium.com/audelabs/c-development-using-visual-studio-code-cmake-and-lldb-d0f13d38c563)
+
+2. [Integrate with External Tools via Tasks](https://code.visualstudio.com/docs/editor/tasks#vscode)
+
+To build the project from Visual Studio Code you should do the following commands:
+
+1. `Tasks->Run Task...` and `gyp refresh`
+2. `Tasks->Run Task...` and `make debug`or `make release`

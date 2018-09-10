@@ -556,6 +556,23 @@ pricesPanTableCryptoShortNameFg: windowSubTextFg; // prices panel table cryptocu
 pricesPanTableUpFg: historyPeer2NameFg; // prices panel table price text in case of up (green)
 pricesPanTableDownFg: attentionButtonFg; // prices panel table price text in case of down (red)
 
+newsPanBg: pricesPanBg; // news panel background
+newsPanSiteNameFg: windowSubTextFg; // news panel site name text
+newsPanNewsHeaderFg: windowFg; // news panel news header text
+newsPanNewsBodyFg: windowSubTextFg; // news panel news body text
+newsPanNewsReadFg: windowSubTextFg; // news panel already read news text
+
+videosPanBg: pricesPanBg; // videos panel background
+videosPanSiteNameFg: windowSubTextFg; // videos panel site name text
+videosPanNewsHeaderFg: windowFg; // videos panel news header text
+videosPanNewsBodyFg: windowSubTextFg; // videos panel news body text
+videosPanNewsReadFg: windowSubTextFg; // videos panel already read news text
+
+resourcesPanBg: pricesPanBg; // resources panel background
+resourcesPanGroupFg: windowSubTextFg; // resources panel group title text
+resourcesPanItemTitleFg: windowFg; // resources panel item title text
+resourcesPanItemDescriptionFg: windowSubTextFg; // resources panel item description text
+
 tableHeaderBg: emojiPanCategories; // table header background
 tableHeaderFg: windowSubTextFg; // table header foreground
 tableColumnSortInactiveFg: #00000010 | dialogsMenuIconFg;

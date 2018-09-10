@@ -176,6 +176,17 @@ pricesPanColumnPriceWidth: 85px;
 pricesPanColumn24hWidth: 70px;
 pricesPanHover: windowBgOver; // background of selected row in prices panel
 
+// Last update label at the PricesWidget
+pricesPanLastUpdateLabel: FlatLabel(defaultFlatLabel) {
+		align: align(left);
+		textFg: windowSubTextFg;
+		style: TextStyle(defaultTextStyle) {
+		}
+		palette: TextPalette(defaultTextPalette) {
+			linkFg: windowSubTextFg;
+		}
+}
+
 // Site name icon at the PricesListWidget.
 pricesPanSiteNameIcon: IconButton {
         width: 249px;
@@ -207,6 +218,78 @@ pricesPanMarketCapLabel: FlatLabel(defaultFlatLabel) {
         palette: TextPalette(defaultTextPalette) {
                 linkFg: pricesPanHeaderFg;
         }
+}
+
+newsPanPadding: pricesPanPadding;
+newsPanHeader: pricesPanHeader;
+newsPanRowHeight: 70px;
+newsPanRowVerticalPadding: 8px;
+newsPanChannelRowHeight: 64;
+newsPanDateHeight: 16px;
+newsPanImageWidth: 54px;
+newsPanImageHeight: 54px;
+newsPanHover: pricesPanHover; // background of selected row in news panel
+
+// Last update label at the RssWidget
+newsPanLastUpdateLabel: FlatLabel(defaultFlatLabel) {
+		align: align(left);
+		textFg: windowSubTextFg;
+		style: TextStyle(defaultTextStyle) {
+		}
+		palette: TextPalette(defaultTextPalette) {
+			linkFg: windowSubTextFg;
+		}
+}
+
+// Sort model label at the RssWidget
+newsPanSortModeLabel: FlatLabel(defaultFlatLabel) {
+		align: align(left);
+		textFg: windowSubTextFg;
+		style: TextStyle(defaultTextStyle) {
+		}
+		palette: TextPalette(defaultTextPalette) {
+			linkFg: windowSubTextFg;
+		}
+}
+
+// Show unread news label at the RssWidget
+newsPanIsShowReadLabel: FlatLabel(defaultFlatLabel) {
+		align: align(right);
+		textFg: windowSubTextFg;
+		style: TextStyle(defaultTextStyle) {
+		}
+		palette: TextPalette(defaultTextPalette) {
+			linkFg: windowSubTextFg;
+		}
+}
+
+videosPanPadding: pricesPanPadding;
+videosPanHeader: pricesPanHeader;
+videosPanRowHeight: 106px;
+videosPanRowVerticalPadding: 8px;
+videosPanChannelRowHeight: 64;
+videosPanDateHeight: 16px;
+videosPanImageWidth: 160px;
+videosPanImageHeight: 90px;
+videosPanHover: pricesPanHover; // background of selected row in videos panel
+
+resourcesPanPadding: pricesPanPadding;
+resourcesPanHeader: pricesPanHeader;
+resourcesPanRowHeight: 48px;
+resourcesPanRowVerticalPadding: 8px;
+resourcesPanGroupRowHeight: 36;
+resourcesPanImageSize: 32px;
+resourcesPanHover: pricesPanHover; // background of selected row in resources panel
+
+// Last update label at the ResourcesWidget
+resourcesPanLastUpdateLabel: FlatLabel(defaultFlatLabel) {
+		align: align(left);
+		textFg: windowSubTextFg;
+		style: TextStyle(defaultTextStyle) {
+		}
+		palette: TextPalette(defaultTextPalette) {
+			linkFg: windowSubTextFg;
+		}
 }
 
 // Ascending icon at the table column header.

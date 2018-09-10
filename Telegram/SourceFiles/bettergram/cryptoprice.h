@@ -4,6 +4,8 @@
 
 namespace Bettergram {
 
+class RemoteImage;
+
 /**
  * @brief The CryptoPrice class contains current price of one cryptocurrency.
  * See also https://www.livecoinwatch.com
@@ -54,7 +56,6 @@ public:
 	int originSortIndex() const;
 
 	void updateData(const CryptoPrice &price);
-	void downloadIcon();
 
 public slots:
 
@@ -75,10 +76,8 @@ private:
 	/// Site address of the information about the cryptocurrency. For example: https://www.livecoinwatch.com/price/Bitcoin-BTC
 	QUrl _url;
 
-	/// Url of the cryptocurrency icon. For example: https://www.livecoinwatch.com/images/icons32/btc.png
-	QUrl _iconUrl;
-
-	QPixmap _icon;
+	/// Cryptocurrency icon. For example: https://www.livecoinwatch.com/images/icons32/btc.png
+	QSharedPointer<RemoteImage> _icon;
 
 	/// Name of the cryptocurrency. For example: Bitcoin
 	QString _name;
@@ -101,12 +100,8 @@ private:
 	/// Sort index in the price list fetched from the server.
 	int _originSortIndex = 0;
 
-	void downloadIconLater();
-
 	void setUrl(const QUrl &url);
-	void setIconUrl(const QUrl &iconUrl);
-	void setIcon(const QByteArray &byteArray);
-	void setIcon(const QPixmap &icon);
+	void setIcon(const QSharedPointer<RemoteImage> &icon);
 	void setName(const QString &name);
 	void setShortName(const QString &shortName);
 	void setIsChangeFor24HoursGrown(bool isChangeFor24HoursGrown);

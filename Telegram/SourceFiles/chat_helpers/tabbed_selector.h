@@ -33,7 +33,7 @@ enum class SelectorTab {
 	Prices,
 	Emoji,
 	Stickers,
-	Gifs,
+	Gifs
 };
 
 class EmojiListWidget;
@@ -83,6 +83,7 @@ public:
 
 	class Inner;
 	class InnerFooter;
+	class SlideAnimation;
 
 protected:
 	void paintEvent(QPaintEvent *e) override;
@@ -130,7 +131,7 @@ private:
 		}
 
 	private:
-		SelectorTab _type = SelectorTab::Emoji;
+		SelectorTab _type = SelectorTab::Prices;
 		object_ptr<Inner> _widget = { nullptr };
 		QPointer<Inner> _weak;
 		object_ptr<InnerFooter> _footer;
@@ -176,7 +177,6 @@ private:
 	int _footerTop = 0;
 	PeerData *_currentPeer = nullptr;
 
-	class SlideAnimation;
 	std::unique_ptr<SlideAnimation> _slideAnimation;
 	Animation _a_slide;
 
@@ -265,6 +265,41 @@ protected:
 	}
 	friend class Inner;
 
+};
+
+class TabbedSelector::SlideAnimation : public Ui::RoundShadowAnimation {
+public:
+	enum class Direction {
+		LeftToRight,
+		RightToLeft,
+	};
+	void setFinalImages(Direction direction, QImage &&left, QImage &&right, QRect inner, bool wasSectionIcons);
+
+	void start();
+	void paintFrame(QPainter &p, float64 dt, float64 opacity);
+
+private:
+	Direction _direction = Direction::LeftToRight;
+	QPixmap _leftImage, _rightImage;
+	int _width = 0;
+	int _height = 0;
+	int _innerLeft = 0;
+	int _innerTop = 0;
+	int _innerRight = 0;
+	int _innerBottom = 0;
+	int _innerWidth = 0;
+	int _innerHeight = 0;
+
+	int _painterInnerLeft = 0;
+	int _painterInnerTop = 0;
+	int _painterInnerWidth = 0;
+	int _painterInnerBottom = 0;
+	int _painterCategoriesTop = 0;
+	int _painterInnerHeight = 0;
+	int _painterInnerRight = 0;
+
+	int _frameIntsPerLineAdd = 0;
+	bool _wasSectionIcons = false;
 };
 
 } // namespace ChatHelpers

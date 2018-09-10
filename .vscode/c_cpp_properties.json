@@ -1,0 +1,30 @@
+{
+	"configurations": [
+		{
+			"name": "Linux",
+			"includePath": [
+				"${workspaceFolder}/**",
+				"${workspaceFolder}/Telegram/SourceFiles",
+				"${workspaceFolder}/Telegram/ThirdParty/crl/src",
+				"${workspaceFolder}/Telegram/ThirdParty/GSL/include",
+				"${workspaceFolder}/Telegram/ThirdParty/variant/include",
+				"${workspaceFolder}/out/Debug/obj/gen",
+				"${workspaceFolder}/out/Release/obj/gen",
+				"${workspaceFolder}/../Libraries/range-v3/include",
+				"/usr/local/tdesktop/Qt-5.6.2/include",
+				"/usr/local/tdesktop/Qt-5.6.2/include/**",
+				"/usr/local/tdesktop/Qt-5.6.2/include/QtCore/5.6.2/QtCore",
+				"/usr/local/tdesktop/Qt-5.6.2/include/QtGui/5.6.2/QtGui"
+			],
+			"forcedInclude": [
+				"${workspaceFolder}/Telegram/SourceFiles/stdafx.h"
+			],
+			"defines": [],
+			"compilerPath": "/usr/bin/gcc",
+			"cStandard": "c11",
+			"cppStandard": "c++17",
+			"intelliSenseMode": "clang-x64"
+		}
+	],
+	"version": 4
+}

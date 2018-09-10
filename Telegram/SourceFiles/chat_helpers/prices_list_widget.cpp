@@ -1,7 +1,7 @@
 #include "prices_list_widget.h"
 #include "table_column_header_widget.h"
 
-#include "bettergram/bettergramsettings.h"
+#include "bettergram/bettergramservice.h"
 #include "bettergram/cryptopricelist.h"
 #include "bettergram/cryptoprice.h"
 
@@ -55,18 +55,20 @@ void PricesListWidget::Footer::processPanelHideFinished()
 
 void PricesListWidget::Footer::onFooterClicked()
 {
-	QDesktopServices::openUrl(QUrl("https://www.livecoinwatch.com"));
+	BettergramService::openUrl(QUrl("https://www.livecoinwatch.com"));
 }
 
 PricesListWidget::PricesListWidget(QWidget* parent, not_null<Window::Controller*> controller)
 	: Inner(parent, controller)
 {
+	_lastUpdateLabel = new Ui::FlatLabel(this, st::pricesPanLastUpdateLabel);
+
 	_siteName = new Ui::IconButton(this, st::pricesPanSiteNameIcon);
-	_siteName->setClickedCallback([] { QDesktopServices::openUrl(QUrl("https://www.livecoinwatch.com")); });
+	_siteName->setClickedCallback([] { BettergramService::openUrl(QUrl("https://www.livecoinwatch.com")); });
 
 	_marketCap = new Ui::FlatLabel(this, st::pricesPanMarketCapLabel);
 	_marketCap->setRichText(textcmdLink(1, lang(lng_prices_market_cap)
-										.arg(BettergramSettings::instance()->cryptoPriceList()->marketCapString())));
+										.arg(BettergramService::instance()->cryptoPriceList()->marketCapString())));
 	_marketCap->setLink(1, std::make_shared<UrlClickHandler>(qsl("https://www.livecoinwatch.com")));
 
 	_coinHeader = new TableColumnHeaderWidget(this);
@@ -90,11 +92,12 @@ PricesListWidget::PricesListWidget(QWidget* parent, not_null<Window::Controller*
 	connect(_24hHeader, &TableColumnHeaderWidget::sortOrderChanged,
 			this, &PricesListWidget::on24hColumnSortOrderChanged);
 
-	BettergramSettings::instance()->getCryptoPriceList();
+	BettergramService::instance()->getCryptoPriceList();
 
 	updateControlsGeometry();
+	updateLastUpdateLabel();
 
-	CryptoPriceList *priceList = BettergramSettings::instance()->cryptoPriceList();
+	CryptoPriceList *priceList = BettergramService::instance()->cryptoPriceList();
 	connect(priceList, &CryptoPriceList::updated, this, &PricesListWidget::onPriceListUpdated);
 
 	setMouseTracking(true);
@@ -122,7 +125,7 @@ void PricesListWidget::afterShown()
 {
 	startPriceListTimer();
 
-	BettergramSettings::instance()->getCryptoPriceList();
+	BettergramService::instance()->getCryptoPriceList();
 }
 
 void PricesListWidget::beforeHiding()
@@ -133,18 +136,18 @@ void PricesListWidget::beforeHiding()
 void PricesListWidget::timerEvent(QTimerEvent *event)
 {
 	if (event->timerId() == _timerId) {
-		BettergramSettings::instance()->getCryptoPriceList();
+		BettergramService::instance()->getCryptoPriceList();
 	}
 }
 
 void PricesListWidget::startPriceListTimer()
 {
 	if (!_timerId) {
-		_timerId = startTimer(BettergramSettings::instance()->cryptoPriceList()->freq() * 1000);
+		_timerId = startTimer(BettergramService::instance()->cryptoPriceList()->freq() * 1000);
 
 		if (!_timerId) {
 			LOG(("Can not start timer for %1 ms")
-				.arg(BettergramSettings::instance()->cryptoPriceList()->freq()));
+				.arg(BettergramService::instance()->cryptoPriceList()->freq()));
 		}
 	}
 }
@@ -189,7 +192,7 @@ int PricesListWidget::getTableContentTop() const
 
 int PricesListWidget::getTableContentHeight() const
 {
-	return st::pricesPanTableRowHeight * BettergramSettings::instance()->cryptoPriceList()->count();
+	return st::pricesPanTableRowHeight * BettergramService::instance()->cryptoPriceList()->count();
 }
 
 int PricesListWidget::getRowTop(int row) const
@@ -246,7 +249,7 @@ void PricesListWidget::countSelectedRow(const QPoint &point)
 		return;
 	}
 
-	int rowCount = BettergramSettings::instance()->cryptoPriceList()->count();
+	int rowCount = BettergramService::instance()->cryptoPriceList()->count();
 
 	for (int row = 0; row < rowCount; row++) {
 		if (getRowRectangle(row).contains(point)) {
@@ -282,17 +285,21 @@ void PricesListWidget::mousePressEvent(QMouseEvent *e)
 
 void PricesListWidget::mouseReleaseEvent(QMouseEvent *e)
 {
+	if (e->button() != Qt::LeftButton) {
+		return;
+	}
+
 	QPointF point = e->localPos();
 
 	countSelectedRow(QPoint(static_cast<int>(qRound(point.x())),
 							static_cast<int>(qRound(point.y()))));
 
-	CryptoPriceList *priceList = BettergramSettings::instance()->cryptoPriceList();
+	CryptoPriceList *priceList = BettergramService::instance()->cryptoPriceList();
 
 	if (_pressedRow >= 0 && _pressedRow < priceList->count() && _pressedRow == _selectedRow) {
 		QUrl url = priceList->at(_pressedRow)->url();
 		if (!url.isEmpty()) {
-			QDesktopServices::openUrl(url);
+			BettergramService::openUrl(url);
 		}
 	}
 }
@@ -351,7 +358,7 @@ void PricesListWidget::paintEvent(QPaintEvent *event) {
 	// Draw rows
 
 	int columnCoinTextLeft = columnCoinLeft + st::pricesPanTableImageSize + st::pricesPanTablePadding;
-	int rowCount = BettergramSettings::instance()->cryptoPriceList()->count();
+	int rowCount = BettergramService::instance()->cryptoPriceList()->count();
 
 	if (_selectedRow != -1 && _selectedRow < rowCount) {
 		QRect rowRectangle(0, getRowTop(_selectedRow), width(), st::pricesPanTableRowHeight);
@@ -360,7 +367,7 @@ void PricesListWidget::paintEvent(QPaintEvent *event) {
 
 	painter.setFont(st::semiboldFont);
 
-	for (const CryptoPrice *price : *BettergramSettings::instance()->cryptoPriceList()) {
+	for (const CryptoPrice *price : *BettergramService::instance()->cryptoPriceList()) {
 		if (!price->icon().isNull()) {
 			QRect targetRect(columnCoinLeft,
 							 top + (st::pricesPanTableRowHeight - st::pricesPanTableImageSize) / 2,
@@ -409,7 +416,10 @@ void PricesListWidget::resizeEvent(QResizeEvent *e)
 
 void PricesListWidget::updateControlsGeometry()
 {
-	_siteName->moveToLeft((width() - _siteName->width()) / 2, st::pricesPanHeader);
+	_lastUpdateLabel->moveToLeft(st::pricesPanPadding, st::pricesPanHeader);
+
+	_siteName->moveToLeft((width() - _siteName->width()) / 2,
+						  _lastUpdateLabel->y() + _lastUpdateLabel->height() + st::pricesPanPadding / 2);
 
 	updateMarketCap();
 
@@ -431,10 +441,16 @@ void PricesListWidget::updateControlsGeometry()
 	_24hHeader->moveToLeft(_priceHeader->x() + _priceHeader->width(), headerTop);
 }
 
+void PricesListWidget::updateLastUpdateLabel()
+{
+	_lastUpdateLabel->setText(lang(lng_prices_last_update)
+							  .arg(BettergramService::instance()->cryptoPriceList()->lastUpdateString()));
+}
+
 void PricesListWidget::updateMarketCap()
 {
 	_marketCap->setRichText(textcmdLink(1, lang(lng_prices_market_cap)
-										.arg(BettergramSettings::instance()->cryptoPriceList()->marketCapString())));
+										.arg(BettergramService::instance()->cryptoPriceList()->marketCapString())));
 	_marketCap->setLink(1, std::make_shared<UrlClickHandler>(qsl("https://www.livecoinwatch.com")));
 
 	_marketCap->moveToLeft((width() - _marketCap->width()) / 2,
@@ -465,7 +481,7 @@ void PricesListWidget::onCoinColumnSortOrderChanged()
 		break;
 	}
 
-	BettergramSettings::instance()->cryptoPriceList()->setSortOrder(sortOrder);
+	BettergramService::instance()->cryptoPriceList()->setSortOrder(sortOrder);
 }
 
 void PricesListWidget::onPriceColumnSortOrderChanged()
@@ -492,7 +508,7 @@ void PricesListWidget::onPriceColumnSortOrderChanged()
 		break;
 	}
 
-	BettergramSettings::instance()->cryptoPriceList()->setSortOrder(sortOrder);
+	BettergramService::instance()->cryptoPriceList()->setSortOrder(sortOrder);
 }
 
 void PricesListWidget::on24hColumnSortOrderChanged()
@@ -519,11 +535,12 @@ void PricesListWidget::on24hColumnSortOrderChanged()
 		break;
 	}
 
-	BettergramSettings::instance()->cryptoPriceList()->setSortOrder(sortOrder);
+	BettergramService::instance()->cryptoPriceList()->setSortOrder(sortOrder);
 }
 
 void PricesListWidget::onPriceListUpdated()
 {
+	updateLastUpdateLabel();
 	updateMarketCap();
 	update();
 }

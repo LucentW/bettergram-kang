@@ -51,7 +51,7 @@ private:
 	EntryTypes _type;
 	bool _selected = false;
 	int _unreadCount = 0;
-	base::unique_qptr<Ui::PopupMenu> _menu;
+	base::unique_qptr<Ui::PopupMenu> _menu = nullptr;
 };
 
 } // namespace Dialogs

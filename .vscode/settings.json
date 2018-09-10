@@ -1,0 +1,19 @@
+{
+	"editor.insertSpaces": false,
+	"editor.detectIndentation": false,
+	"editor.tabSize": 4,
+	"files.associations": {
+		"pointers": "cpp",
+		"multi_span": "cpp",
+		"span": "cpp",
+		"array": "cpp",
+		"deque": "cpp",
+		"forward_list": "cpp",
+		"list": "cpp",
+		"unordered_map": "cpp",
+		"unordered_set": "cpp",
+		"vector": "cpp",
+		"string_view": "cpp",
+		"gsl_util": "cpp"
+	}
+}

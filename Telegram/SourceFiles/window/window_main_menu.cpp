@@ -25,7 +25,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "observer_peer.h"
 #include "auth_session.h"
 #include "mainwidget.h"
-#include "bettergram/bettergramsettings.h"
+#include "bettergram/bettergramservice.h"
 
 namespace Window {
 
@@ -74,7 +74,7 @@ MainMenu::MainMenu(
 	_manageSubscription->setLink(1, std::make_shared<UrlClickHandler>(qsl("http://www.bettergram.io")));
 	_manageSubscription->setVisible(false);
 
-	Bettergram::BettergramSettings *settings = Bettergram::BettergramSettings::instance();
+	Bettergram::BettergramService *settings = Bettergram::BettergramService::instance();
 	subscribe(settings->isPaidObservable(), [this] { updateBettergramProText(); });
 
 	updateBettergramProText();
@@ -142,7 +142,7 @@ void MainMenu::refreshMenu() {
 
 void MainMenu::updateBettergramProText()
 {
-	Bettergram::BettergramSettings *settings = Bettergram::BettergramSettings::instance();
+	Bettergram::BettergramService *settings = Bettergram::BettergramService::instance();
 
 	//TODO: bettergram: set correct links to bettergram pro labels
 

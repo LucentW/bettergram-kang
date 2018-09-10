@@ -58,6 +58,7 @@ private:
 	int _selectedRow = -1;
 	int _pressedRow = -1;
 
+	Ui::FlatLabel *_lastUpdateLabel = nullptr;
 	Ui::IconButton *_siteName = nullptr;
 	Ui::FlatLabel *_marketCap = nullptr;
 	TableColumnHeaderWidget *_coinHeader = nullptr;
@@ -81,6 +82,7 @@ private:
 	void countSelectedRow(const QPoint &point);
 
 	void updateControlsGeometry();
+	void updateLastUpdateLabel();
 	void updateMarketCap();
 
 	void startPriceListTimer();

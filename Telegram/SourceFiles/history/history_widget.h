@@ -63,6 +63,8 @@ namespace ChatHelpers {
 class TabbedPanel;
 class TabbedSection;
 class TabbedSelector;
+class BettergramTabbedPanel;
+class BettergramTabbedSelector;
 } // namespace ChatHelpers
 
 namespace Storage {
@@ -213,6 +215,8 @@ public:
 	void historyToDown(History *history);
 
 	QRect historyRect() const;
+	void pushBettergramTabsToThirdSection(
+		const Window::SectionShow &params);
 	void pushTabbedSelectorToThirdSection(
 		const Window::SectionShow &params);
 
@@ -432,12 +436,16 @@ private slots:
 private:
 	using TabbedPanel = ChatHelpers::TabbedPanel;
 	using TabbedSelector = ChatHelpers::TabbedSelector;
+	using BettergramTabbedPanel = ChatHelpers::BettergramTabbedPanel;
+	using BettergramTabbedSelector = ChatHelpers::BettergramTabbedSelector;
 	using DragState = Storage::MimeDataState;
 
 	void send();
 	void handlePendingHistoryUpdate();
 	void fullPeerUpdated(PeerData *peer);
+	void toggleBettergramTabsMode();
 	void toggleTabbedSelectorMode();
+	void returnBettergramTabbedSelector(object_ptr<BettergramTabbedSelector> selector);
 	void returnTabbedSelector(object_ptr<TabbedSelector> selector);
 	void recountChatWidth();
 	void setReportSpamStatus(DBIPeerReportSpamStatus status);
@@ -807,6 +815,7 @@ private:
 	mtpRequestId _unblockRequest = 0;
 	mtpRequestId _reportSpamRequest = 0;
 	object_ptr<Ui::IconButton> _attachToggle;
+	object_ptr<Ui::EmojiButton> _bettergramTabsToggle;
 	object_ptr<Ui::EmojiButton> _tabbedSelectorToggle;
 	object_ptr<Ui::ImportantTooltip> _tabbedSelectorToggleTooltip = { nullptr };
 	bool _tabbedSelectorToggleTooltipShown = false;
@@ -842,6 +851,8 @@ private:
 	QTimer _membersDropdownShowTimer;
 
 	object_ptr<InlineBots::Layout::Widget> _inlineResults = { nullptr };
+	object_ptr<BettergramTabbedPanel> _bettergramTabbedPanel;
+	QPointer<BettergramTabbedSelector> _bettergramTabbedSelector;
 	object_ptr<TabbedPanel> _tabbedPanel;
 	QPointer<TabbedSelector> _tabbedSelector;
 	DragState _attachDragState;
