@@ -26,7 +26,7 @@ QString LocationClickHandler::copyToClipboardContextItemText() const {
 	return lang(lng_context_copy_link);
 }
 
-void LocationClickHandler::onClick(Qt::MouseButton button) const {
+void LocationClickHandler::onClick(ClickContext context) const {
 	if (!psLaunchMaps(_coords)) {
 		QDesktopServices::openUrl(_text);
 	}
@@ -222,9 +222,12 @@ void LocationManager::failed(LocationData *data) {
 	serverRedirects.remove(data);
 }
 
-void LocationData::load() {
-	if (!thumb->isNull()) return thumb->load(false, false);
-	if (loading) return;
+void LocationData::load(Data::FileOrigin origin) {
+	if (!thumb->isNull()) {
+		return thumb->load(origin, false, false);
+	} else if (loading) {
+		return;
+	}
 
 	loading = true;
 	if (locationManager) {

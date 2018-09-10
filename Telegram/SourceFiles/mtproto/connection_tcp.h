@@ -47,7 +47,6 @@ private:
 		Ready,
 		Finished,
 	};
-	static constexpr auto kShortBufferSize = 65535; // Of ints, 256 kb.
 
 	void socketRead();
 	void writeConnectionStart();
@@ -59,6 +58,7 @@ private:
 	void socketError(QAbstractSocket::SocketError e);
 
 	mtpBuffer parsePacket(bytes::const_span bytes);
+	void ensureAvailableInBuffer(int amount);
 	static void handleError(QAbstractSocket::SocketError e, QTcpSocket &sock);
 	static uint32 fourCharsToUInt(char ch1, char ch2, char ch3, char ch4) {
 		char ch[4] = { ch1, ch2, ch3, ch4 };
@@ -68,14 +68,14 @@ private:
 	void sendBuffer(mtpBuffer &&buffer);
 
 	QTcpSocket _socket;
-	uint32 _packetIndex = 0; // sent packet number
+	bool _connectionStarted = false;
 
-	uint32 _packetRead = 0;
-	uint32 _packetLeft = 0; // reading from socket
-	bool _readingToShort = true;
-	mtpBuffer _longBuffer;
-	mtpPrime _shortBuffer[kShortBufferSize];
-	char *_currentPosition = nullptr;
+	int _offsetBytes = 0;
+	int _readBytes = 0;
+	int _leftBytes = 0;
+	bytes::vector _smallBuffer;
+	bytes::vector _largeBuffer;
+	bool _usingLargeBuffer = false;
 
 	uchar _sendKey[CTRState::KeySize];
 	CTRState _sendState;

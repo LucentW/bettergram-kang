@@ -74,6 +74,7 @@ void openPeerByName(
 void joinGroupByHash(const QString &hash);
 void showSettings();
 
+void activateClickHandler(ClickHandlerPtr handler, ClickContext context);
 void activateClickHandler(ClickHandlerPtr handler, Qt::MouseButton button);
 
 } // namespace App
@@ -97,8 +98,10 @@ void showBox(
 
 } // namespace internal
 
-void showMediaPreview(DocumentData *document);
-void showMediaPreview(PhotoData *photo);
+void showMediaPreview(
+	Data::FileOrigin origin,
+	not_null<DocumentData*> document);
+void showMediaPreview(Data::FileOrigin origin, not_null<PhotoData*> photo);
 void hideMediaPreview();
 
 template <typename BoxType>

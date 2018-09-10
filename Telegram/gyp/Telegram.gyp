@@ -111,7 +111,11 @@
       '<@(style_files)',
       '<!@(<(list_sources_command) <(qt_moc_list_sources_arg))',
       'telegram_sources.txt',
-      '<(res_loc)/css/export_style.css',
+	  '<(res_loc)/langs/cloud_lang.strings',
+      '<(res_loc)/export_html/css/style.css',
+      '<(res_loc)/export_html/js/script.js',
+      '<(res_loc)/export_html/images/back.png',
+      '<(res_loc)/export_html/images/back@2x.png',
     ],
     'sources!': [
       '<!@(<(list_sources_command) <(qt_moc_list_sources_arg) --exclude_for <(build_os))',
@@ -122,6 +126,12 @@
           'CUSTOM_API_ID',
         ],
         'dependencies': [
+        ],
+      }], [ 'build_mac', {
+        'mac_bundle': '1',
+        'mac_bundle_resources': [
+          '<!@(python -c "for s in \'<@(langpacks)\'.split(\' \'): print(\'<(res_loc)/langs/\' + s + \'.lproj/Localizable.strings\')")',
+          '../Telegram/Images.xcassets',
         ],
       }],
     ],

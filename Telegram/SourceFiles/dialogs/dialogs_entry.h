@@ -89,7 +89,7 @@ public:
 		return _sortKeyInChatList;
 	}
 	void updateChatListSortPosition();
-	void setChatsListDate(QDateTime date);
+	void setChatsListTimeId(TimeId date);
 	virtual void updateChatListExistence();
 	bool needUpdateInChatList() const;
 
@@ -120,8 +120,8 @@ public:
 		paintUserpic(p, rtl() ? (w - x - size) : x, y, size);
 	}
 
-	QDateTime chatsListDate() const {
-		return _lastMessageDate;
+	TimeId chatsListTimeId() const {
+		return _lastMessageTimeId;
 	}
 
 	virtual ~Entry() = default;
@@ -130,7 +130,7 @@ public:
 	mutable Text lastItemTextCache;
 
 private:
-	virtual QDateTime adjustChatListDate() const;
+	virtual TimeId adjustChatListTimeId() const;
 	virtual void changedInChatListHook(Dialogs::Mode list, bool added);
 	virtual void changedChatListPinHook();
 
@@ -146,7 +146,7 @@ private:
 	uint64 _sortKeyInChatList = 0;
 	int _pinnedIndex = 0;
 	bool _isProxyPromoted = false;
-	QDateTime _lastMessageDate;
+	TimeId _lastMessageTimeId = 0;
 	bool _isFavorite = false;
 };
 

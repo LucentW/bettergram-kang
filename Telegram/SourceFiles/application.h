@@ -12,6 +12,7 @@ class Launcher;
 class UpdateChecker;
 } // namespace Core
 
+bool InternalPassportLink(const QString &url);
 bool StartUrlRequiresActivate(const QString &url);
 
 class Application : public QApplication {
@@ -61,9 +62,7 @@ private:
 	void singleInstanceChecked();
 
 private:
-#ifndef TDESKTOP_DISABLE_AUTOUPDATE
 	std::unique_ptr<Core::UpdateChecker> _updateChecker;
-#endif // !TDESKTOP_DISABLE_AUTOUPDATE
 
 };
 

@@ -33,7 +33,7 @@ style::color PeerUserpicColor(PeerId peerId);
 class PeerClickHandler : public ClickHandler {
 public:
 	PeerClickHandler(not_null<PeerData*> peer);
-	void onClick(Qt::MouseButton button) const override;
+	void onClick(ClickContext context) const override;
 
 	not_null<PeerData*> peer() const {
 		return _peer;
@@ -166,7 +166,7 @@ public:
 		int y,
 		int size) const;
 	void loadUserpic(bool loadFirst = false, bool prior = true) {
-		_userpic->load(loadFirst, prior);
+		_userpic->load(userpicPhotoOrigin(), loadFirst, prior);
 	}
 	bool userpicLoaded() const {
 		return _userpic->loaded();
@@ -189,6 +189,11 @@ public:
 	}
 	PhotoId userpicPhotoId() const {
 		return userpicPhotoUnknown() ? 0 : _userpicPhotoId;
+	}
+	Data::FileOrigin userpicPhotoOrigin() const {
+		return (isUser() && userpicPhotoId())
+			? Data::FileOriginUserPhoto(bareId(), userpicPhotoId())
+			: Data::FileOrigin(Data::FileOriginPeerPhoto(id));
 	}
 
 	int nameVersion = 1;

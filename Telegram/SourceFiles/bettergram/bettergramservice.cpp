@@ -68,7 +68,7 @@ void BettergramService::openUrl(const QUrl &url)
 	QString urlString = url.toString();
 
 	if (urlString.startsWith(QLatin1String("tg://"), Qt::CaseInsensitive)) {
-		Messenger::Instance().openLocalUrl(urlString);
+		Messenger::Instance().openLocalUrl(urlString, {});
 	} else {
 		QDesktopServices::openUrl(url);
 	}

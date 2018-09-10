@@ -23,19 +23,18 @@ struct PasswordCheckState {
 	bool requesting = true;
 	bool hasPassword = false;
 	bool checked = false;
+	MTPInputPeer singlePeer = MTP_inputPeerEmpty();
 };
 
 struct ProcessingState {
 	enum class Step {
 		Initializing,
-		LeftChannelsList,
 		DialogsList,
 		PersonalInfo,
 		Userpics,
 		Contacts,
 		Sessions,
 		OtherData,
-		LeftChannels,
 		Dialogs,
 	};
 	enum class FileType {
@@ -112,7 +111,7 @@ using State = base::optional_variant<
 
 class ControllerWrap {
 public:
-	ControllerWrap();
+	explicit ControllerWrap(const MTPInputPeer &peer);
 
 	rpl::producer<State> state() const;
 

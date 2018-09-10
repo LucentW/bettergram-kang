@@ -20,6 +20,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "inline_bots/inline_bot_layout_item.h"
 #include "storage/localstorage.h"
 #include "boxes/abstract_box.h"
+#include "passport/passport_form_controller.h"
 #include "data/data_media_types.h"
 #include "data/data_feed.h"
 #include "data/data_photo.h"
@@ -57,7 +58,7 @@ void UpdateImage(ImagePtr &old, ImagePtr now) {
 	} else if (const auto delayed = old->toDelayedStorageImage()) {
 		const auto location = now->location();
 		if (!location.isNull()) {
-			delayed->setStorageLocation(location);
+			delayed->setStorageLocation(Data::FileOrigin(), location);
 		}
 	}
 }
@@ -72,12 +73,16 @@ Session::Session(not_null<AuthSession*> session)
 	setupChannelLeavingViewer();
 }
 
-void Session::startExport() {
+void Session::startExport(PeerData *peer) {
+	startExport(peer ? peer->input : MTP_inputPeerEmpty());
+}
+
+void Session::startExport(const MTPInputPeer &singlePeer) {
 	if (_exportPanel) {
 		_exportPanel->activatePanel();
 		return;
 	}
-	_export = std::make_unique<Export::ControllerWrap>();
+	_export = std::make_unique<Export::ControllerWrap>(singlePeer);
 	_exportPanel = std::make_unique<Export::View::PanelController>(
 		_export.get());
 
@@ -155,6 +160,30 @@ void Session::stopExport() {
 		_exportViewChanges.fire(nullptr);
 	}
 	_export = nullptr;
+}
+
+const Passport::SavedCredentials *Session::passportCredentials() const {
+	return _passportCredentials ? &_passportCredentials->first : nullptr;
+}
+
+void Session::rememberPassportCredentials(
+		Passport::SavedCredentials data,
+		TimeMs rememberFor) {
+	Expects(rememberFor > 0);
+
+	static auto generation = 0;
+	_passportCredentials = std::make_unique<CredentialsWithGeneration>(
+		std::move(data),
+		++generation);
+	App::CallDelayed(rememberFor, _session, [=, check = generation] {
+		if (_passportCredentials && _passportCredentials->second == check) {
+			forgetPassportCredentials();
+		}
+	});
+}
+
+void Session::forgetPassportCredentials() {
+	_passportCredentials = nullptr;
 }
 
 void Session::setupContactViewsViewer() {
@@ -707,7 +736,7 @@ void Session::updateNotifySettingsLocal(not_null<PeerData*> peer) {
 }
 
 void Session::unmuteByFinishedDelayed(TimeMs delay) {
-	accumulate_max(delay, kMaxNotifyCheckDelay);
+	accumulate_min(delay, kMaxNotifyCheckDelay);
 	if (!_unmuteByFinishedTimer.isActive()
 		|| _unmuteByFinishedTimer.remainingTime() > delay) {
 		_unmuteByFinishedTimer.callOnce(delay);
@@ -802,6 +831,7 @@ not_null<PhotoData*> Session::photo(
 		return photo(
 			data.c_photo().vid.v,
 			data.c_photo().vaccess_hash.v,
+			data.c_photo().vfile_reference.v,
 			data.c_photo().vdate.v,
 			ImagePtr(*thumb, "JPG"),
 			ImagePtr(*medium, "JPG"),
@@ -816,6 +846,7 @@ not_null<PhotoData*> Session::photo(
 not_null<PhotoData*> Session::photo(
 		PhotoId id,
 		const uint64 &access,
+		const QByteArray &fileReference,
 		TimeId date,
 		const ImagePtr &thumb,
 		const ImagePtr &medium,
@@ -824,6 +855,7 @@ not_null<PhotoData*> Session::photo(
 	photoApplyFields(
 		result,
 		access,
+		fileReference,
 		date,
 		thumb,
 		medium,
@@ -881,6 +913,7 @@ PhotoData *Session::photoFromWeb(
 	return photo(
 		rand_value<PhotoId>(),
 		uint64(0),
+		QByteArray(),
 		unixtime(),
 		thumb,
 		medium,
@@ -944,6 +977,7 @@ void Session::photoApplyFields(
 		photoApplyFields(
 			photo,
 			data.vaccess_hash.v,
+			data.vfile_reference.v,
 			data.vdate.v,
 			App::image(*thumb),
 			App::image(*medium),
@@ -954,6 +988,7 @@ void Session::photoApplyFields(
 void Session::photoApplyFields(
 		not_null<PhotoData*> photo,
 		const uint64 &access,
+		const QByteArray &fileReference,
 		TimeId date,
 		const ImagePtr &thumb,
 		const ImagePtr &medium,
@@ -962,6 +997,7 @@ void Session::photoApplyFields(
 		return;
 	}
 	photo->access = access;
+	photo->fileReference = fileReference;
 	photo->date = date;
 	UpdateImage(photo->thumb, thumb);
 	UpdateImage(photo->medium, medium);
@@ -1007,7 +1043,7 @@ not_null<DocumentData*> Session::document(
 		return document(
 			fields.vid.v,
 			fields.vaccess_hash.v,
-			fields.vversion.v,
+			fields.vfile_reference.v,
 			fields.vdate.v,
 			fields.vattributes.v,
 			qs(fields.vmime_type),
@@ -1023,7 +1059,7 @@ not_null<DocumentData*> Session::document(
 not_null<DocumentData*> Session::document(
 		DocumentId id,
 		const uint64 &access,
-		int32 version,
+		const QByteArray &fileReference,
 		TimeId date,
 		const QVector<MTPDocumentAttribute> &attributes,
 		const QString &mime,
@@ -1035,7 +1071,7 @@ not_null<DocumentData*> Session::document(
 	documentApplyFields(
 		result,
 		access,
-		version,
+		fileReference,
 		date,
 		attributes,
 		mime,
@@ -1113,7 +1149,7 @@ DocumentData *Session::documentFromWeb(
 	const auto result = document(
 		rand_value<DocumentId>(),
 		uint64(0),
-		int32(0),
+		QByteArray(),
 		unixtime(),
 		data.vattributes.v,
 		data.vmime_type.v,
@@ -1134,7 +1170,7 @@ DocumentData *Session::documentFromWeb(
 	const auto result = document(
 		rand_value<DocumentId>(),
 		uint64(0),
-		int32(0),
+		QByteArray(),
 		unixtime(),
 		data.vattributes.v,
 		data.vmime_type.v,
@@ -1160,7 +1196,7 @@ void Session::documentApplyFields(
 	documentApplyFields(
 		document,
 		data.vaccess_hash.v,
-		data.vversion.v,
+		data.vfile_reference.v,
 		data.vdate.v,
 		data.vattributes.v,
 		qs(data.vmime_type),
@@ -1173,7 +1209,7 @@ void Session::documentApplyFields(
 void Session::documentApplyFields(
 		not_null<DocumentData*> document,
 		const uint64 &access,
-		int32 version,
+		const QByteArray &fileReference,
 		TimeId date,
 		const QVector<MTPDocumentAttribute> &attributes,
 		const QString &mime,
@@ -1185,9 +1221,8 @@ void Session::documentApplyFields(
 		return;
 	}
 	document->setattributes(attributes);
-	document->setRemoteVersion(version);
 	if (dc != 0 && access != 0) {
-		document->setRemoteLocation(dc, access);
+		document->setRemoteLocation(dc, access, fileReference);
 	}
 	document->date = date;
 	document->setMimeString(mime);
@@ -1356,9 +1391,7 @@ void Session::webpageApplyFields(
 		int duration,
 		const QString &author,
 		TimeId pendingTill) {
-	if (!page->pendingTill && pendingTill > 0) {
-		_session->api().requestWebPageDelayed(page);
-	}
+	const auto requestPending = (!page->pendingTill && pendingTill > 0);
 	const auto changed = page->applyChanges(
 		type,
 		url,
@@ -1371,6 +1404,9 @@ void Session::webpageApplyFields(
 		duration,
 		author,
 		pendingTill);
+	if (requestPending) {
+		_session->api().requestWebPageDelayed(page);
+	}
 	if (changed) {
 		notifyWebPageUpdateDelayed(page);
 	}
