@@ -322,11 +322,11 @@ QString getHomeDir() {
 } // namespace
 
 QString psAppDataPath() {
-	// Previously we used ~/.TelegramDesktop, so look there first.
+	// Previously we used ~/.Bettergram, so look there first.
 	// If we find data there, we should still use it.
 	auto home = getHomeDir();
 	if (!home.isEmpty()) {
-		auto oldPath = home + qsl(".TelegramDesktop/");
+		auto oldPath = home + qsl(".Bettergram/");
 		auto oldSettingsBase = oldPath + qsl("tdata/settings");
 		if (QFile(oldSettingsBase + '0').exists() || QFile(oldSettingsBase + '1').exists()) {
 			return oldPath;

@@ -246,7 +246,7 @@ void SettingsWidget::addLocationLabel(
 			return (cPlatform() == dbipWindows) ? result.toLower() : result;
 		};
 		const auto text = (check(path) == check(psDownloadPath()))
-			? QString("Downloads/Telegram Desktop")
+			? QString("Downloads/Bettergram")
 			: path;
 		auto pathLink = TextWithEntities{
 			QDir::toNativeSeparators(text),

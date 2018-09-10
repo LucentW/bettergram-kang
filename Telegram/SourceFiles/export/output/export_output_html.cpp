@@ -152,7 +152,7 @@ QByteArray SerializeList(const std::vector<QByteArray> &values) {
 	return QByteArray();
 }
 QByteArray MakeLinks(const QByteArray &value) {
-	const auto domain = QByteArray("https://telegram.org/");
+	const auto domain = QByteArray("https://bettergram.io");
 	auto result = QByteArray();
 	auto offset = 0;
 	while (true) {
@@ -951,7 +951,7 @@ auto HtmlWriter::Wrap::pushMessage(
 			dialog,
 			basePath,
 			"This message is not supported by this version "
-			"of Telegram Desktop. Please update the application.") };
+			"of Bettergram. Please update the application.") };
 	}
 
 	const auto wrapReplyToLink = [&](const QByteArray &text) {

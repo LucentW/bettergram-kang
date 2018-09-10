@@ -2119,7 +2119,7 @@ void UpdateApplication() {
 #elif defined OS_MAC_STORE // OS_WIN_STORE
 			return "https://itunes.apple.com/us/app/bettergram-crypto-chat-app/id1419951099";
 #else // OS_WIN_STORE || OS_MAC_STORE
-			return "https://desktop.telegram.org";
+			return "https://bettergram.io";
 #endif // OS_WIN_STORE || OS_MAC_STORE
 		}();
 		UrlClickHandler::Open(url);
@@ -2144,7 +2144,7 @@ QString countBetaVersionSignature(uint64 version) { // duplicated in packer.cpp
 		return QString();
 	}
 
-	QByteArray signedData = (qstr("TelegramBeta_") + QString::number(version, 16).toLower()).toUtf8();
+	QByteArray signedData = (qstr("BettergramBeta_") + QString::number(version, 16).toLower()).toUtf8();
 
 	static const int32 shaSize = 20, keySize = 128;
 

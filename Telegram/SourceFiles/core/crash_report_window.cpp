@@ -482,12 +482,12 @@ void LastCrashedWindow::onCheckingFinished() {
 	LOG(("Crash report check for sending done, result: %1").arg(QString::fromUtf8(result)));
 
 	if (result == "Old") {
-		_pleaseSendReport.setText(qsl("This report is about some old version of Telegram Desktop."));
+		_pleaseSendReport.setText(qsl("This report is about some old version of Bettergram."));
 		_sendingState = SendingTooOld;
 		updateControls();
 		return;
 	} else if (result == "Unofficial") {
-		_pleaseSendReport.setText(qsl("You use some custom version of Telegram Desktop."));
+		_pleaseSendReport.setText(qsl("You use some custom version of Bettergram."));
 		_sendingState = SendingUnofficial;
 		updateControls();
 		return;
