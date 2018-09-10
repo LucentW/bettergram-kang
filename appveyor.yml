@@ -5,7 +5,7 @@ deploy: off
 
 environment:
   matrix:
-   - BUILD_VERSION: disable_crash_reports,disable_autoupdate
+   - BUILD_VERSION: disable_crash_reports
 
 install:
   - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/secure-file/master/install.ps1'))
@@ -20,9 +20,14 @@ before_build:
 
 build:
   project: Telegram\Telegram.sln
+  
+configuration:
+  - Release
 
 artifacts:
-  - path: out\Debug\Bettergram.exe
-    name: BettergramKang.exe
-  - path: out\Debug\Bettergram.exe.pdb
-    name: BettergramKang.exe.pdb
+  - path: out\Release\Bettergram.exe
+    name: BettergramKang
+    
+  - path: out\Release\Bettergram.exe.pdb
+    name: Symbols
+    type: zip
