@@ -5034,17 +5034,16 @@ void MainWidget::feedUpdate(const MTPUpdate &update) {
 		const auto &d = update.c_updateDialogPinned();
 		switch (d.vpeer.type()) {
 		case mtpc_dialogPeer: {
-			//In Bettergram we should not send or receive pin information
-			//const auto peerId = peerFromMTP(d.vpeer.c_dialogPeer().vpeer);
-			//if (const auto history = App::historyLoaded(peerId)) {
-			//	Auth().data().setPinnedDialog(history, d.is_pinned());
-			//} else {
-			//	DEBUG_LOG(("API Error: "
-			//		"pinned chat not loaded for peer %1"
-			//		).arg(peerId
-			//		));
-			//	_dialogs->loadPinnedDialogs();
-			//}
+			const auto peerId = peerFromMTP(d.vpeer.c_dialogPeer().vpeer);
+			if (const auto history = App::historyLoaded(peerId)) {
+				Auth().data().setPinnedDialog(history, d.is_pinned());
+			} else {
+				DEBUG_LOG(("API Error: "
+					"pinned chat not loaded for peer %1"
+					).arg(peerId
+					));
+				_dialogs->loadPinnedDialogs();
+			}
 		} break;
 		//case mtpc_dialogPeerFeed: { // #feed
 		//	const auto feedId = d.vpeer.c_dialogPeerFeed().vfeed_id.v;

@@ -584,52 +584,46 @@ void Session::insertPinnedDialog(const Dialogs::Key &key, int pinnedIndex) {
 }
 
 void Session::applyPinnedDialogs(const QVector<MTPDialog> &list) {
-	//In Bettergram we should not send or receive pin information
-	Q_UNUSED(list)
+	clearPinnedDialogs();
+	for (auto i = list.size(); i != 0;) {
+		const auto &dialog = list[--i];
+		switch (dialog.type()) {
+		case mtpc_dialog: {
+			const auto &dialogData = dialog.c_dialog();
+			if (const auto peer = peerFromMTP(dialogData.vpeer)) {
+				setPinnedDialog(App::history(peer), true);
+			}
+		} break;
 
-	//clearPinnedDialogs();
-	//for (auto i = list.size(); i != 0;) {
-	//	const auto &dialog = list[--i];
-	//	switch (dialog.type()) {
-	//	case mtpc_dialog: {
-	//		const auto &dialogData = dialog.c_dialog();
-	//		if (const auto peer = peerFromMTP(dialogData.vpeer)) {
-	//			setPinnedDialog(App::history(peer), true);
-	//		}
-	//	} break;
+		//case mtpc_dialogFeed: { // #feed
+		//	const auto &feedData = dialog.c_dialogFeed();
+		//	const auto feedId = feedData.vfeed_id.v;
+		//	setPinnedDialog(feed(feedId), true);
+		//} break;
 
-	//	//case mtpc_dialogFeed: { // #feed
-	//	//	const auto &feedData = dialog.c_dialogFeed();
-	//	//	const auto feedId = feedData.vfeed_id.v;
-	//	//	setPinnedDialog(feed(feedId), true);
-	//	//} break;
-
-	//	default: Unexpected("Type in ApiWrap::applyDialogsPinned.");
-	//	}
-	//}
+		default: Unexpected("Type in ApiWrap::applyDialogsPinned.");
+		}
+	}
 }
 
 void Session::applyPinnedDialogs(const QVector<MTPDialogPeer> &list) {
-	//In Bettergram we should not send or receive pin information
-	Q_UNUSED(list)
-
-	//clearPinnedDialogs();
-	//for (auto i = list.size(); i != 0;) {
-	//	const auto &dialogPeer = list[--i];
-	//	switch (dialogPeer.type()) {
-	//	case mtpc_dialogPeer: {
-	//		const auto &peerData = dialogPeer.c_dialogPeer();
-	//		if (const auto peerId = peerFromMTP(peerData.vpeer)) {
-	//			setPinnedDialog(App::history(peerId), true);
-	//		}
-	//	} break;
-	//	//case mtpc_dialogPeerFeed: { // #feed
-	//	//	const auto &feedData = dialogPeer.c_dialogPeerFeed();
-	//	//	const auto feedId = feedData.vfeed_id.v;
-	//	//	setPinnedDialog(feed(feedId), true);
-	//	//} break;
-	//	}
-	//}
+	clearPinnedDialogs();
+	for (auto i = list.size(); i != 0;) {
+		const auto &dialogPeer = list[--i];
+		switch (dialogPeer.type()) {
+		case mtpc_dialogPeer: {
+			const auto &peerData = dialogPeer.c_dialogPeer();
+			if (const auto peerId = peerFromMTP(peerData.vpeer)) {
+				setPinnedDialog(App::history(peerId), true);
+			}
+		} break;
+		//case mtpc_dialogPeerFeed: { // #feed
+		//	const auto &feedData = dialogPeer.c_dialogPeerFeed();
+		//	const auto feedId = feedData.vfeed_id.v;
+		//	setPinnedDialog(feed(feedId), true);
+		//} break;
+		}
+	}
 }
 
 int Session::pinnedDialogsCount() const {
