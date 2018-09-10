@@ -32,15 +32,18 @@ extern "C" {
 #endif // else of Q_OS_WIN
 
 namespace Core {
-
-#ifndef TDESKTOP_DISABLE_AUTOUPDATE
-
 namespace {
 
 constexpr auto kUpdaterTimeout = 10 * TimeMs(1000);
 constexpr auto kMaxResponseSize = 1024 * 1024;
 constexpr auto kMaxUpdateSize = 256 * 1024 * 1024;
 constexpr auto kChunkSize = 128 * 1024;
+
+#ifdef TDESKTOP_DISABLE_AUTOUPDATE
+bool UpdaterIsDisabled = true;
+#else // TDESKTOP_DISABLE_AUTOUPDATE
+bool UpdaterIsDisabled = false;
+#endif // TDESKTOP_DISABLE_AUTOUPDATE
 
 std::weak_ptr<Updater> UpdaterInstance;
 
@@ -1464,7 +1467,7 @@ auto MtpChecker::parseFile(const MTPmessages_Messages &result) const
 	const auto location = MTP_inputDocumentFileLocation(
 		fields.vid,
 		fields.vaccess_hash,
-		fields.vversion);
+		fields.vfile_reference);
 	return ParsedFile { name, size, fields.vdc_id.v, location };
 }
 
@@ -1559,6 +1562,16 @@ Fn<void(const RPCError &)> MtpLoader::failHandler() {
 }
 
 } // namespace
+
+bool UpdaterDisabled() {
+	return UpdaterIsDisabled;
+}
+
+void SetUpdaterDisabledAtStartup() {
+	Expects(UpdaterInstance.lock() == nullptr);
+
+	UpdaterIsDisabled = true;
+}
 
 class Updater : public base::has_weak_ptr {
 public:
@@ -2099,34 +2112,31 @@ bool checkReadyUpdate() {
 }
 
 void UpdateApplication() {
-	cSetLastUpdateCheck(0);
-	Core::UpdateChecker().start();
-	if (const auto window = App::wnd()) {
-		auto settings = Box<Settings::Widget>();
-		const auto weak = make_weak(settings.data());
-		window->showSpecialLayer(std::move(settings), anim::type::normal);
-		if (weak) {
-			weak->scrollToUpdateRow();
+	if (UpdaterDisabled()) {
+		const auto url = [&] {
+#ifdef OS_WIN_STORE
+			return "https://www.microsoft.com/en-us/store/p/telegram-desktop/9nztwsqntd0s";
+#elif defined OS_MAC_STORE // OS_WIN_STORE
+			return "https://itunes.apple.com/us/app/bettergram-crypto-chat-app/id1419951099";
+#else // OS_WIN_STORE || OS_MAC_STORE
+			return "https://desktop.telegram.org";
+#endif // OS_WIN_STORE || OS_MAC_STORE
+		}();
+		UrlClickHandler::Open(url);
+	} else {
+		cSetLastUpdateCheck(0);
+		Core::UpdateChecker().start();
+		if (const auto window = App::wnd()) {
+			auto settings = Box<Settings::Widget>();
+			const auto weak = make_weak(settings.data());
+			window->showSpecialLayer(std::move(settings), anim::type::normal);
+			if (weak) {
+				weak->scrollToUpdateRow();
+			}
+			window->showFromTray();
 		}
 	}
 }
-
-#else // !TDESKTOP_DISABLE_AUTOUPDATE
-
-void UpdateApplication() {
-	const auto url = [&] {
-#ifdef OS_WIN_STORE
-		return "https://www.microsoft.com/en-us/store/p/telegram-desktop/9nztwsqntd0s";
-#elif defined OS_MAC_STORE // OS_WIN_STORE
-		return "https://itunes.apple.com/us/app/bettergram-crypto-chat-app/id1419951099";
-#else // OS_WIN_STORE || OS_MAC_STORE
-		return "https://desktop.telegram.org";
-#endif // OS_WIN_STORE || OS_MAC_STORE
-	}();
-	UrlClickHandler::doOpen(url);
-}
-
-#endif // !TDESKTOP_DISABLE_AUTOUPDATE
 
 QString countBetaVersionSignature(uint64 version) { // duplicated in packer.cpp
 	if (cBetaPrivateKey().isEmpty()) {

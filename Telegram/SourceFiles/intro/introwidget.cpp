@@ -84,20 +84,20 @@ Widget::Widget(QWidget *parent) : RpWidget(parent)
 
 	cSetPasswordRecovered(false);
 
-#ifndef TDESKTOP_DISABLE_AUTOUPDATE
-	Core::UpdateChecker checker;
-	checker.isLatest() | rpl::start_with_next([=] {
+	if (!Core::UpdaterDisabled()) {
+		Core::UpdateChecker checker;
+		checker.isLatest() | rpl::start_with_next([=] {
+			onCheckUpdateStatus();
+		}, lifetime());
+		checker.failed() | rpl::start_with_next([=] {
+			onCheckUpdateStatus();
+		}, lifetime());
+		checker.ready() | rpl::start_with_next([=] {
+			onCheckUpdateStatus();
+		}, lifetime());
+		checker.start();
 		onCheckUpdateStatus();
-	}, lifetime());
-	checker.failed() | rpl::start_with_next([=] {
-		onCheckUpdateStatus();
-	}, lifetime());
-	checker.ready() | rpl::start_with_next([=] {
-		onCheckUpdateStatus();
-	}, lifetime());
-	checker.start();
-	onCheckUpdateStatus();
-#endif // !TDESKTOP_DISABLE_AUTOUPDATE
+	}
 }
 
 void Widget::setupConnectingWidget() {
@@ -136,6 +136,7 @@ void Widget::createLanguageLink() {
 		createLink(Lang::GetOriginalValue(lng_switch_to_this), defaultId);
 	} else if (!suggestedId.isEmpty() && suggestedId != currentId) {
 		request(MTPlangpack_GetStrings(
+			MTP_string(Lang::CloudLangPackName()),
 			MTP_string(suggestedId),
 			MTP_vector<MTPstring>(1, MTP_string("lng_switch_to_this"))
 		)).done([=](const MTPVector<MTPLangPackString> &result) {
@@ -148,8 +149,9 @@ void Widget::createLanguageLink() {
 	}
 }
 
-#ifndef TDESKTOP_DISABLE_AUTOUPDATE
 void Widget::onCheckUpdateStatus() {
+	Expects(!Core::UpdaterDisabled());
+
 	if (Core::UpdateChecker().state() == Core::UpdateChecker::State::Ready) {
 		if (_update) return;
 		_update.create(
@@ -173,7 +175,6 @@ void Widget::onCheckUpdateStatus() {
 	}
 	updateControlsGeometry();
 }
-#endif // TDESKTOP_DISABLE_AUTOUPDATE
 
 void Widget::setInnerFocus() {
 	if (getStep()->animating()) {

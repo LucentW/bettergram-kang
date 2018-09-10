@@ -1548,7 +1548,7 @@ void DialogsInner::contextMenuEvent(QContextMenuEvent *e) {
 		mousePressReleased(_pressButton);
 	}
 
-	_menu = base::make_unique_q<Ui::PopupMenu>(nullptr);
+	_menu = base::make_unique_q<Ui::PopupMenu>(this);
 	if (const auto history = key.history()) {
 		Window::FillPeerMenu(
 			_controller,
@@ -1818,9 +1818,9 @@ void DialogsInner::applyDialog(const MTPDdialog &dialog) {
 	history->applyDialog(dialog);
 
 	if (!history->useProxyPromotion() && !history->isPinnedDialog()) {
-		const auto date = history->chatsListDate();
-		if (!date.isNull()) {
-			addSavedPeersAfter(date);
+		const auto date = history->chatsListTimeId();
+		if (date != 0) {
+			addSavedPeersAfter(ParseDateTime(date));
 		}
 	}
 	_contactsNoDialogs->del(history);
@@ -1852,7 +1852,7 @@ void DialogsInner::addSavedPeersAfter(const QDateTime &date) {
 	auto &saved = cRefSavedPeersByTime();
 	while (!saved.isEmpty() && (date.isNull() || date < saved.lastKey())) {
 		const auto history = App::history(saved.last()->id);
-		history->setChatsListDate(saved.lastKey());
+		history->setChatsListTimeId(ServerTimeFromParsed(saved.lastKey()));
 		_contactsNoDialogs->del(history);
 		saved.remove(saved.lastKey(), saved.last());
 	}

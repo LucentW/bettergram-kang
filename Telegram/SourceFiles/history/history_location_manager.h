@@ -70,7 +70,7 @@ struct LocationData {
 	ImagePtr thumb;
 	bool loading;
 
-	void load();
+	void load(Data::FileOrigin origin);
 };
 
 class LocationClickHandler : public ClickHandler {
@@ -79,7 +79,7 @@ public:
 		setup();
 	}
 
-	void onClick(Qt::MouseButton button) const override;
+	void onClick(ClickContext context) const override;
 
 	QString tooltip() const override {
 		return QString();

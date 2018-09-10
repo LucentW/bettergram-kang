@@ -100,9 +100,9 @@ void activateBotCommand(
 			}
 		}
 		if (skipConfirmation) {
-			UrlClickHandler::doOpen(url);
+			UrlClickHandler::Open(url);
 		} else {
-			HiddenUrlClickHandler::doOpen(url);
+			HiddenUrlClickHandler::Open(url);
 		}
 	} break;
 
@@ -177,10 +177,14 @@ void showSettings() {
 	}
 }
 
-void activateClickHandler(ClickHandlerPtr handler, Qt::MouseButton button) {
-	crl::on_main(wnd(), [handler, button] {
-		handler->onClick(button);
+void activateClickHandler(ClickHandlerPtr handler, ClickContext context) {
+	crl::on_main(wnd(), [=] {
+		handler->onClick(context);
 	});
+}
+
+void activateClickHandler(ClickHandlerPtr handler, Qt::MouseButton button) {
+	activateClickHandler(handler, ClickContext{ button });
 }
 
 } // namespace App
@@ -199,15 +203,17 @@ void showBox(
 
 } // namespace internal
 
-void showMediaPreview(DocumentData *document) {
+void showMediaPreview(
+		Data::FileOrigin origin,
+		not_null<DocumentData*> document) {
 	if (auto w = App::wnd()) {
-		w->ui_showMediaPreview(document);
+		w->ui_showMediaPreview(origin, document);
 	}
 }
 
-void showMediaPreview(PhotoData *photo) {
+void showMediaPreview(Data::FileOrigin origin, not_null<PhotoData*> photo) {
 	if (auto w = App::wnd()) {
-		w->ui_showMediaPreview(photo);
+		w->ui_showMediaPreview(origin, photo);
 	}
 }
 

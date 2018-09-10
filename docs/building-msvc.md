@@ -47,10 +47,13 @@ All commands will be launched from **x86 Native Tools Command Prompt for VS 2017
 
 Open **x86 Native Tools Command Prompt for VS 2017.bat**, go to ***BuildPath*** and run
 
-    cd ThirdParty
-    git clone https://chromium.googlesource.com/external/gyp
-    cd gyp
-    git checkout a478c1ab51
+```
+cd ThirdParty
+git clone https://chromium.googlesource.com/external/gyp
+cd gyp
+git checkout a478c1ab51
+```
+
 then close the window
 
 Add **GYP**, **Ninja** and **Perl** to your PATH:
@@ -68,9 +71,11 @@ If you have installed it in the ***BuildPath*** directory, then add ***BuildPath
 
 Open **x86 Native Tools Command Prompt for VS 2017.bat**, go to ***BuildPath*** and run:
 
-    git clone --recursive https://github.com/bettergram/bettergram.git
-    copy bettergram\build_bettergram.bat .
-    build_bettergram
+```
+git clone --recursive https://github.com/bettergram/bettergram.git
+copy bettergram\build_bettergram.bat .
+build_bettergram
+```
 
 ## Build the project
 

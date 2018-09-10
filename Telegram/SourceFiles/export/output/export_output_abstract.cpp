@@ -19,8 +19,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 namespace Export {
 namespace Output {
 
-QString NormalizePath(const QString &source) {
-	QDir folder(source);
+QString NormalizePath(const Settings &settings) {
+	QDir folder(settings.path);
 	const auto path = folder.absolutePath();
 	auto result = path.endsWith('/') ? path : (path + '/');
 	if (!folder.exists()) {
@@ -32,7 +32,9 @@ QString NormalizePath(const QString &source) {
 		return result;
 	}
 	const auto date = QDate::currentDate();
-	const auto base = QString("DataExport_%1_%2_%3"
+	const auto base = QString(settings.onlySinglePeer()
+		? "ChatExport_%1_%2_%3"
+		: "DataExport_%1_%2_%3"
 	).arg(date.day(), 2, 10, QChar('0')
 	).arg(date.month(), 2, 10, QChar('0')
 	).arg(date.year());
@@ -56,19 +58,11 @@ std::unique_ptr<AbstractWriter> CreateWriter(Format format) {
 	Unexpected("Format in Export::Output::CreateWriter.");
 }
 
-Stats AbstractWriter::produceTestExample(const QString &path) {
+Stats AbstractWriter::produceTestExample(
+		const QString &path,
+		const Environment &environment) {
 	auto result = Stats();
 	const auto folder = QDir(path).absolutePath();
-	auto environment = Environment();
-	environment.internalLinksDomain = "https://t.me/";
-	environment.aboutTelegram = "About Telegram";
-	environment.aboutContacts = "About contacts";
-	environment.aboutFrequent = "About frequent";
-	environment.aboutSessions = "About sessions";
-	environment.aboutWebSessions = "About web sessions";
-	environment.aboutChats = "About chats";
-	environment.aboutLeftChats = "About left chats";
-
 	auto settings = Settings();
 	settings.format = format();
 	settings.path = (folder.endsWith('/') ? folder : (folder + '/'))
@@ -205,7 +199,11 @@ Stats AbstractWriter::produceTestExample(const QString &path) {
 		message.id = counter();
 		message.date = prevdate();
 		message.edited = date();
-		message.forwardedFromId = user.info.userId;
+		static auto count = 0;
+		if (++count % 3 == 0) {
+			message.forwardedFromId = Data::UserPeerId(user.info.userId);
+			message.forwardedDate = date();
+		}
 		message.fromId = user.info.userId;
 		message.replyToMsgId = counter();
 		message.viaBotId = bot.info.userId;
@@ -471,8 +469,8 @@ Stats AbstractWriter::produceTestExample(const QString &path) {
 	dialogChat.splits.push_back(1);
 	dialogChat.topMessageDate = sliceChat2.list.back().date;
 	dialogChat.topMessageId = sliceChat2.list.back().id;
-	dialogs.list.push_back(dialogBot);
-	dialogs.list.push_back(dialogChat);
+	dialogs.chats.push_back(dialogBot);
+	dialogs.chats.push_back(dialogChat);
 
 	check(writeDialogsStart(dialogs));
 	check(writeDialogStart(dialogBot));
@@ -485,14 +483,10 @@ Stats AbstractWriter::produceTestExample(const QString &path) {
 	check(writeDialogEnd());
 	check(writeDialogsEnd());
 
-	check(writeLeftChannelsStart(Data::DialogsInfo()));
-	check(writeLeftChannelsEnd());
-
 	check(finish());
 
 	return result;
 }
-
 
 } // namespace Output
 } // namespace Export

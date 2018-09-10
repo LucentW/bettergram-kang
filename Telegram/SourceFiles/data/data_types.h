@@ -8,6 +8,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #pragma once
 
 #include "base/value_ordering.h"
+#include "ui/text/text.h" // For QFIXED_MAX
 
 class HistoryItem;
 using HistoryItemsList = std::vector<not_null<HistoryItem*>>;
@@ -205,6 +206,8 @@ struct FullMsgId {
 	MsgId msg = 0;
 
 };
+
+Q_DECLARE_METATYPE(FullMsgId);
 
 using MessageIdsList = std::vector<FullMsgId>;
 

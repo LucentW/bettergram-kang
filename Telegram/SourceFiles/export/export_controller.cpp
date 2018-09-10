@@ -15,12 +15,27 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "export/output/export_output_stats.h"
 
 namespace Export {
+namespace {
 
-auto kNullStateCallback = [](ProcessingState&) {};
+const auto kNullStateCallback = [](ProcessingState&) {};
+
+Settings NormalizeSettings(const Settings &settings) {
+	if (!settings.onlySinglePeer()) {
+		return base::duplicate(settings);
+	}
+	auto result = base::duplicate(settings);
+	result.format = Output::Format::Html;
+	result.types = result.fullChats = Settings::Type::AnyChatsMask;
+	return result;
+}
+
+} // namespace
 
 class Controller {
 public:
-	Controller(crl::weak_on_queue<Controller> weak);
+	Controller(
+		crl::weak_on_queue<Controller> weak,
+		const MTPInputPeer &peer);
 
 	rpl::producer<State> state() const;
 
@@ -54,7 +69,6 @@ private:
 	void exportNext();
 	void initialize();
 	void initialized(const ApiWrap::StartInfo &info);
-	void collectLeftChannels();
 	void collectDialogsList();
 	void exportPersonalInfo();
 	void exportUserpics();
@@ -63,42 +77,30 @@ private:
 	void exportOtherData();
 	void exportDialogs();
 	void exportNextDialog();
-	void exportLeftChannels();
-	void exportNextLeftChannel();
 
 	template <typename Callback = const decltype(kNullStateCallback) &>
 	ProcessingState prepareState(
 		Step step,
 		Callback &&callback = kNullStateCallback) const;
 	ProcessingState stateInitializing() const;
-	ProcessingState stateLeftChannelsList(int processed) const;
 	ProcessingState stateDialogsList(int processed) const;
 	ProcessingState statePersonalInfo() const;
 	ProcessingState stateUserpics(const DownloadProgress &progress) const;
 	ProcessingState stateContacts() const;
 	ProcessingState stateSessions() const;
 	ProcessingState stateOtherData() const;
-	ProcessingState stateLeftChannels(
-		const DownloadProgress &progress) const;
 	ProcessingState stateDialogs(const DownloadProgress &progress) const;
 	void fillMessagesState(
 		ProcessingState &result,
 		const Data::DialogsInfo &info,
 		int index,
-		const DownloadProgress &progress,
-		int addIndex,
-		int addCount) const;
+		const DownloadProgress &progress) const;
 
 	int substepsInStep(Step step) const;
-
-	bool normalizePath();
 
 	ApiWrap _api;
 	Settings _settings;
 	Environment _environment;
-
-	Data::DialogsInfo _leftChannelsInfo;
-	int _leftChannelIndex = -1;
 
 	Data::DialogsInfo _dialogsInfo;
 	int _dialogIndex = -1;
@@ -128,7 +130,9 @@ private:
 
 };
 
-Controller::Controller(crl::weak_on_queue<Controller> weak)
+Controller::Controller(
+	crl::weak_on_queue<Controller> weak,
+	const MTPInputPeer &peer)
 : _api(weak.runner())
 , _state(PasswordCheckState{}) {
 	_api.errors(
@@ -145,6 +149,7 @@ Controller::Controller(crl::weak_on_queue<Controller> weak)
 	auto state = PasswordCheckState();
 	state.checked = false;
 	state.requesting = false;
+	state.singlePeer = peer;
 	setState(std::move(state));
 }
 
@@ -229,10 +234,10 @@ void Controller::startExport(
 	if (!_settings.path.isEmpty()) {
 		return;
 	}
-	_settings = base::duplicate(settings);
+	_settings = NormalizeSettings(settings);
 	_environment = environment;
 
-	_settings.path = Output::NormalizePath(_settings.path);
+	_settings.path = Output::NormalizePath(_settings);
 	_writer = Output::CreateWriter(_settings.format);
 	fillExportSteps();
 	exportNext();
@@ -241,9 +246,6 @@ void Controller::startExport(
 void Controller::fillExportSteps() {
 	using Type = Settings::Type;
 	_steps.push_back(Step::Initializing);
-	if (_settings.types & Type::GroupsChannelsMask) {
-		_steps.push_back(Step::LeftChannelsList);
-	}
 	if (_settings.types & Type::AnyChatsMask) {
 		_steps.push_back(Step::DialogsList);
 	}
@@ -265,9 +267,6 @@ void Controller::fillExportSteps() {
 	if (_settings.types & Type::AnyChatsMask) {
 		_steps.push_back(Step::Dialogs);
 	}
-	if (_settings.types & Type::GroupsChannelsMask) {
-		_steps.push_back(Step::LeftChannels);
-	}
 }
 
 void Controller::fillSubstepsInSteps(const ApiWrap::StartInfo &info) {
@@ -280,9 +279,6 @@ void Controller::fillSubstepsInSteps(const ApiWrap::StartInfo &info) {
 		result[index] = count;
 	};
 	push(Step::Initializing, 1);
-	if (_settings.types & Settings::Type::GroupsChannelsMask) {
-		push(Step::LeftChannelsList, 1);
-	}
 	if (_settings.types & Settings::Type::AnyChatsMask) {
 		push(Step::DialogsList, 1);
 	}
@@ -300,9 +296,6 @@ void Controller::fillSubstepsInSteps(const ApiWrap::StartInfo &info) {
 	}
 	if (_settings.types & Settings::Type::OtherData) {
 		push(Step::OtherData, 1);
-	}
-	if (_settings.types & Settings::Type::GroupsChannelsMask) {
-		push(Step::LeftChannels, info.leftChannelsCount);
 	}
 	if (_settings.types & Settings::Type::AnyChatsMask) {
 		push(Step::Dialogs, info.dialogsCount);
@@ -330,14 +323,12 @@ void Controller::exportNext() {
 	const auto step = _steps[_stepIndex];
 	switch (step) {
 	case Step::Initializing: return initialize();
-	case Step::LeftChannelsList: return collectLeftChannels();
 	case Step::DialogsList: return collectDialogsList();
 	case Step::PersonalInfo: return exportPersonalInfo();
 	case Step::Userpics: return exportUserpics();
 	case Step::Contacts: return exportContacts();
 	case Step::Sessions: return exportSessions();
 	case Step::OtherData: return exportOtherData();
-	case Step::LeftChannels: return exportLeftChannels();
 	case Step::Dialogs: return exportDialogs();
 	}
 	Unexpected("Step in Controller::exportNext.");
@@ -356,17 +347,6 @@ void Controller::initialized(const ApiWrap::StartInfo &info) {
 	}
 	fillSubstepsInSteps(info);
 	exportNext();
-}
-
-void Controller::collectLeftChannels() {
-	setState(stateLeftChannelsList(0));
-	_api.requestLeftChannelsList([=](int count) {
-		setState(stateLeftChannelsList(count));
-		return true;
-	}, [=](Data::DialogsInfo &&result) {
-		_leftChannelsInfo = std::move(result);
-		exportNext();
-	});
 }
 
 void Controller::collectDialogsList() {
@@ -457,9 +437,9 @@ void Controller::exportDialogs() {
 
 void Controller::exportNextDialog() {
 	const auto index = ++_dialogIndex;
-	if (index < _dialogsInfo.list.size()) {
-		const auto &info = _dialogsInfo.list[index];
-		_api.requestMessages(info, [=](const Data::DialogInfo &info) {
+	const auto info = _dialogsInfo.item(index);
+	if (info) {
+		_api.requestMessages(*info, [=](const Data::DialogInfo &info) {
 			if (ioCatchError(_writer->writeDialogStart(info))) {
 				return false;
 			}
@@ -493,52 +473,6 @@ void Controller::exportNextDialog() {
 	exportNext();
 }
 
-void Controller::exportLeftChannels() {
-	if (ioCatchError(_writer->writeLeftChannelsStart(_leftChannelsInfo))) {
-		return;
-	}
-
-	exportNextLeftChannel();
-}
-
-void Controller::exportNextLeftChannel() {
-	const auto index = ++_leftChannelIndex;
-	if (index < _leftChannelsInfo.list.size()) {
-		const auto &info = _leftChannelsInfo.list[index];
-		_api.requestMessages(info, [=](const Data::DialogInfo &info) {
-			if (ioCatchError(_writer->writeLeftChannelStart(info))) {
-				return false;
-			}
-			_messagesWritten = 0;
-			_messagesCount = ranges::accumulate(
-				info.messagesCountPerSplit,
-				0);
-			setState(stateLeftChannels(DownloadProgress()));
-			return true;
-		}, [=](DownloadProgress progress) {
-			setState(stateLeftChannels(progress));
-			return true;
-		}, [=](Data::MessagesSlice &&result) {
-			if (ioCatchError(_writer->writeLeftChannelSlice(result))) {
-				return false;
-			}
-			_messagesWritten += result.list.size();
-			setState(stateLeftChannels(DownloadProgress()));
-			return true;
-		}, [=] {
-			if (ioCatchError(_writer->writeLeftChannelEnd())) {
-				return;
-			}
-			exportNextLeftChannel();
-		});
-		return;
-	}
-	if (ioCatchError(_writer->writeLeftChannelsEnd())) {
-		return;
-	}
-	exportNext();
-}
-
 template <typename Callback>
 ProcessingState Controller::prepareState(
 		Step step,
@@ -561,22 +495,11 @@ ProcessingState Controller::stateInitializing() const {
 	return ProcessingState();
 }
 
-ProcessingState Controller::stateLeftChannelsList(int processed) const {
-	return prepareState(Step::LeftChannelsList, [&](
-			ProcessingState &result) {
-		result.entityIndex = processed;
-		result.entityCount = std::max(
-			processed,
-			substepsInStep(Step::LeftChannels))
-			+ substepsInStep(Step::Dialogs);
-	});
-}
-
 ProcessingState Controller::stateDialogsList(int processed) const {
 	const auto step = Step::DialogsList;
 	return prepareState(step, [&](ProcessingState &result) {
-		result.entityIndex = substepsInStep(Step::LeftChannels) + processed;
-		result.entityCount = substepsInStep(Step::LeftChannels) + std::max(
+		result.entityIndex = processed;
+		result.entityCount = std::max(
 			processed,
 			substepsInStep(Step::Dialogs));
 	});
@@ -612,35 +535,15 @@ ProcessingState Controller::stateOtherData() const {
 	return prepareState(Step::OtherData);
 }
 
-ProcessingState Controller::stateLeftChannels(
-		const DownloadProgress & progress) const {
-	const auto step = Step::LeftChannels;
-	return prepareState(step, [&](ProcessingState &result) {
-		const auto addIndex = _dialogsInfo.list.size();
-		const auto addCount = addIndex;
-		fillMessagesState(
-			result,
-			_leftChannelsInfo,
-			_leftChannelIndex,
-			progress,
-			addIndex,
-			addCount);
-	});
-}
-
 ProcessingState Controller::stateDialogs(
 		const DownloadProgress &progress) const {
 	const auto step = Step::Dialogs;
 	return prepareState(step, [&](ProcessingState &result) {
-		const auto addIndex = 0;
-		const auto addCount = _leftChannelsInfo.list.size();
 		fillMessagesState(
 			result,
 			_dialogsInfo,
 			_dialogIndex,
-			progress,
-			addIndex,
-			addCount);
+			progress);
 	});
 }
 
@@ -648,14 +551,14 @@ void Controller::fillMessagesState(
 		ProcessingState &result,
 		const Data::DialogsInfo &info,
 		int index,
-		const DownloadProgress &progress,
-		int addIndex,
-		int addCount) const {
-	const auto &dialog = info.list[index];
-	result.entityIndex = index + addIndex;
-	result.entityCount = info.list.size() + addCount;
-	result.entityName = dialog.name;
-	result.entityType = (dialog.type == Data::DialogInfo::Type::Self)
+		const DownloadProgress &progress) const {
+	const auto dialog = info.item(index);
+	Assert(dialog != nullptr);
+
+	result.entityIndex = index;
+	result.entityCount = info.chats.size() + info.left.size();
+	result.entityName = dialog->name;
+	result.entityType = (dialog->type == Data::DialogInfo::Type::Self)
 		? ProcessingState::EntityType::SavedMessages
 		: ProcessingState::EntityType::Chat;
 	result.itemIndex = _messagesWritten + progress.itemIndex;
@@ -682,7 +585,7 @@ void Controller::setFinishedState() {
 		_stats.bytesCount() });
 }
 
-ControllerWrap::ControllerWrap() {
+ControllerWrap::ControllerWrap(const MTPInputPeer &peer) : _wrapped(peer) {
 }
 
 rpl::producer<State> ControllerWrap::state() const {

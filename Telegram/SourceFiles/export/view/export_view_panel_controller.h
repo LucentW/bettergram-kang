@@ -19,8 +19,12 @@ class SeparatePanel;
 } // namespace Ui
 
 namespace Export {
+
+struct Environment;
+
 namespace View {
 
+Environment PrepareEnvironment();
 QPointer<BoxContent> SuggestStart();
 void ClearSuggestStart();
 
@@ -46,6 +50,7 @@ public:
 	~PanelController();
 
 private:
+	void fillParams(const PasswordCheckState &state);
 	void stopExport();
 	void createPanel();
 	void updateState(State &&state);

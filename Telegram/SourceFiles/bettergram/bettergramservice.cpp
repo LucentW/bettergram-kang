@@ -68,7 +68,7 @@ void BettergramService::openUrl(const QUrl &url)
 	QString urlString = url.toString();
 
 	if (urlString.startsWith(QLatin1String("tg://"), Qt::CaseInsensitive)) {
-		Messenger::Instance().openLocalUrl(urlString);
+		Messenger::Instance().openLocalUrl(urlString, {});
 	} else {
 		QDesktopServices::openUrl(url);
 	}
@@ -124,7 +124,7 @@ void BettergramService::setIsPaid(bool isPaid)
 	if (_isPaid != isPaid) {
 		// _isPaid = isPaid;
 		_isPaid = true;
-		
+
 		emit isPaidChanged();
 		_isPaidObservable.notify();
 	}
@@ -134,6 +134,7 @@ BettergramService::BillingPlan BettergramService::billingPlan() const
 {
 	// return _billingPlan;
 	return BillingPlan::Yearly;
+
 }
 
 void BettergramService::setBillingPlan(BillingPlan billingPlan)
@@ -437,6 +438,7 @@ void BettergramService::getNextAd(bool reset)
 	// }
 
 	/* KANG: don't dl ads from upstream
+
 	QString url = "https://api.bettergram.io/v1/ads/next";
 
 	if (!reset && !_currentAd->isEmpty()) {
@@ -454,6 +456,7 @@ void BettergramService::getNextAd(bool reset)
 
 	connect(reply, &QNetworkReply::sslErrors,
 			this, &BettergramService::onGetNextAdSslFailed); */
+
 }
 
 void BettergramService::getNextAdLater(bool reset)

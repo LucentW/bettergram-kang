@@ -5,7 +5,7 @@ deploy: off
 
 environment:
   matrix:
-   - BUILD_VERSION: 
+   - BUILD_VERSION: disable_crash_reports,disable_autoupdate
 
 install:
   - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/secure-file/master/install.ps1'))
