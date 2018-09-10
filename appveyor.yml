@@ -26,9 +26,9 @@ build:
 #  - Release
 
 artifacts:
-  - path: out\Release\Bettergram.exe
+  - path: out\Debug\Bettergram.exe
     name: BettergramKang
     
-  - path: out\Release\Bettergram.exe.pdb
+  - path: out\Debug\Bettergram.exe.pdb
     name: Symbols
     type: zip
