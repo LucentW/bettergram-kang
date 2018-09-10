@@ -330,6 +330,7 @@ EditDocumentScheme GetDocumentScheme(
 				}
 				return Result::Shown;
 			};
+			/* KANG FIXME
 			using Row = EditDocumentScheme::Row;
 			auto additional = std::initializer_list<Row>{
 				{
@@ -368,7 +369,7 @@ EditDocumentScheme GetDocumentScheme(
 			};
 			for (auto &row : additional) {
 				result.rows.push_back(std::move(row));
-			}
+			} */
 		}
 		return result;
 	} break;
