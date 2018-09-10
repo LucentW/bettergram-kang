@@ -21,8 +21,9 @@ before_build:
 build:
   project: Telegram\Telegram.sln
   
-configuration:
-  - Release
+# FIXME: fix release build to reduce executable size
+# configuration:
+#  - Release
 
 artifacts:
   - path: out\Release\Bettergram.exe
