@@ -133,8 +133,6 @@ Application::Application(
         LOG(("Connecting local socket to %1...").arg(_localServerName));
 		_localSocket.connectToServer(_localServerName);
 	}
-
-	Bettergram::BettergramService::init();
 }
 
 Application::~Application() = default;
@@ -488,6 +486,8 @@ void launch() {
 	}
 
 	application()->createMessenger();
+
+	Bettergram::BettergramService::init();
 }
 
 void refreshGlobalProxy() {
