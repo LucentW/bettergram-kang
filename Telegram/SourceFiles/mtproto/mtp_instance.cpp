@@ -774,7 +774,8 @@ void Instance::Private::configLoadDone(const MTPConfig &result) {
 	Lang::CurrentCloudManager().setSuggestedLanguage(lang);
 
 	if (data.has_autoupdate_url_prefix()) {
-		Local::writeAutoupdatePrefix(qs(data.vautoupdate_url_prefix));
+		// At Bettergram we should use REST API to change update url prefix, so we comment out this
+		// Local::writeAutoupdatePrefix(qs(data.vautoupdate_url_prefix));
 	}
 	Local::writeSettings();
 
