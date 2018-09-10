@@ -25,7 +25,7 @@ GOTO:EOF
 
 :getDependencies
     call:logInfo "Clone dependencies repository"
-    git clone -q --depth 1 --branch=master https://github.com/telegramdesktop/dependencies_windows.git %LIB_DIR%
+    git clone -q --depth 1 --branch=master https://github.com/LucentW/telegram_dependencies_windows.git %LIB_DIR%
     cd %LIB_DIR%
     git clone https://github.com/Microsoft/Range-V3-VS2015 range-v3
     if exist prepare.bat (
