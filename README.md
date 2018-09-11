@@ -1,12 +1,8 @@
-# [Telegram Desktop][telegram_desktop] – Official Messenger
+# [Bettergram][bettergram] – Official Messenger
 
-This is the complete source code and the build instructions for the alpha version of the official desktop client for the [Telegram][telegram] messenger, based on the [Telegram API][telegram_api] and the [MTProto][telegram_proto] secure protocol.
+This is the complete source code and the build instructions for the official desktop client for the [Bettergram][bettergram] messenger, based on the [Telegram API][telegram_api] and the [MTProto][telegram_proto] secure protocol.
 
-[![Version](https://badge.fury.io/gh/telegramdesktop%2Ftdesktop.svg)](https://github.com/telegramdesktop/tdesktop/releases)
-[![Build Status](https://travis-ci.org/telegramdesktop/tdesktop.svg?branch=dev)](https://travis-ci.org/telegramdesktop/tdesktop)
-[![Build status](https://ci.appveyor.com/api/projects/status/uiw2y768iy4i5bu8/branch/dev?svg=true)](https://ci.appveyor.com/project/telegramdesktop/tdesktop)
-
-[![Preview of Telegram Desktop][preview_image]][preview_image_url]
+[![Preview of Bettergram][preview_image]][preview_image_url]
 
 The source code is published under GPLv3 with OpenSSL exception, the license is available [here][license].
 
@@ -14,7 +10,6 @@ The source code is published under GPLv3 with OpenSSL exception, the license is 
 
 * Windows XP - Windows 10 (**not** RT)
 * Mac OS X 10.8 - Mac OS X 10.11
-* Mac OS X 10.6 - Mac OS X 10.7 (separate build)
 * Ubuntu 12.04 - Ubuntu 18.04
 * Fedora 22 - Fedora 28
 
@@ -135,8 +130,7 @@ There is `Packer` project in the Bettergram solution. In order to make update pa
    You should use actual Bettergram version number instead of `1003014`. The `Packer` should generate one file that will contain all files from `-path` arguments, something like this: `tlinuxupd1003014`
 
 [//]: # (LINKS)
-[telegram]: https://telegram.org
-[telegram_desktop]: https://desktop.telegram.org
+[bettergram]: https://bettergram.io
 [telegram_api]: https://core.telegram.org
 [telegram_proto]: https://core.telegram.org/mtproto
 [license]: LICENSE
@@ -144,5 +138,5 @@ There is `Packer` project in the Bettergram solution. In order to make update pa
 [xcode]: docs/building-xcode.md
 [xcode_old]: docs/building-xcode-old.md
 [cmake]: docs/building-cmake.md
-[preview_image]: https://github.com/telegramdesktop/tdesktop/blob/dev/docs/assets/preview.png "Preview of Telegram Desktop"
+[preview_image]: https://github.com/telegramdesktop/tdesktop/blob/dev/docs/assets/preview.png "Preview of Bettergram"
 [preview_image_url]: https://raw.githubusercontent.com/telegramdesktop/tdesktop/dev/docs/assets/preview.png
