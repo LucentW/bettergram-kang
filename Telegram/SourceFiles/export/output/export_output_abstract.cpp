@@ -171,13 +171,13 @@ Stats AbstractWriter::produceTestExample(
 	auto session = Data::Session();
 	session.applicationName = "Bettergram";
 	session.applicationVersion = "1.3.8";
-	session.country = "GB";
+	session.country = "USA";
 	session.created = date();
 	session.deviceModel = "PC";
 	session.ip = "127.0.0.1";
 	session.lastActive = date();
 	session.platform = "Windows";
-	session.region = "London";
+	session.region = "Wyoming";
 	session.systemVersion = "10";
 	sessions.list.push_back(session);
 	sessions.list.push_back(session);
@@ -189,7 +189,7 @@ Stats AbstractWriter::produceTestExample(
 	webSession.ip = "127.0.0.1";
 	webSession.lastActive = date();
 	webSession.platform = "Windows";
-	webSession.region = "London, GB";
+	webSession.region = "Wyoming, USA";
 	sessions.webList.push_back(webSession);
 	sessions.webList.push_back(webSession);
 	check(writeSessionsList(sessions));
