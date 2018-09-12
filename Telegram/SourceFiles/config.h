@@ -10,6 +10,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "core/version.h"
 #include "settings.h"
 
+#ifndef BETTERGRAM_UPDATES
+#define BETTERGRAM_UPDATES (1)
+#endif
+
 constexpr str_const AppNameOld = "Bettergram Win (Unofficial)";
 constexpr str_const AppName = "Bettergram";
 
@@ -178,6 +182,25 @@ inline int builtInDcsCountIPv6() {
 	return (cTestMode() ? sizeof(_builtInTestDcsIPv6) : sizeof(_builtInDcsIPv6)) / sizeof(BuiltInDc);
 }
 
+#if BETTERGRAM_UPDATES
+// There are original Bettergram updates publc keys
+static const char *UpdatesPublicKey = "\
+-----BEGIN RSA PUBLIC KEY-----\n\
+MIGJAoGBAL2GHOQERRUdN0fhBXPhDgq83wPZIKUi5qevwmiWFZkpUt4d484R+qbf\n\
+eJcvVGN9c4uO7012MhK/X4RqbjPAg7tjzLg6bjtWOvw37TSBBwhNXesUl91WTn8K\n\
+y0P8cZCZKrPfDDTo+vG4X5+pEO4qyn5xuVuakoDwxaEpY2wXIm45AgMBAAE=\n\
+-----END RSA PUBLIC KEY-----\
+";
+
+static const char *UpdatesPublicAlphaKey = "\
+-----BEGIN RSA PUBLIC KEY-----\n\
+MIGJAoGBANVM9KKoX8n6lNzP7+Gmmen4WkbtJi7nuI9nozLDTMQ3IB26rYIfznKx\n\
+Wlx8VJeefeyrnK3usIByRA6cqrknCmJ0hz2/OA0WgK5LD1Y7SzHS66Tvy4VgbOnN\n\
+sG3BEsMXdzcsqvVD7yzmRPEoeZMPzDLqP9nPVBmReQ4lyJ/j8Yq/AgMBAAE=\n\
+-----END RSA PUBLIC KEY-----\
+";
+#else
+// There are original Telegram updates publc keys
 static const char *UpdatesPublicKey = "\
 -----BEGIN RSA PUBLIC KEY-----\n\
 MIGJAoGBAMA4ViQrjkPZ9xj0lrer3r23JvxOnrtE8nI69XLGSr+sRERz9YnUptnU\n\
@@ -193,6 +216,7 @@ MIGJAoGBALWu9GGs0HED7KG7BM73CFZ6o0xufKBRQsdnq3lwA8nFQEvmdu+g/I1j\n\
 w/CVnbwQOw0g5GBwwFV3r0uTTvy44xx8XXxk+Qknu4eBCsmrAFNnAgMBAAE=\n\
 -----END RSA PUBLIC KEY-----\
 ";
+#endif
 
 #ifdef CUSTOM_API_ID
 #include "../../../TelegramPrivate/custom_api_id.h" // Custom API id and API hash

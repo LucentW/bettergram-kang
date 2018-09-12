@@ -24,6 +24,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "lang/lang_cloud_manager.h"
 #include "base/timer.h"
 
+#ifndef BETTERGRAM_UPDATES
+#define BETTERGRAM_UPDATES (1)
+#endif
+
 namespace MTP {
 namespace {
 
@@ -774,8 +778,10 @@ void Instance::Private::configLoadDone(const MTPConfig &result) {
 	Lang::CurrentCloudManager().setSuggestedLanguage(lang);
 
 	if (data.has_autoupdate_url_prefix()) {
-		// At Bettergram we should use REST API to change update url prefix, so we comment out this
-		// Local::writeAutoupdatePrefix(qs(data.vautoupdate_url_prefix));
+		// At Bettergram we should use REST API to change update url prefix
+#if !BETTERGRAM_UPDATES
+		Local::writeAutoupdatePrefix(qs(data.vautoupdate_url_prefix));
+#endif
 	}
 	Local::writeSettings();
 
