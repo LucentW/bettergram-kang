@@ -69,10 +69,13 @@ signals:
 	void billingPlanChanged();
 
 protected:
+	void timerEvent(QTimerEvent *timerEvent) override;
 
 private:
 	static BettergramService *_instance;
 	static const QString _defaultLastUpdateString;
+	static const int _checkForFirstUpdatesDelay;
+	static const int _checkForUpdatesPeriod;
 
 	QNetworkAccessManager _networkManager;
 
@@ -84,8 +87,11 @@ private:
 	RssChannelList *_videoChannelList = nullptr;
 	ResourceGroupList *_resourceGroupList = nullptr;
 	AdItem *_currentAd = nullptr;
+	int _checkForUpdatesTimerId = 0;
 	bool _isWindowActive = true;
 	std::function<void()> _isWindowActiveHandler = nullptr;
+
+	static void checkForNewUpdates();
 
 	base::Observable<void> _isPaidObservable;
 	base::Observable<void> _billingPlanObservable;
