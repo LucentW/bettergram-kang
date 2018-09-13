@@ -201,8 +201,8 @@ EditDocumentScheme GetDocumentScheme(
 				}
 			}();
 		}
-		result.rows = {
-			{
+		result.rows = std::vector<EditDocumentScheme::Row>({
+			EditDocumentScheme::Row({
 				ValueClass::Fields,
 				PanelDetailsType::Text,
 				qsl("first_name"),
@@ -210,8 +210,8 @@ EditDocumentScheme GetDocumentScheme(
 				NameValidate,
 				DontFormat,
 				kMaxNameSize,
-			},
-			{
+			}),
+			EditDocumentScheme::Row({
 				ValueClass::Fields,
 				PanelDetailsType::Text,
 				qsl("middle_name"),
@@ -220,8 +220,8 @@ EditDocumentScheme GetDocumentScheme(
 				DontFormat,
 				kMaxNameSize,
 				qsl("first_name"),
-			},
-			{
+			}),
+			EditDocumentScheme::Row({
 				ValueClass::Fields,
 				PanelDetailsType::Text,
 				qsl("last_name"),
@@ -230,40 +230,40 @@ EditDocumentScheme GetDocumentScheme(
 				DontFormat,
 				kMaxNameSize,
 				qsl("first_name"),
-			},
-			{
+			}),
+			EditDocumentScheme::Row({
 				ValueClass::Fields,
 				PanelDetailsType::Date,
 				qsl("birth_date"),
 				lang(lng_passport_birth_date),
 				DateValidate,
 				DontFormat,
-			},
-			{
+			}),
+			EditDocumentScheme::Row({
 				ValueClass::Fields,
 				PanelDetailsType::Gender,
 				qsl("gender"),
 				lang(lng_passport_gender),
 				GenderValidate,
 				GenderFormat,
-			},
-			{
+			}),
+			EditDocumentScheme::Row({
 				ValueClass::Fields,
 				PanelDetailsType::Country,
 				qsl("country_code"),
 				lang(lng_passport_country),
 				CountryValidate,
 				CountryFormat,
-			},
-			{
+			}),
+			EditDocumentScheme::Row({
 				ValueClass::Fields,
 				PanelDetailsType::Country,
 				qsl("residence_country_code"),
 				lang(lng_passport_residence_country),
 				CountryValidate,
 				CountryFormat,
-			},
-			{
+			}),
+			EditDocumentScheme::Row({
 				ValueClass::Scans,
 				PanelDetailsType::Text,
 				qsl("document_no"),
@@ -271,16 +271,16 @@ EditDocumentScheme GetDocumentScheme(
 				DocumentValidate,
 				DontFormat,
 				kMaxDocumentSize,
-			},
-			{
+			}),
+			EditDocumentScheme::Row({
 				ValueClass::Scans,
 				PanelDetailsType::Date,
 				qsl("expiry_date"),
 				lang(lng_passport_expiry_date),
 				DateOrEmptyValidate,
 				DontFormat,
-			},
-		};
+			}),
+		});
 		if (nativeNames) {
 			result.additionalDependencyKey = qsl("residence_country_code");
 
@@ -332,7 +332,7 @@ EditDocumentScheme GetDocumentScheme(
 			};
 			using Row = EditDocumentScheme::Row;
 			auto additional = std::initializer_list<Row>{
-				{
+				Row({
 					ValueClass::Additional,
 					PanelDetailsType::Text,
 					qsl("first_name_native"),
@@ -342,8 +342,8 @@ EditDocumentScheme GetDocumentScheme(
 					kMaxNameSize,
 					QString(),
 					qsl("first_name"),
-				},
-				{
+				}),
+				Row({
 					ValueClass::Additional,
 					PanelDetailsType::Text,
 					qsl("middle_name_native"),
@@ -353,8 +353,8 @@ EditDocumentScheme GetDocumentScheme(
 					kMaxNameSize,
 					qsl("first_name_native"),
 					qsl("middle_name"),
-				},
-				{
+				}),
+				Row({
 					ValueClass::Additional,
 					PanelDetailsType::Text,
 					qsl("last_name_native"),
@@ -364,7 +364,7 @@ EditDocumentScheme GetDocumentScheme(
 					kMaxNameSize,
 					qsl("first_name_native"),
 					qsl("last_name"),
-				},
+				}),
 			};
 			for (auto &row : additional) {
 				result.rows.push_back(std::move(row));
