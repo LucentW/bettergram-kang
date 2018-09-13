@@ -547,9 +547,10 @@ void RssChannel::load(QSettings &settings)
 
 void RssChannel::save(QSettings &settings)
 {
-	settings.setValue("feedLink", feedLink());
-	settings.setValue("iconLink", iconLink());
-	settings.setValue("link", link());
+	// We have to save QUrl as QString due bug on macOS
+	settings.setValue("feedLink", feedLink().toString());
+	settings.setValue("iconLink", iconLink().toString());
+	settings.setValue("link", link().toString());
 
 	settings.setValue("title", title());
 	settings.setValue("description", description());

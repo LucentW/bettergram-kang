@@ -389,10 +389,11 @@ void RssItem::save(QSettings &settings)
 	settings.setValue("author", author());
 	settings.setValue("categoryList", categoryList());
 
-	settings.setValue("link", link());
-	settings.setValue("commentsLink", commentsLink());
+	// We have to save QUrl as QString due bug on macOS
+	settings.setValue("link", link().toString());
+	settings.setValue("commentsLink", commentsLink().toString());
 	settings.setValue("publishDate", publishDate());
-	settings.setValue("imageLink", _image.link());
+	settings.setValue("imageLink", _image.link().toString());
 
 	settings.setValue("isRead", isRead());
 }
