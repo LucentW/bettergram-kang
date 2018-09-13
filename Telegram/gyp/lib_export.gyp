@@ -20,10 +20,14 @@
       'common.gypi',
       'qt.gypi',
       'telegram_win.gypi',
-      'telegram_mac.gypi',
       'telegram_linux.gypi',
       'pch.gypi',
     ],
+    'conditions': [[ 'build_mac', {
+      'include_dirs': [
+        '/usr/local/include',
+      ]
+	}]],
     'variables': {
       'src_loc': '../SourceFiles',
       'res_loc': '../Resources',
