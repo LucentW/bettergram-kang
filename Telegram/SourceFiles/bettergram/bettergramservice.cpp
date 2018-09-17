@@ -9,6 +9,7 @@
 #include <messenger.h>
 #include <settings.h>
 #include <core/update_checker.h>
+#include <core/click_handler_types.h>
 #include <lang/lang_keys.h>
 #include <styles/style_chat_helpers.h>
 
@@ -75,12 +76,7 @@ QString BettergramService::generateLastUpdateString(const QDateTime &dateTime, b
 void BettergramService::openUrl(const QUrl &url)
 {
 	QString urlString = url.toString();
-
-	if (urlString.startsWith(QLatin1String("tg://"), Qt::CaseInsensitive)) {
-		Messenger::Instance().openLocalUrl(urlString, {});
-	} else {
-		QDesktopServices::openUrl(url);
-	}
+	UrlClickHandler::Open(urlString);
 }
 
 Bettergram::BettergramService::BettergramService(QObject *parent) :
