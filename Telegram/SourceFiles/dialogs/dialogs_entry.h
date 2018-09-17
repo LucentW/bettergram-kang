@@ -59,6 +59,7 @@ public:
 	}
 	int posInChatList(Mode list) const;
 	not_null<Row*> addToChatList(Mode list, not_null<IndexedList*> indexed);
+	void setRowInCurrentTab(Row *row);
 	void removeFromChatList(Mode list, not_null<IndexedList*> indexed);
 	void removeChatListEntryByLetter(Mode list, QChar letter);
 	void addChatListEntryByLetter(
@@ -66,7 +67,7 @@ public:
 		QChar letter,
 		not_null<Row*> row);
 	void updateChatListEntry() const;
-	/// It is workaround to paint correctly.
+	/// It is workaround to paint correctly in Bettergram application.
 	/// Because now we use filtered list of dialogs we recreate Row* instances,
 	/// but the Entry contains old ones.
 	/// It would be cool to remove row pointers from Entry class in the future.
@@ -138,10 +139,13 @@ private:
 	RowsByLetter &chatListLinks(Mode list);
 	const RowsByLetter &chatListLinks(Mode list) const;
 	Row *mainChatListLink(Mode list) const;
+	Row *rowInCurrentTab() const;
 	void loadIsFavorite(uint64 id);
 	void loadPinnedIndex(uint64 id);
 
 	Dialogs::Key _key;
+	/// It is bettergram specific variable, it stores pointer to the appropriate Row in the current Tab
+	Row *_rowInCurrentTab = nullptr;
 	RowsByLetter _chatListLinks[2];
 	uint64 _sortKeyInChatList = 0;
 	int _pinnedIndex = 0;
