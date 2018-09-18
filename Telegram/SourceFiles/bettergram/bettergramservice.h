@@ -35,6 +35,8 @@ public:
 
 	static void openUrl(const QUrl &url);
 
+	static void showBettergramTabs();
+
 	bool isPaid() const;
 	BillingPlan billingPlan() const;
 
@@ -67,6 +69,7 @@ public slots:
 signals:
 	void isPaidChanged();
 	void billingPlanChanged();
+	void needToShowBettergramTabs();
 
 protected:
 	void timerEvent(QTimerEvent *timerEvent) override;

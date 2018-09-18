@@ -80,6 +80,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_profile.h"
 #include "styles/style_chat_helpers.h"
 #include "styles/style_info.h"
+#include "bettergram/bettergramservice.h"
 
 namespace {
 
@@ -581,6 +582,13 @@ HistoryWidget::HistoryWidget(
 	_bettergramTabsToggle->setClickedCallback([this] {
 		toggleBettergramTabsMode();
 	});
+
+	{
+		using namespace Bettergram;
+
+		connect(BettergramService::instance(), &BettergramService::needToShowBettergramTabs,
+				this, &HistoryWidget::toggleBettergramTabsMode);
+	}
 
 	_tabbedSelectorToggle->installEventFilter(_tabbedPanel);
 	_tabbedSelectorToggle->setClickedCallback([this] {

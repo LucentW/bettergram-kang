@@ -79,6 +79,13 @@ void BettergramService::openUrl(const QUrl &url)
 	UrlClickHandler::Open(urlString);
 }
 
+void BettergramService::showBettergramTabs()
+{
+	Q_ASSERT(_instance);
+
+	emit _instance->needToShowBettergramTabs();
+}
+
 Bettergram::BettergramService::BettergramService(QObject *parent) :
 	QObject(parent),
 	_cryptoPriceList(new CryptoPriceList(this)),

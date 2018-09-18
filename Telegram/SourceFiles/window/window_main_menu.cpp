@@ -134,6 +134,11 @@ void MainMenu::refreshMenu() {
 	*_nightThemeAction = action;
 	action->setCheckable(true);
 	action->setChecked(Window::Theme::IsNightMode());
+
+	_menu->addAction(lang(lng_menu_open_bettergram_tabs), [] {
+		Bettergram::BettergramService::showBettergramTabs();
+	}, &st::mainMenuOpenBettergramTabs, &st::mainMenuOpenBettergramTabsOver);
+
 	_menu->finishAnimating();
 
 	updatePhone();

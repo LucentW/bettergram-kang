@@ -15,6 +15,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 "lng_menu_update" = "Update";
 "lng_menu_back" = "Back";
 "lng_menu_night_mode" = "Night Mode";
+"lng_menu_open_bettergram_tabs" = "Open Bettergram Tabs";
 "lng_menu_manage_subscription" = "Manage Subscription";
 "lng_menu_upgrade_to_bettergram_pro" = "Upgrade to Bettergram Pro";
 "lng_menu_bettergram_pro" = "Bettergram Pro";
