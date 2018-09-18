@@ -193,6 +193,16 @@ void RssItem::markAsUnRead()
 	setIsRead(false);
 }
 
+bool RssItem::isExistAtLastFeeds() const
+{
+	return _isExistAtLastFeeds;
+}
+
+void RssItem::setIsExistAtLastFeeds(bool isExistAtLastFeeds)
+{
+	_isExistAtLastFeeds = isExistAtLastFeeds;
+}
+
 bool RssItem::equalsTo(const QSharedPointer<RssItem> &item)
 {
 	return _link == item->link();
@@ -218,6 +228,8 @@ void RssItem::update(const QSharedPointer<RssItem> &item)
 
 		_imageFromSite->setLink(item->_imageFromSite->link());
 	}
+
+	_isExistAtLastFeeds = true;
 
 	// We do not change _isRead field in this method
 }

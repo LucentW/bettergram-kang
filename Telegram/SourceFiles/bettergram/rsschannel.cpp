@@ -315,7 +315,7 @@ void RssChannel::removeOldItems()
 	QDateTime now = QDateTime::currentDateTime();
 
 	for (iterator it = _list.begin(); it < _list.end();) {
-		if ((*it)->isOld()) {
+		if (!(*it)->isExistAtLastFeeds() && (*it)->isOld()) {
 			it = _list.erase(it);
 		} else {
 			++it;
@@ -330,7 +330,10 @@ bool RssChannel::parse()
 	}
 
 	_categoryList.clear();
-	removeOldItems();
+
+	for (QSharedPointer<RssItem> &item : _list) {
+		item->setIsExistAtLastFeeds(false);
+	}
 
 	QXmlStreamReader xml;
 	xml.addData(_source);
@@ -359,6 +362,8 @@ bool RssChannel::parse()
 			.arg(_feedLink.toString())
 			.arg(xml.errorString())
 			.arg(xml.error()));
+	} else {
+		removeOldItems();
 	}
 
 	_lastSourceHash = countSourceHash(_source);
@@ -596,15 +601,9 @@ void RssChannel::merge(const QSharedPointer<RssItem> &item)
 	QSharedPointer<RssItem> existedItem = find(item);
 
 	if (existedItem.isNull()) {
-		if (!item->isOld()) {
-			add(item);
-		}
+		add(item);
 	} else {
-		if (item->isOld()) {
-			_list.removeAll(existedItem);
-		} else {
-			existedItem->update(item);
-		}
+		existedItem->update(item);
 	}
 }
 
@@ -616,6 +615,8 @@ void RssChannel::add(const QSharedPointer<RssItem> &item)
 
 	connect(item.data(), &RssItem::isReadChanged, this, &RssChannel::isReadChanged);
 	connect(item.data(), &RssItem::imageChanged, this, &RssChannel::iconChanged);
+
+	item->setIsExistAtLastFeeds(true);
 
 	_list.push_back(item);
 }

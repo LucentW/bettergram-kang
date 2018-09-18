@@ -50,6 +50,9 @@ public:
 	void markAllNewsAtSiteAsRead();
 	void markAsUnRead();
 
+	bool isExistAtLastFeeds() const;
+	void setIsExistAtLastFeeds(bool isExistAtLastFeeds);
+
 	bool equalsTo(const QSharedPointer<RssItem> &item);
 	void update(const QSharedPointer<RssItem> &item);
 
@@ -93,6 +96,9 @@ private:
 	ImageFromSite *_imageFromSite = nullptr;
 
 	bool _isRead = false;
+
+	/// True if this item exists at the last feeds from sites.
+	bool _isExistAtLastFeeds = true;
 
 	static QString removeHtmlTags(const QString &text);
 
