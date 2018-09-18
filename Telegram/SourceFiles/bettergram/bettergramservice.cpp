@@ -12,6 +12,7 @@
 #include <core/click_handler_types.h>
 #include <lang/lang_keys.h>
 #include <styles/style_chat_helpers.h>
+#include <platform/platform_specific.h>
 
 #include <QTimer>
 #include <QTimerEvent>
@@ -127,6 +128,8 @@ Bettergram::BettergramService::BettergramService(QObject *parent) :
 	QTimer::singleShot(_checkForFirstUpdatesDelay, Qt::VeryCoarseTimer, this, [] { checkForNewUpdates(); });
 
 	_checkForUpdatesTimerId = startTimer(_checkForUpdatesPeriod, Qt::VeryCoarseTimer);
+
+	Platform::RegisterCustomScheme();
 }
 
 bool BettergramService::isPaid() const
