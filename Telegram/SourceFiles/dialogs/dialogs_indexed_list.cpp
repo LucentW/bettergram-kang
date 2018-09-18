@@ -245,12 +245,15 @@ void IndexedList::performFilter()
 
 	if(_filterTypes == EntryType::All)
 	{
-		for (auto it = _list.cbegin(); it != _list.cend(); ++it)
-		{
-			(*it)->key().entry()->setRowInCurrentTab(nullptr);
+		if (_pFiltered) {
+			for (auto it = _list.cbegin(); it != _list.cend(); ++it)
+			{
+				(*it)->key().entry()->setRowInCurrentTab(nullptr);
+			}
+
+			_pFiltered.release();
 		}
 
-		_pFiltered.release();
 		emit performFilterFinished();
 		return;
 	}
