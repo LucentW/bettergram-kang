@@ -484,7 +484,7 @@ struct Data {
 
 	Adaptive::WindowLayout AdaptiveWindowLayout = Adaptive::WindowLayout::Normal;
 	Adaptive::ChatLayout AdaptiveChatLayout = Adaptive::ChatLayout::Normal;
-	bool AdaptiveForWide = true;
+	bool AdaptiveForWide = false;
 	base::Observable<void> AdaptiveChanged;
 
 	bool DialogsModeEnabled = false;
