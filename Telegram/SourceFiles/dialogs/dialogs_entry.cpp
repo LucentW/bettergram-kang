@@ -143,10 +143,9 @@ void Entry::setRowInCurrentTab(Row *row) {
 PositionChange Entry::adjustByPosInChatList(
 		Mode list,
 		not_null<IndexedList*> indexed) {
-	const auto lnk = mainChatListLink(list);
-	const auto movedFrom = lnk->pos();
+	const auto movedFrom = posInChatList(list);
 	indexed->adjustByPos(chatListLinks(list));
-	const auto movedTo = lnk->pos();
+	const auto movedTo = posInChatList(list);
 	return { movedFrom, movedTo };
 }
 
