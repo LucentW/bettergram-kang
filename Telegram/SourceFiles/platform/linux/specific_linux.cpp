@@ -425,7 +425,7 @@ void RegisterCustomScheme() {
 		QDir().mkpath(path);
 		QFile f(file);
 		if (f.open(QIODevice::WriteOnly)) {
-			QString icon = icons + qsl("telegram.png");
+			QString icon = icons + qsl("bettergram.png");
 			auto iconExists = QFile(icon).exists();
 			if (Local::oldSettingsVersion() < 10021 && iconExists) {
 				// Icon was changed.
@@ -447,7 +447,7 @@ void RegisterCustomScheme() {
 			s << "Comment=Bettergram - our free open source improved version of the Telegram desktop app\n";
 			s << "TryExec=" << EscapeShell(QFile::encodeName(cExeDir() + cExeName())) << "\n";
 			s << "Exec=" << EscapeShell(QFile::encodeName(cExeDir() + cExeName())) << " -- %u\n";
-			s << "Icon=telegram\n";
+			s << "Icon=bettergram\n";
 			s << "Terminal=false\n";
 			s << "StartupWMClass=Bettergram\n";
 			s << "Type=Application\n";
@@ -456,9 +456,9 @@ void RegisterCustomScheme() {
 			f.close();
 
 			if (_psRunCommand("desktop-file-install --dir=" + EscapeShell(QFile::encodeName(home + qsl(".local/share/applications"))) + " --delete-original " + EscapeShell(QFile::encodeName(file)))) {
-				DEBUG_LOG(("App Info: removing old .desktop file"));
-				QFile(qsl("%1.local/share/applications/telegram.desktop").arg(home)).remove();
-
+				_psRunCommand("update-desktop-database " + EscapeShell(QFile::encodeName(home + qsl(".local/share/applications"))));
+				_psRunCommand("xdg-mime default bettergram.desktop x-scheme-handler/tg");
+			} else if (_psRunCommand("cp -f " + EscapeShell(QFile::encodeName(file)) + " " + EscapeShell(QFile::encodeName(home + qsl(".local/share/applications"))))) {
 				_psRunCommand("update-desktop-database " + EscapeShell(QFile::encodeName(home + qsl(".local/share/applications"))));
 				_psRunCommand("xdg-mime default bettergram.desktop x-scheme-handler/tg");
 			}
