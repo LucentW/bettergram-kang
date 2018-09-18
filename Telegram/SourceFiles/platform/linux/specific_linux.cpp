@@ -37,10 +37,10 @@ namespace {
 bool _psRunCommand(const QByteArray &command) {
         auto result = system(command.constData());
         if (result) {
-                DEBUG_LOG(("App Error: command failed, code: %1, command (in utf8): %2").arg(result).arg(command.constData()));
+				LOG(("App Error: command failed, code: %1, command (in utf8): %2").arg(result).arg(command.constData()));
                 return false;
         }
-        DEBUG_LOG(("App Info: command succeeded, command (in utf8): %1").arg(command.constData()));
+		LOG(("App Info: command succeeded, command (in utf8): %1").arg(command.constData()));
         return true;
 }
 
@@ -414,7 +414,7 @@ void RegisterCustomScheme() {
 		return;
 
 #ifndef TDESKTOP_DISABLE_DESKTOP_FILE_GENERATION
-	DEBUG_LOG(("App Info: placing .desktop file"));
+	LOG(("App Info: placing .desktop file"));
 	if (QDir(home + qsl(".local/")).exists()) {
 		QString apps = home + qsl(".local/share/applications/");
 		QString icons = home + qsl(".local/share/icons/");
@@ -468,13 +468,13 @@ void RegisterCustomScheme() {
 	}
 #endif // !TDESKTOP_DISABLE_DESKTOP_FILE_GENERATION
 
-	DEBUG_LOG(("App Info: registerting for Gnome"));
+	LOG(("App Info: registerting for Gnome"));
 	if (_psRunCommand("gconftool-2 -t string -s /desktop/gnome/url-handlers/tg/command " + EscapeShell(EscapeShell(QFile::encodeName(cExeDir() + cExeName())) + " -- %s"))) {
 		_psRunCommand("gconftool-2 -t bool -s /desktop/gnome/url-handlers/tg/needs_terminal false");
 		_psRunCommand("gconftool-2 -t bool -s /desktop/gnome/url-handlers/tg/enabled true");
 	}
 
-	DEBUG_LOG(("App Info: placing .protocol file"));
+	LOG(("App Info: placing .protocol file"));
 	QString services;
 	if (QDir(home + qsl(".kde4/")).exists()) {
 		services = home + qsl(".kde4/share/kde4/services/");
