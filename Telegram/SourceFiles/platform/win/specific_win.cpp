@@ -121,7 +121,7 @@ namespace {
 			WCHAR nameBuf[nameBufSize];
 			int32 len = GetWindowText(hWnd, nameBuf, nameBufSize);
 			if (len && len < nameBufSize) {
-				if (QRegularExpression(qsl("^Telegram(\\s*\\(\\d+\\))?$")).match(QString::fromStdWString(nameBuf)).hasMatch()) {
+				if (QRegularExpression(qsl("^Bettergram(\\s*\\(\\d+\\))?$")).match(QString::fromStdWString(nameBuf)).hasMatch()) {
 					BOOL res = ::SetForegroundWindow(hWnd);
 					::SetFocus(hWnd);
 					return FALSE;
@@ -693,11 +693,11 @@ void _manageAppLnk(bool create, bool silent, int path_csidl, const wchar_t *args
 }
 
 void psAutoStart(bool start, bool silent) {
-	_manageAppLnk(start, silent, CSIDL_STARTUP, L"-autostart", L"Telegram autorun link.\nYou can disable autorun in Telegram settings.");
+	_manageAppLnk(start, silent, CSIDL_STARTUP, L"-autostart", L"Bettergram autorun link.\nYou can disable autorun in Bettergram settings.");
 }
 
 void psSendToMenu(bool send, bool silent) {
-	_manageAppLnk(send, silent, CSIDL_SENDTO, L"-sendpath", L"Telegram send to link.\nYou can disable send to menu item in Telegram settings.");
+	_manageAppLnk(send, silent, CSIDL_SENDTO, L"-sendpath", L"Bettergram send to link.\nYou can disable send to menu item in Bettergram settings.");
 }
 
 void psUpdateOverlayed(TWidget *widget) {
