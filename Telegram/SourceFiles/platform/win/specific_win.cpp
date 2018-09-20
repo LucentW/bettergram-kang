@@ -617,7 +617,7 @@ void RegisterCustomScheme() {
 	if (!_psOpenRegKey(L"Software\\Bettergram", &rkey)) return;
 	if (!_psOpenRegKey(L"Software\\Bettergram\\Capabilities", &rkey)) return;
 	if (!_psSetKeyValue(rkey, L"ApplicationName", qsl("Bettergram"))) return;
-	if (!_psSetKeyValue(rkey, L"ApplicationDescription", qsl("Bettergram"))) return;
+	if (!_psSetKeyValue(rkey, L"ApplicationDescription", qsl("Bettergram - our free open source improved version of the Telegram desktop app"))) return;
 	if (!_psOpenRegKey(L"Software\\Bettergram\\Capabilities\\UrlAssociations", &rkey)) return;
 	if (!_psSetKeyValue(rkey, L"tg", qsl("tdesktop.tg"))) return;
 
