@@ -38,7 +38,7 @@ public:
 
 	bool isQuitPrevent();
 
-	~Instance();
+	virtual ~Instance();
 
 private:
 	not_null<Call::Delegate*> getCallDelegate() {
