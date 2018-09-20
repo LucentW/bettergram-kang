@@ -1,0 +1,18 @@
+1.3.12 (24.09.18)
+
+- Fixed several bugs.
+- Realized autoupdating.
+- Added Bettergram tabs: News, Videos and Resources.
+- Users can pin up to 200 pins. 
+
+1.3.11 (29.08.18)
+
+- Mac Store Release Build - 50 Pins, Favorites, Sortable Tabs, Announcement and Crypto Price Bar.
+
+1.3.9 (5.08.18)
+
+- Mac Release Build - 50 Pins, Favorites, Sortable Tabs, Announcement and Crypto Price Bar.
+
+1.3.9 (27.07.18)
+
+- PC Release Build - 50 Pins, Favorites, Sortable Tabs, Announcement and Crypto Price Bar.
