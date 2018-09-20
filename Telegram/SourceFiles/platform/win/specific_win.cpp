@@ -586,7 +586,7 @@ void RegisterCustomScheme() {
 		return;
 	}
 #ifndef TDESKTOP_DISABLE_REGISTER_CUSTOM_SCHEME
-	DEBUG_LOG(("App Info: Checking custom scheme 'tg'..."));
+	LOG(("App Info: Checking custom scheme 'tg'..."));
 
 	HKEY rkey;
 	QString exe = QDir::toNativeSeparators(cExeDir() + cExeName());
