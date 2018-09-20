@@ -91,3 +91,19 @@ There is `Packer` project in the Bettergram solution. In order to make update pa
    ```
 
    You should use actual Bettergram version number instead of `1003014`. The `Packer` should generate one file that will contain all files from `-path` arguments, something like this: `tlinuxupd1003014`
+
+## Build new release
+
+In order to build new release you should do the following steps:
+
+1. Change `Version` at the `Telegram/Resources/uwp/AppX/AppxManifest.xml` file
+2. Change `FILEVERSION`, `PRODUCTVERSION`, `FileVersion` and `ProductVersion` at the `Telegram/Resources/winrc/Telegram.rc` file
+3. Change `FILEVERSION`, `PRODUCTVERSION`, `FileVersion` and `ProductVersion` at the `Telegram/Resources/winrc/Updater.rc` file
+4. Change `BETA_VERSION_MACRO` to `0ULL`, `AppVersion`, `AppVersionStr` at `Telegram/SourceFiles/core/version.h` file
+5. Change `BetaVersion` to `0`, `AppVersion`, `AppVersionStrMajor`, `AppVersionStrSmall` and `AppVersionStr` at `Telegram/build/version` file
+6. Add description of the new version into `bettergram_changelog.txt` file
+7. Add new commit with the description from `bettergram_changelog.txt` file
+8. Add new tag with the version to git
+
+As an example you can see the [Version 1.3.13.](https://github.com/telegramdesktop/tdesktop/commit/d98bbca353fa12cc7b7fcecd193335db363aec35) commit.
+Or you can use `set_version.bat` and `set_version.sh` files.
