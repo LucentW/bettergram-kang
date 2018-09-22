@@ -31,6 +31,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_session.h"
 #include "history/history.h"
 
+#ifndef BETTERGRAM_UPDATES
+#define BETTERGRAM_UPDATES (1)
+#endif
+
 extern "C" {
 #include <openssl/evp.h>
 } // extern "C"
@@ -2642,7 +2646,12 @@ const QString &readAutoupdatePrefixRaw() {
 			return AutoupdatePrefix(value);
 		}
 	}
+
+#if BETTERGRAM_UPDATES
+	return AutoupdatePrefix("https://updates.bettergram.io");
+#else
 	return AutoupdatePrefix("https://updates.tdesktop.com");
+#endif
 }
 
 void writeAutoupdatePrefix(const QString &prefix) {
@@ -4295,6 +4304,7 @@ Window::Theme::Saved readThemeUsingKey(FileKey key) {
 		}
 	}
 	return result;
+
 }
 
 QString loadThemeUsingKey(FileKey key) {
@@ -4304,6 +4314,7 @@ QString loadThemeUsingKey(FileKey key) {
 		? result
 		: QString();
 }
+
 
 void writeTheme(const Window::Theme::Saved &saved) {
 	if (_themeKeyLegacy) {

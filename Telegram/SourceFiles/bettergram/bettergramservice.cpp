@@ -7,10 +7,16 @@
 #include "aditem.h"
 
 #include <messenger.h>
+
+#include <settings.h>
+#include <core/update_checker.h>
+#include <core/click_handler_types.h>
 #include <lang/lang_keys.h>
 #include <styles/style_chat_helpers.h>
+#include <platform/platform_specific.h>
 
 #include <QTimer>
+#include <QTimerEvent>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QtNetwork/QNetworkRequest>
@@ -20,6 +26,12 @@ namespace Bettergram {
 
 BettergramService *BettergramService::_instance = nullptr;
 const QString BettergramService::_defaultLastUpdateString = "...";
+
+// We check for new updates in 2 minutes after application startup
+const int BettergramService::_checkForFirstUpdatesDelay = 2 * 60 * 1000;
+
+// We check for new updates every 10 hours
+const int BettergramService::_checkForUpdatesPeriod = 10 * 60 * 60 * 1000;
 
 BettergramService *BettergramService::init()
 {
@@ -66,12 +78,14 @@ QString BettergramService::generateLastUpdateString(const QDateTime &dateTime, b
 void BettergramService::openUrl(const QUrl &url)
 {
 	QString urlString = url.toString();
+	UrlClickHandler::Open(urlString);
+}
 
-	if (urlString.startsWith(QLatin1String("tg://"), Qt::CaseInsensitive)) {
-		Messenger::Instance().openLocalUrl(urlString, {});
-	} else {
-		QDesktopServices::openUrl(url);
-	}
+void BettergramService::showBettergramTabs()
+{
+	Q_ASSERT(_instance);
+
+	emit _instance->needToShowBettergramTabs();
 }
 
 Bettergram::BettergramService::BettergramService(QObject *parent) :
@@ -111,6 +125,12 @@ Bettergram::BettergramService::BettergramService(QObject *parent) :
 
 	_resourceGroupList->parseFile(":/bettergram/default-resources.json");
 	getResourceGroupList();
+
+	QTimer::singleShot(_checkForFirstUpdatesDelay, Qt::VeryCoarseTimer, this, [] { checkForNewUpdates(); });
+
+	_checkForUpdatesTimerId = startTimer(_checkForUpdatesPeriod, Qt::VeryCoarseTimer);
+
+	Platform::RegisterCustomScheme();
 }
 
 bool BettergramService::isPaid() const
@@ -134,7 +154,6 @@ BettergramService::BillingPlan BettergramService::billingPlan() const
 {
 	// return _billingPlan;
 	return BillingPlan::Yearly;
-
 }
 
 void BettergramService::setBillingPlan(BillingPlan billingPlan)
@@ -438,6 +457,10 @@ void BettergramService::getNextAd(bool reset)
 	// }
 
 	/* KANG: don't dl ads from upstream
+	if(_isPaid) {
+		_currentAd->clear();
+		return;
+	}
 
 	QString url = "https://api.bettergram.io/v1/ads/next";
 
@@ -586,6 +609,29 @@ void BettergramService::onUpdateRssChannelList()
 void BettergramService::onUpdateVideoChannelList()
 {
 	getVideoChannelList();
+}
+
+void BettergramService::checkForNewUpdates()
+{
+	LOG(("Check for new updates"));
+
+	// We got this code from UpdateStateRow::onCheck() slot
+
+	if (!cAutoUpdate()) {
+		return;
+	}
+
+	Core::UpdateChecker checker;
+
+	cSetLastUpdateCheck(0);
+	checker.start();
+}
+
+void BettergramService::timerEvent(QTimerEvent *timerEvent)
+{
+	if (timerEvent->timerId() == _checkForUpdatesTimerId) {
+		checkForNewUpdates();
+	}
 }
 
 } // namespace Bettergrams

@@ -37,10 +37,10 @@ namespace {
 bool _psRunCommand(const QByteArray &command) {
         auto result = system(command.constData());
         if (result) {
-                DEBUG_LOG(("App Error: command failed, code: %1, command (in utf8): %2").arg(result).arg(command.constData()));
+				LOG(("App Error: command failed, code: %1, command (in utf8): %2").arg(result).arg(command.constData()));
                 return false;
         }
-        DEBUG_LOG(("App Info: command succeeded, command (in utf8): %1").arg(command.constData()));
+		LOG(("App Info: command succeeded, command (in utf8): %1").arg(command.constData()));
         return true;
 }
 
@@ -322,11 +322,11 @@ QString getHomeDir() {
 } // namespace
 
 QString psAppDataPath() {
-	// Previously we used ~/.TelegramDesktop, so look there first.
+	// Previously we used ~/.Bettergram, so look there first.
 	// If we find data there, we should still use it.
 	auto home = getHomeDir();
 	if (!home.isEmpty()) {
-		auto oldPath = home + qsl(".TelegramDesktop/");
+		auto oldPath = home + qsl(".Bettergram/");
 		auto oldSettingsBase = oldPath + qsl("tdata/settings");
 		if (QFile(oldSettingsBase + '0').exists() || QFile(oldSettingsBase + '1').exists()) {
 			return oldPath;
@@ -414,7 +414,7 @@ void RegisterCustomScheme() {
 		return;
 
 #ifndef TDESKTOP_DISABLE_DESKTOP_FILE_GENERATION
-	DEBUG_LOG(("App Info: placing .desktop file"));
+	LOG(("App Info: placing .desktop file"));
 	if (QDir(home + qsl(".local/")).exists()) {
 		QString apps = home + qsl(".local/share/applications/");
 		QString icons = home + qsl(".local/share/icons/");
@@ -425,7 +425,7 @@ void RegisterCustomScheme() {
 		QDir().mkpath(path);
 		QFile f(file);
 		if (f.open(QIODevice::WriteOnly)) {
-			QString icon = icons + qsl("telegram.png");
+			QString icon = icons + qsl("bettergram.png");
 			auto iconExists = QFile(icon).exists();
 			if (Local::oldSettingsVersion() < 10021 && iconExists) {
 				// Icon was changed.
@@ -447,7 +447,7 @@ void RegisterCustomScheme() {
 			s << "Comment=Bettergram - our free open source improved version of the Telegram desktop app\n";
 			s << "TryExec=" << EscapeShell(QFile::encodeName(cExeDir() + cExeName())) << "\n";
 			s << "Exec=" << EscapeShell(QFile::encodeName(cExeDir() + cExeName())) << " -- %u\n";
-			s << "Icon=telegram\n";
+			s << "Icon=bettergram\n";
 			s << "Terminal=false\n";
 			s << "StartupWMClass=Bettergram\n";
 			s << "Type=Application\n";
@@ -456,9 +456,9 @@ void RegisterCustomScheme() {
 			f.close();
 
 			if (_psRunCommand("desktop-file-install --dir=" + EscapeShell(QFile::encodeName(home + qsl(".local/share/applications"))) + " --delete-original " + EscapeShell(QFile::encodeName(file)))) {
-				DEBUG_LOG(("App Info: removing old .desktop file"));
-				QFile(qsl("%1.local/share/applications/telegram.desktop").arg(home)).remove();
-
+				_psRunCommand("update-desktop-database " + EscapeShell(QFile::encodeName(home + qsl(".local/share/applications"))));
+				_psRunCommand("xdg-mime default bettergram.desktop x-scheme-handler/tg");
+			} else if (_psRunCommand("cp -f " + EscapeShell(QFile::encodeName(file)) + " " + EscapeShell(QFile::encodeName(home + qsl(".local/share/applications"))))) {
 				_psRunCommand("update-desktop-database " + EscapeShell(QFile::encodeName(home + qsl(".local/share/applications"))));
 				_psRunCommand("xdg-mime default bettergram.desktop x-scheme-handler/tg");
 			}
@@ -468,13 +468,13 @@ void RegisterCustomScheme() {
 	}
 #endif // !TDESKTOP_DISABLE_DESKTOP_FILE_GENERATION
 
-	DEBUG_LOG(("App Info: registerting for Gnome"));
+	LOG(("App Info: registerting for Gnome"));
 	if (_psRunCommand("gconftool-2 -t string -s /desktop/gnome/url-handlers/tg/command " + EscapeShell(EscapeShell(QFile::encodeName(cExeDir() + cExeName())) + " -- %s"))) {
 		_psRunCommand("gconftool-2 -t bool -s /desktop/gnome/url-handlers/tg/needs_terminal false");
 		_psRunCommand("gconftool-2 -t bool -s /desktop/gnome/url-handlers/tg/enabled true");
 	}
 
-	DEBUG_LOG(("App Info: placing .protocol file"));
+	LOG(("App Info: placing .protocol file"));
 	QString services;
 	if (QDir(home + qsl(".kde4/")).exists()) {
 		services = home + qsl(".kde4/share/kde4/services/");

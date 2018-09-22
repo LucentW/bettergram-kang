@@ -31,6 +31,16 @@ extern "C" {
 #include <lzma.h>
 #endif // else of Q_OS_WIN
 
+#ifndef BETTERGRAM_UPDATES
+#define BETTERGRAM_UPDATES (1)
+#endif
+
+#if BETTERGRAM_UPDATES
+#define MTP_UPDATES (0)
+#else
+#define MTP_UPDATES (1)
+#endif
+
 namespace Core {
 namespace {
 
@@ -209,6 +219,7 @@ private:
 
 };
 
+#if MTP_UPDATES
 class MtpWeak : private QObject, private base::Subscriber {
 public:
 	MtpWeak(QPointer<MTP::Instance> instance);
@@ -303,6 +314,7 @@ private:
 	MtpWeak _mtp;
 
 };
+#endif // #if MTP_UPDATES
 
 std::shared_ptr<Updater> GetUpdaterInstance() {
 	if (const auto result = UpdaterInstance.lock()) {
@@ -1159,6 +1171,7 @@ void HttpLoaderActor::partFailed(QNetworkReply::NetworkError e) {
 	_parent->threadSafeFailed();
 }
 
+#if MTP_UPDATES
 MtpWeak::MtpWeak(QPointer<MTP::Instance> instance)
 : _instance(instance) {
 	if (!valid()) {
@@ -1560,6 +1573,7 @@ Fn<void(const RPCError &)> MtpLoader::failHandler() {
 		threadSafeFailed();
 	};
 }
+#endif // #if MTP_UPDATES
 
 } // namespace
 
@@ -1591,7 +1605,9 @@ public:
 	int already() const;
 	int size() const;
 
+#if MTP_UPDATES
 	void setMtproto(const QPointer<MTP::Instance> &mtproto);
+#endif
 
 	~Updater();
 
@@ -1633,10 +1649,14 @@ private:
 	rpl::event_stream<> _failed;
 	rpl::event_stream<> _ready;
 	Implementation _httpImplementation;
+#if MTP_UPDATES
 	Implementation _mtpImplementation;
+#endif
 	std::shared_ptr<Loader> _activeLoader;
+#if MTP_UPDATES
 	bool _usingMtprotoLoader = (cBetaVersion() != 0);
 	QPointer<MTP::Instance> _mtproto;
+#endif
 
 	rpl::lifetime _lifetime;
 
@@ -1742,7 +1762,11 @@ int Updater::already() const {
 
 void Updater::stop() {
 	_httpImplementation = Implementation();
+
+#if MTP_UPDATES
 	_mtpImplementation = Implementation();
+#endif
+
 	_activeLoader = nullptr;
 	_action = Action::Waiting;
 }
@@ -1780,9 +1804,12 @@ void Updater::start(bool forceWait) {
 		startImplementation(
 			&_httpImplementation,
 			std::make_unique<HttpChecker>(_testing));
+
+#if MTP_UPDATES
 		startImplementation(
 			&_mtpImplementation,
 			std::make_unique<MtpChecker>(_mtproto, _testing));
+#endif
 
 		_checking.fire({});
 	} else {
@@ -1845,10 +1872,12 @@ void Updater::test() {
 	start(false);
 }
 
+#if MTP_UPDATES
 void Updater::setMtproto(const QPointer<MTP::Instance> &mtproto) {
 	_mtproto = mtproto;
 
 }
+#endif
 
 void Updater::handleTimeout() {
 	if (_action == Action::Checking) {
@@ -1858,7 +1887,11 @@ void Updater::handleTimeout() {
 			}
 		};
 		reset(_httpImplementation);
+
+#if MTP_UPDATES
 		reset(_mtpImplementation);
+#endif
+
 		if (!tryLoaders()) {
 			cSetLastUpdateCheck(0);
 			_timer.callOnce(kUpdaterTimeout);
@@ -1869,7 +1902,11 @@ void Updater::handleTimeout() {
 }
 
 bool Updater::tryLoaders() {
+#if MTP_UPDATES
 	if (_httpImplementation.checker || _mtpImplementation.checker) {
+#else
+	if (_httpImplementation.checker) {
+#endif
 		// Some checkers didn't finish yet.
 		return true;
 	}
@@ -1897,6 +1934,7 @@ bool Updater::tryLoaders() {
 			_isLatest.fire({});
 		}
 	};
+#if MTP_UPDATES
 	if (_mtpImplementation.failed && _httpImplementation.failed) {
 		_failed.fire({});
 		return false;
@@ -1910,6 +1948,14 @@ bool Updater::tryLoaders() {
 			: _httpImplementation);
 		_usingMtprotoLoader = !_usingMtprotoLoader;
 	}
+#else
+	if (_httpImplementation.failed) {
+		_failed.fire({});
+		return false;
+	} else {
+		tryOne(_httpImplementation);
+	}
+#endif
 	return true;
 }
 
@@ -1943,11 +1989,13 @@ Updater::~Updater() {
 
 UpdateChecker::UpdateChecker()
 : _updater(GetUpdaterInstance()) {
+#if MTP_UPDATES
 	if (const auto messenger = Messenger::InstancePointer()) {
 		if (const auto mtproto = messenger->mtp()) {
 			_updater->setMtproto(mtproto);
 		}
 	}
+#endif
 }
 
 rpl::producer<> UpdateChecker::checking() const {
@@ -1980,7 +2028,11 @@ void UpdateChecker::test() {
 }
 
 void UpdateChecker::setMtproto(const QPointer<MTP::Instance> &mtproto) {
+#if MTP_UPDATES
 	_updater->setMtproto(mtproto);
+#else
+	Q_UNUSED(mtproto);
+#endif
 }
 
 void UpdateChecker::stop() {
@@ -2119,7 +2171,7 @@ void UpdateApplication() {
 #elif defined OS_MAC_STORE // OS_WIN_STORE
 			return "https://itunes.apple.com/us/app/bettergram-crypto-chat-app/id1419951099";
 #else // OS_WIN_STORE || OS_MAC_STORE
-			return "https://desktop.telegram.org";
+			return "https://bettergram.io";
 #endif // OS_WIN_STORE || OS_MAC_STORE
 		}();
 		UrlClickHandler::Open(url);
@@ -2144,7 +2196,7 @@ QString countBetaVersionSignature(uint64 version) { // duplicated in packer.cpp
 		return QString();
 	}
 
-	QByteArray signedData = (qstr("TelegramBeta_") + QString::number(version, 16).toLower()).toUtf8();
+	QByteArray signedData = (qstr("BettergramBeta_") + QString::number(version, 16).toLower()).toUtf8();
 
 	static const int32 shaSize = 20, keySize = 128;
 

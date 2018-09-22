@@ -132,13 +132,20 @@ Row *Entry::mainChatListLink(Mode list) const {
 	return it->second;
 }
 
+Row *Entry::rowInCurrentTab() const {
+	return _rowInCurrentTab;
+}
+
+void Entry::setRowInCurrentTab(Row *row) {
+	_rowInCurrentTab = row;
+}
+
 PositionChange Entry::adjustByPosInChatList(
 		Mode list,
 		not_null<IndexedList*> indexed) {
-	const auto lnk = mainChatListLink(list);
-	const auto movedFrom = lnk->pos();
+	const auto movedFrom = posInChatList(list);
 	indexed->adjustByPos(chatListLinks(list));
-	const auto movedTo = lnk->pos();
+	const auto movedTo = posInChatList(list);
 	return { movedFrom, movedTo };
 }
 
@@ -153,6 +160,9 @@ void Entry::setChatsListTimeId(TimeId date) {
 }
 
 int Entry::posInChatList(Dialogs::Mode list) const {
+	if (list == Mode::All) {
+		return _rowInCurrentTab ? _rowInCurrentTab->pos() : mainChatListLink(list)->pos();
+	}
 	return mainChatListLink(list)->pos();
 }
 
@@ -200,7 +210,7 @@ void Entry::updateChatListEntry() const {
 		if (inChatList(Mode::All)) {
 			main->repaintDialogRow(
 				Mode::All,
-				mainChatListLink(Mode::All));
+				_rowInCurrentTab ? _rowInCurrentTab : mainChatListLink(Mode::All));
 			if (inChatList(Mode::Important)) {
 				main->repaintDialogRow(
 					Mode::Important,

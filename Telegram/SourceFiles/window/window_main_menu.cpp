@@ -134,6 +134,11 @@ void MainMenu::refreshMenu() {
 	*_nightThemeAction = action;
 	action->setCheckable(true);
 	action->setChecked(Window::Theme::IsNightMode());
+
+	_menu->addAction(lang(lng_menu_open_bettergram_tabs), [] {
+		Bettergram::BettergramService::showBettergramTabs();
+	}, &st::mainMenuOpenBettergramTabs, &st::mainMenuOpenBettergramTabsOver);
+
 	_menu->finishAnimating();
 
 	updatePhone();
@@ -147,10 +152,10 @@ void MainMenu::updateBettergramProText()
 
 	if (settings->isPaid()) {
 		_upgradeToBettergramPro->setRichText(textcmdLink(1, lang(lng_menu_bettergram_pro)));
-		_upgradeToBettergramPro->setLink(1, std::make_shared<UrlClickHandler>(qsl("https://desktop.telegram.org")));
+		_upgradeToBettergramPro->setLink(1, std::make_shared<UrlClickHandler>(qsl("https://bettergram.io")));
 	} else {
 		_upgradeToBettergramPro->setRichText(textcmdLink(1, lang(lng_menu_upgrade_to_bettergram_pro)));
-		_upgradeToBettergramPro->setLink(1, std::make_shared<UrlClickHandler>(qsl("https://desktop.telegram.org")));
+		_upgradeToBettergramPro->setLink(1, std::make_shared<UrlClickHandler>(qsl("https://bettergram.io")));
 	}
 }
 

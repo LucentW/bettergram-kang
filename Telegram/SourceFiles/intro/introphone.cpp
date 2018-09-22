@@ -112,7 +112,7 @@ void PhoneWidget::hidePhoneError() {
 //		auto signupText = lng_phone_notreg(lt_link_start, textcmdStartLink(1), lt_link_end, textcmdStopLink(), lt_signup_start, textcmdStartLink(2), lt_signup_end, textcmdStopLink());
 //		auto inner = object_ptr<Ui::FlatLabel>(this, signupText, Ui::FlatLabel::InitType::Rich, st::introDescription);
 //		_signup.create(this, std::move(inner));
-//		_signup->entity()->setLink(1, std::make_shared<UrlClickHandler>(qsl("https://telegram.org"), false));
+//		_signup->entity()->setLink(1, std::make_shared<UrlClickHandler>(qsl("https://bettergram.io"), false));
 //		_signup->entity()->setLink(2, std::make_shared<LambdaClickHandler>([this] {
 //			toSignUp();
 //		}));

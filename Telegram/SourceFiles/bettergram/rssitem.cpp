@@ -193,6 +193,16 @@ void RssItem::markAsUnRead()
 	setIsRead(false);
 }
 
+bool RssItem::isExistAtLastFeeds() const
+{
+	return _isExistAtLastFeeds;
+}
+
+void RssItem::setIsExistAtLastFeeds(bool isExistAtLastFeeds)
+{
+	_isExistAtLastFeeds = isExistAtLastFeeds;
+}
+
 bool RssItem::equalsTo(const QSharedPointer<RssItem> &item)
 {
 	return _link == item->link();
@@ -218,6 +228,8 @@ void RssItem::update(const QSharedPointer<RssItem> &item)
 
 		_imageFromSite->setLink(item->_imageFromSite->link());
 	}
+
+	_isExistAtLastFeeds = true;
 
 	// We do not change _isRead field in this method
 }
@@ -389,10 +401,11 @@ void RssItem::save(QSettings &settings)
 	settings.setValue("author", author());
 	settings.setValue("categoryList", categoryList());
 
-	settings.setValue("link", link());
-	settings.setValue("commentsLink", commentsLink());
+	// We have to save QUrl as QString due bug on macOS
+	settings.setValue("link", link().toString());
+	settings.setValue("commentsLink", commentsLink().toString());
 	settings.setValue("publishDate", publishDate());
-	settings.setValue("imageLink", _image.link());
+	settings.setValue("imageLink", _image.link().toString());
 
 	settings.setValue("isRead", isRead());
 }

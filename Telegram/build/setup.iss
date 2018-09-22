@@ -1,8 +1,8 @@
-#define MyAppShortName "Telegram"
-#define MyAppName "Telegram Desktop"
-#define MyAppPublisher "Telegram Messenger LLP"
-#define MyAppURL "https://tdesktop.com"
-#define MyAppExeName "Telegram.exe"
+#define MyAppShortName "Bettergram"
+#define MyAppName "Bettergram"
+#define MyAppPublisher "Bettergram LLC"
+#define MyAppURL "https://bettergram.io"
+#define MyAppExeName "Bettergram.exe"
 #define MyAppId "53F49750-6209-4FBF-9CA8-7A333C87D1ED"
 
 [Setup]
@@ -22,7 +22,7 @@ AllowNoIcons=yes
 OutputDir={#ReleasePath}
 OutputBaseFilename=tsetup.{#MyAppVersionFull}
 SetupIconFile={#SourcePath}..\Resources\art\icon256.ico
-UninstallDisplayIcon={app}\Telegram.exe
+UninstallDisplayIcon={app}\Bettergram.exe
 Compression=lzma
 SolidCompression=yes
 DisableStartupPrompt=yes
@@ -48,7 +48,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; OnlyBelowVersion: 0,6.1
 
 [Files]
-Source: "{#ReleasePath}\Telegram.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#ReleasePath}\Bettergram.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleasePath}\Updater.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 

@@ -49,7 +49,7 @@ not_null<HistoryItem*> CreateUnsupportedMessage(
 		UserId viaBotId,
 		TimeId date,
 		UserId from) {
-	const auto siteLink = qsl("https://desktop.telegram.org");
+	const auto siteLink = qsl("https://bettergram.io");
 	auto text = TextWithEntities{
 		lng_message_unsupported(lt_link, siteLink)
 	};

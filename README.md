@@ -1,12 +1,8 @@
-# [Telegram Desktop][telegram_desktop] – Official Messenger
+# [Bettergram][bettergram] – Official Messenger
 
-This is the complete source code and the build instructions for the alpha version of the official desktop client for the [Telegram][telegram] messenger, based on the [Telegram API][telegram_api] and the [MTProto][telegram_proto] secure protocol.
+This is the complete source code and the build instructions for the official desktop client for the [Bettergram][bettergram] messenger, based on the [Telegram API][telegram_api] and the [MTProto][telegram_proto] secure protocol.
 
-[![Version](https://badge.fury.io/gh/telegramdesktop%2Ftdesktop.svg)](https://github.com/telegramdesktop/tdesktop/releases)
-[![Build Status](https://travis-ci.org/telegramdesktop/tdesktop.svg?branch=dev)](https://travis-ci.org/telegramdesktop/tdesktop)
-[![Build status](https://ci.appveyor.com/api/projects/status/uiw2y768iy4i5bu8/branch/dev?svg=true)](https://ci.appveyor.com/project/telegramdesktop/tdesktop)
-
-[![Preview of Telegram Desktop][preview_image]][preview_image_url]
+[![Preview of Bettergram][preview_image]][preview_image_url]
 
 The source code is published under GPLv3 with OpenSSL exception, the license is available [here][license].
 
@@ -14,7 +10,6 @@ The source code is published under GPLv3 with OpenSSL exception, the license is 
 
 * Windows XP - Windows 10 (**not** RT)
 * Mac OS X 10.8 - Mac OS X 10.11
-* Mac OS X 10.6 - Mac OS X 10.7 (separate build)
 * Ubuntu 12.04 - Ubuntu 18.04
 * Fedora 22 - Fedora 28
 
@@ -42,38 +37,20 @@ The source code is published under GPLv3 with OpenSSL exception, the license is 
 
 ## Build instructions
 
+* [Build instructions][building]
 * [Visual Studio 2017][msvc]
 * [Xcode 9][xcode]
 * [GYP/CMake on GNU/Linux][cmake]
 
-## Customize application
-
-Before publish a custom version of Telegram Desktop application you need to get new `api_id` and `api_hash` values.
-To do that you need to follow instructions at the page: [Obtaining api_id](https://core.telegram.org/api/obtaining_api_id).
-See also the thread: [GitHub: "internal server error" on login](https://github.com/telegramdesktop/tdesktop/issues/4717).
-
-So, after obtaining new values of `api_id` and `api_hash` you need to create a new directory next to your `tdesktop` folder with the name: `TelegramPrivate`.
-And place a new file `custom_api_id.h` there with the content:
-
-```
-static const int32 ApiId = [api_id];
-static const char *ApiHash = "[api_hash]";
-```
-
-And please check that we set `CUSTOM_API_ID` define at the `Telegram.gyp` file.
-
-Also please note that we do not need to place the `custom_api_id.h` to Git.
-It is because we should keep `api_id` and `api_hash` values private.
-
 [//]: # (LINKS)
-[telegram]: https://telegram.org
-[telegram_desktop]: https://desktop.telegram.org
+[bettergram]: https://bettergram.io
 [telegram_api]: https://core.telegram.org
 [telegram_proto]: https://core.telegram.org/mtproto
 [license]: LICENSE
+[building]: docs/building.md
 [msvc]: docs/building-msvc.md
 [xcode]: docs/building-xcode.md
 [xcode_old]: docs/building-xcode-old.md
 [cmake]: docs/building-cmake.md
-[preview_image]: https://github.com/telegramdesktop/tdesktop/blob/dev/docs/assets/preview.png "Preview of Telegram Desktop"
+[preview_image]: https://github.com/telegramdesktop/tdesktop/blob/dev/docs/assets/preview.png "Preview of Bettergram"
 [preview_image_url]: https://raw.githubusercontent.com/telegramdesktop/tdesktop/dev/docs/assets/preview.png

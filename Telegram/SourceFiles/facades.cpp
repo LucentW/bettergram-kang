@@ -372,9 +372,9 @@ uint64 SandboxUserTag = 0;
 namespace Sandbox {
 
 bool CheckBetaVersionDir() {
-	QFile beta(cExeDir() + qsl("TelegramBeta_data/tdata/beta"));
+	QFile beta(cExeDir() + qsl("BettergramBeta_data/tdata/beta"));
 	if (cBetaVersion()) {
-		cForceWorkingDir(cExeDir() + qsl("TelegramBeta_data/"));
+		cForceWorkingDir(cExeDir() + qsl("BettergramBeta_data/"));
 		QDir().mkpath(cWorkingDir() + qstr("tdata"));
 		if (*BetaPrivateKey) {
 			cSetBetaPrivateKey(QByteArray(BetaPrivateKey));
@@ -388,7 +388,7 @@ bool CheckBetaVersionDir() {
 			return false;
 		}
 	} else if (beta.exists()) {
-		cForceWorkingDir(cExeDir() + qsl("TelegramBeta_data/"));
+		cForceWorkingDir(cExeDir() + qsl("BettergramBeta_data/"));
 		if (beta.open(QIODevice::ReadOnly)) {
 			QDataStream dataStream(&beta);
 			dataStream.setVersion(QDataStream::Qt_5_3);
@@ -484,7 +484,7 @@ struct Data {
 
 	Adaptive::WindowLayout AdaptiveWindowLayout = Adaptive::WindowLayout::Normal;
 	Adaptive::ChatLayout AdaptiveChatLayout = Adaptive::ChatLayout::Normal;
-	bool AdaptiveForWide = true;
+	bool AdaptiveForWide = false;
 	base::Observable<void> AdaptiveChanged;
 
 	bool DialogsModeEnabled = false;

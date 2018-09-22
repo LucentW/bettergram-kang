@@ -121,7 +121,7 @@ namespace {
 			WCHAR nameBuf[nameBufSize];
 			int32 len = GetWindowText(hWnd, nameBuf, nameBufSize);
 			if (len && len < nameBufSize) {
-				if (QRegularExpression(qsl("^Telegram(\\s*\\(\\d+\\))?$")).match(QString::fromStdWString(nameBuf)).hasMatch()) {
+				if (QRegularExpression(qsl("^Bettergram(\\s*\\(\\d+\\))?$")).match(QString::fromStdWString(nameBuf)).hasMatch()) {
 					BOOL res = ::SetForegroundWindow(hWnd);
 					::SetFocus(hWnd);
 					return FALSE;
@@ -175,7 +175,7 @@ QString psAppDataPath() {
 	if (GetEnvironmentVariable(L"APPDATA", wstrPath, maxFileLen)) {
 		QDir appData(QString::fromStdWString(std::wstring(wstrPath)));
 #ifdef OS_WIN_STORE
-		return appData.absolutePath() + qsl("/Telegram Desktop UWP/");
+		return appData.absolutePath() + qsl("/Bettergram UWP/");
 #else // OS_WIN_STORE
 		return appData.absolutePath() + '/' + str_const_toString(AppName) + '/';
 #endif // OS_WIN_STORE
@@ -285,10 +285,10 @@ void psDoFixPrevious() {
 		HRESULT userDesktopRes = SHGetFolderPath(0, CSIDL_DESKTOPDIRECTORY, 0, SHGFP_TYPE_CURRENT, userDesktopFolder);
 		HRESULT commonDesktopRes = SHGetFolderPath(0, CSIDL_COMMON_DESKTOPDIRECTORY, 0, SHGFP_TYPE_CURRENT, commonDesktopFolder);
 		if (SUCCEEDED(userDesktopRes)) {
-			userDesktopLnk = QString::fromWCharArray(userDesktopFolder) + "\\Telegram.lnk";
+		        userDesktopLnk = QString::fromWCharArray(userDesktopFolder) + "\\Bettergram.lnk";
 		}
 		if (SUCCEEDED(commonDesktopRes)) {
-			commonDesktopLnk = QString::fromWCharArray(commonDesktopFolder) + "\\Telegram.lnk";
+		        commonDesktopLnk = QString::fromWCharArray(commonDesktopFolder) + "\\Bettergram.lnk";
 		}
 		QFile userDesktopFile(userDesktopLnk), commonDesktopFile(commonDesktopLnk);
 		if (QFile::exists(userDesktopLnk) && QFile::exists(commonDesktopLnk) && userDesktopLnk != commonDesktopLnk) {
@@ -586,7 +586,7 @@ void RegisterCustomScheme() {
 		return;
 	}
 #ifndef TDESKTOP_DISABLE_REGISTER_CUSTOM_SCHEME
-	DEBUG_LOG(("App Info: Checking custom scheme 'tg'..."));
+	LOG(("App Info: Checking custom scheme 'tg'..."));
 
 	HKEY rkey;
 	QString exe = QDir::toNativeSeparators(cExeDir() + cExeName());
@@ -614,15 +614,15 @@ void RegisterCustomScheme() {
 	if (!_psOpenRegKey(L"Software\\Classes\\tdesktop.tg\\shell\\open\\command", &rkey)) return;
 	if (!_psSetKeyValue(rkey, 0, '"' + exe + qsl("\" -workdir \"") + cWorkingDir() + qsl("\" -- \"%1\""))) return;
 
-	if (!_psOpenRegKey(L"Software\\TelegramDesktop", &rkey)) return;
-	if (!_psOpenRegKey(L"Software\\TelegramDesktop\\Capabilities", &rkey)) return;
-	if (!_psSetKeyValue(rkey, L"ApplicationName", qsl("Telegram Desktop"))) return;
-	if (!_psSetKeyValue(rkey, L"ApplicationDescription", qsl("Telegram Desktop"))) return;
-	if (!_psOpenRegKey(L"Software\\TelegramDesktop\\Capabilities\\UrlAssociations", &rkey)) return;
+	if (!_psOpenRegKey(L"Software\\Bettergram", &rkey)) return;
+	if (!_psOpenRegKey(L"Software\\Bettergram\\Capabilities", &rkey)) return;
+	if (!_psSetKeyValue(rkey, L"ApplicationName", qsl("Bettergram"))) return;
+	if (!_psSetKeyValue(rkey, L"ApplicationDescription", qsl("Bettergram - our free open source improved version of the Telegram desktop app"))) return;
+	if (!_psOpenRegKey(L"Software\\Bettergram\\Capabilities\\UrlAssociations", &rkey)) return;
 	if (!_psSetKeyValue(rkey, L"tg", qsl("tdesktop.tg"))) return;
 
 	if (!_psOpenRegKey(L"Software\\RegisteredApplications", &rkey)) return;
-	if (!_psSetKeyValue(rkey, L"Telegram Desktop", qsl("SOFTWARE\\TelegramDesktop\\Capabilities"))) return;
+	if (!_psSetKeyValue(rkey, L"Bettergram", qsl("SOFTWARE\\Bettergram\\Capabilities"))) return;
 #endif // !TDESKTOP_DISABLE_REGISTER_CUSTOM_SCHEME
 }
 
@@ -693,11 +693,11 @@ void _manageAppLnk(bool create, bool silent, int path_csidl, const wchar_t *args
 }
 
 void psAutoStart(bool start, bool silent) {
-	_manageAppLnk(start, silent, CSIDL_STARTUP, L"-autostart", L"Telegram autorun link.\nYou can disable autorun in Telegram settings.");
+	_manageAppLnk(start, silent, CSIDL_STARTUP, L"-autostart", L"Bettergram autorun link.\nYou can disable autorun in Bettergram settings.");
 }
 
 void psSendToMenu(bool send, bool silent) {
-	_manageAppLnk(send, silent, CSIDL_SENDTO, L"-sendpath", L"Telegram send to link.\nYou can disable send to menu item in Telegram settings.");
+	_manageAppLnk(send, silent, CSIDL_SENDTO, L"-sendpath", L"Bettergram send to link.\nYou can disable send to menu item in Bettergram settings.");
 }
 
 void psUpdateOverlayed(TWidget *widget) {
@@ -1117,10 +1117,10 @@ QString psPrepareCrashDump(const QByteArray &crashdump, QString dumpfile) {
 			} else if (QDir(base + qstr(".alpha")).exists()) {
 				base += qstr(".alpha");
 			}
-			if (QFile(base + qstr("/Telegram/Telegram.exe")).exists()) {
-				base += qstr("/Telegram");
+			if (QFile(base + qstr("/Bettergram/Bettergram.exe")).exists()) {
+			        base += qstr("/Bettergram");
 			}
-			tolaunch = base + qstr("Telegram.exe");
+			tolaunch = base + qstr("Bettergram.exe");
 		}
 	}
 	if (!tolaunch.isEmpty()) {

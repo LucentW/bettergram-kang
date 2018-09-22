@@ -245,7 +245,15 @@ void IndexedList::performFilter()
 
 	if(_filterTypes == EntryType::All)
 	{
-		_pFiltered.release();
+		if (_pFiltered) {
+			for (auto it = _list.cbegin(); it != _list.cend(); ++it)
+			{
+				(*it)->key().entry()->setRowInCurrentTab(nullptr);
+			}
+
+			_pFiltered.release();
+		}
+
 		emit performFilterFinished();
 		return;
 	}
@@ -254,8 +262,10 @@ void IndexedList::performFilter()
 
 	for(auto it = _list.cbegin(); it != _list.cend(); ++it)
 	{
-		if(((*it)->entry()->getEntryType() & _filterTypes) != EntryType::None)
-			_pFiltered->addToEnd((*it)->key());
+		if (((*it)->entry()->getEntryType() & _filterTypes) != EntryType::None) {
+			Row *row = _pFiltered->addToEnd((*it)->key());
+			(*it)->key().entry()->setRowInCurrentTab(row);
+		}
 	}
 
 	emit performFilterFinished();

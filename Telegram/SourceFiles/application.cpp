@@ -133,7 +133,6 @@ Application::Application(
         LOG(("Connecting local socket to %1...").arg(_localServerName));
 		_localSocket.connectToServer(_localServerName);
 	}
-
 }
 
 Application::~Application() = default;
